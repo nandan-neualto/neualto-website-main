@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeltaMax™ — GCP &amp; Azure | NeuAlto Technologies</title>
+<meta name="description" content="DeltaMax™ deep dive — the intelligent data quality monitoring platform on Google Cloud and Microsoft Azure: architecture, insights, competitive intelligence, step-by-step guides, results, FAQs, and marketplace listings.">
+<link rel="canonical" href="https://neualto.com/deltamax.html">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0708" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NeuAlto Technologies">
+<meta property="og:title" content="DeltaMax™ on GCP &amp; Azure | NeuAlto Technologies">
+<meta property="og:description" content="Never Fly Blind Again — anomaly detection and intelligent reconciliation at scale, deployed in your own cloud project.">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://neualto.com/pics/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NeuAlto Technologies — engineering the future of enterprise technology">
+<meta name="twitter:image" content="https://neualto.com/pics/og-card.png">
+<link rel="icon" type="image/png" href="pics/logo.png">
+<script>
+(function () {
+  var t;
+  try { t = localStorage.getItem('theme'); } catch (e) {}
+  if (!t) t = 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-sub">
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div id="progress"></div>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html" aria-label="NeuAlto Technologies home">
+      <img class="logo-mark-img" src="pics/logo.png" alt="" width="229" height="202">
+      <span>Neu<span class="alto">Alto</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="services.html">Services</a>
+      <a href="solutions.html" class="active">Solutions</a>
+      <a href="blog.html">Blog</a>
+      <a href="index.html#partners">Partners</a>
+      <a href="index.html#founders">Founders</a>
+      <a href="index.html#faq">FAQ</a>
+      <a href="careers.html">Careers</a>
+    </nav>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn btn-primary nav-cta" href="index.html#contact">Contact Us</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-controls="mobileNav" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
+    <a href="services.html">Services</a>
+    <a href="solutions.html">Solutions</a>
+      <a href="blog.html">Blog</a>
+    <a href="index.html#partners">Partners</a>
+    <a href="index.html#founders">Founders</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="careers.html">Careers</a>
+    <a class="btn btn-primary" href="index.html#contact">Contact Us</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="aurora"><span class="a1"></span><span class="a2"></span></div>
+  <div class="hero-grid-bg"></div>
+  <div class="wrap">
+    <div class="eyebrow reveal"><span class="dot"></span> Product Deep Dive</div>
+    <h1 class="reveal">DeltaMax™ on <span class="accent">GCP &amp; Azure</span></h1>
+    <p class="lede reveal">Never Fly Blind Again — anomaly detection and intelligent reconciliation at scale, deployed inside your own cloud project. Everything from the product sub-sites: insights, architecture, competitive intel, walkthroughs, results, and FAQs.</p>
+    <div class="jump-chips reveal">
+      <a href="solutions.html#deltamax">General Overview</a>
+      <a href="#gcp">GCP Version</a>
+      <a href="#azure">Azure Version</a>
+      <a href="#faqs">FAQs</a>
+      <a href="#buy">Buy DeltaMax</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ GCP ═══════════ -->
+<section class="prod-section" id="gcp">
+  <div class="wrap">
+    <span class="cloud-badge">☁️ Google Cloud Version</span>
+    <h2>The Challenge: Is Your Data Pipeline a Black Box?</h2>
+    <p>Your business runs on data, but that data flows in an endless, complex stream. It arrives in fits and spurts from hundreds of sources.</p>
+    <ul class="check-list">
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> A critical data feed is 30% smaller than usual</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> Millions of mismatched records during migration</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> Teams spend more time firefighting data issues</li>
+    </ul>
+    <p>Traditional tools are reactive. You need proactive intelligence. <b>DeltaMax provides anomaly detection and intelligent reconciliation at scale.</b></p>
+    <div class="sol-duo">
+      <div class="sol-card">
+        <h3>1 · Anomaly Detection</h3>
+        <ul class="check-list">
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Detect unknown issues</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Reduce alert fatigue</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Understand data behavior</li>
+        </ul>
+      </div>
+      <div class="sol-card">
+        <h3>2 · Intelligent Reconciliation</h3>
+        <ul class="check-list">
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Automated reason codes</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Faster investigation</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Confident migrations</li>
+        </ul>
+      </div>
+    </div>
+    <p><b>Who is it for?</b> Data Governance Leaders · Data Engineers · Business Analysts</p>
+  </div>
+</section>
+
+<section class="prod-section alt" id="gcp-insights">
+  <div class="wrap">
+    <span class="prod-kicker">Insights</span>
+    <h2>How DeltaMax Illuminates Your Data Quality</h2>
+    <p>In today's data-driven world, the accuracy and reliability of your data are paramount. But what happens when this vital flow of information becomes a complex, unpredictable stream? Many organizations have robust checks for known problems, but the "unknown unknowns" — subtle data quality issues that slip through the cracks — can cause significant disruptions. Imagine a critical data feed that's suddenly 30% smaller than usual, yet passes all your schema checks. Or the monumental task of manually investigating millions of mismatched records after a platform migration.</p>
+    <p><b>The reactive approach isn't enough.</b> Traditional data quality tools tell you when a predefined rule has been broken — but they can't proactively flag the problems you haven't thought to look for. In an era of massive data scale, you need to anticipate, not just respond.</p>
+    <p><b>Enter DeltaMax: your data's intelligent co-pilot.</b> Developed by Katalyst Street, DeltaMax is an AI-powered monitoring platform built on two core pillars of data trust:</p>
+    <div class="sol-duo">
+      <div class="sol-card">
+        <h3>Anomaly &amp; Volatility Detection</h3>
+        <p>DeltaMax learns the unique rhythm of each data source — its typical volume, value distributions, and arrival patterns — and automatically flags meaningful deviations.</p>
+        <ul class="check-list">
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Surface unknown unknowns with adaptive ML models</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Reduce alert fatigue by separating routine fluctuation from true anomaly</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Establish your data's rhythm across every source, every day</li>
+        </ul>
+      </div>
+      <div class="sol-card">
+        <h3>Intelligent Dataset Reconciliation</h3>
+        <p>Simply comparing datasets for match/no-match is insufficient at the scale of millions or billions of records. DeltaMax adds the context.</p>
+        <ul class="check-list">
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Automated reason codes — 'Scale Mismatch: 1000x', 'Known Transformation', 'Format Difference', 'Truncation Error'</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Drastically reduced investigation time for root cause analysis</li>
+          <li><svg width="15" height="15"><use href="#i-check"/></svg> Certify migrations from System A to System B with confidence</li>
+        </ul>
+      </div>
+    </div>
+    <div class="shot-grid">
+      <a href="pics/solutions/gcp/insights/In1.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In1.png" alt="DeltaMax insight visual 1" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In2.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In2.png" alt="DeltaMax insight visual 2" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In3.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In3.png" alt="DeltaMax insight visual 3" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In4.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In4.png" alt="DeltaMax insight visual 4" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In5.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In5.png" alt="DeltaMax insight visual 5" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In6.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In6.png" alt="DeltaMax insight visual 6" loading="lazy"></a>
+      <a href="pics/solutions/gcp/insights/In7.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/insights/In7.png" alt="DeltaMax insight visual 7" loading="lazy"></a>
+    </div>
+  </div>
+</section>
+
+<section class="prod-section" id="gcp-why">
+  <div class="wrap">
+    <span class="prod-kicker">Why DeltaMax</span>
+    <h2>Data quality is the foundation of migration success</h2>
+    <figure class="figure-card"><img src="pics/solutions/common/why-deltamax1.png" alt="Importance of Data Quality for Migrations" loading="lazy"><figcaption>Importance of Data Quality for Migrations</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/common/why-deltamax2.png" alt="Our Solution" loading="lazy"><figcaption>Our Solution</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/common/why-deltamax3.png" alt="Good Data Quality means better KPI intelligence" loading="lazy"><figcaption>Good Data Quality = Better KPI's Intelligence</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/common/why-deltamax4.png" alt="DeltaMax on the GCP Marketplace" loading="lazy"><figcaption>DeltaMax — GCP Marketplace</figcaption></figure>
+  </div>
+</section>
+
+<section class="prod-section alt" id="gcp-architecture">
+  <div class="wrap">
+    <span class="prod-kicker">Architecture</span>
+    <h2>GCP Reference Architecture</h2>
+    <p>DeltaMax deploys as a virtual machine inside your own Google Cloud project — your data never leaves your security boundary. Outputs flow to Google Cloud Storage, load into BigQuery, and visualize in Looker Studio.</p>
+    <figure class="figure-card"><img src="pics/solutions/gcp/architecture.png" alt="DeltaMax architecture on Google Cloud" loading="lazy"><figcaption>DeltaMax on Google Cloud — VM → GCS → BigQuery → Looker Studio</figcaption></figure>
+  </div>
+</section>
+
+<section class="prod-section" id="gcp-recovery">
+  <div class="wrap">
+    <span class="prod-kicker">Recovery Events</span>
+    <h2>DeltaMax plays both offense and defense in the AI game</h2>
+    <p><b>Recovery Validation — when operational data quality tools aren't enough.</b> DeltaMax is architected for point-in-time validation: comparing a "source of truth" backup against recovered or migrated data with statistical rigor. Operational tools like Dataplex or Monte Carlo focus on ongoing pipeline observability — a different job.</p>
+    <div class="vs-table-wrap">
+      <table class="vs-table">
+        <thead><tr><th>Feature / Aspect</th><th>DeltaMax (Recovery Focus)</th><th>Typical Operational DQ Tools</th></tr></thead>
+        <tbody>
+          <tr><td>Primary Use Case</td><td>One-time / periodic validation between a "known good" state and the current state</td><td>Continuous real-time monitoring of production ETL/ELT pipelines</td></tr>
+          <tr><td>Deployment Model</td><td>Single VM in your Google Cloud project — isolated, standalone</td><td>SaaS agents, serverless functions, or native services (Dataplex)</td></tr>
+          <tr><td>Workflow</td><td>Generate data → run discrete checks (T-tests, PSI, anomaly detection) → GCS → BigQuery → visualize</td><td>Automated policies on schedule; alerts to Slack / PagerDuty</td></tr>
+          <tr><td>Key Techniques</td><td>T-tests &amp; PSI, anomaly detection (IQR &amp; Isolation Forest), schema &amp; type mismatch detection</td><td>Freshness/volume monitoring, schema drift, custom SQL rules</td></tr>
+          <tr><td>Target User</td><td>Data Engineers &amp; CDOs conducting audits or recovery integrity checks</td><td>Data platform owners guarding day-to-day pipeline health</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>The recovery validation workflow</h3>
+    <ol class="step-list">
+      <li><b>Source of truth</b> — a known good backup, e.g. last month's validated dataset.</li>
+      <li><b>Recovery result</b> — the recovered dataset (current month with potential anomalies).</li>
+      <li><b>DeltaMax validation engine</b> — T-tests &amp; PSI detect statistical shifts; IQR &amp; Isolation Forest identify outliers; schema &amp; type checks ensure structural integrity; executive summary reports deliver leadership-friendly audit artifacts.</li>
+    </ol>
+    <p><b>Bottom line:</b> DeltaMax offers a structured, auditable, statistically rigorous framework for recovery validation. For daily pipeline health, complement it with Dataplex, Monte Carlo, or other observability platforms.</p>
+  </div>
+</section>
+
+<section class="prod-section alt" id="gcp-competitive">
+  <div class="wrap">
+    <span class="prod-kicker">Competitive Intel · Independent 3rd-party (Claude LLM) analysis · March 2026</span>
+    <h2>Data Quality &amp; Anomaly Detection: DeltaMax vs. the Field</h2>
+    <p>An AI-assisted analysis of DeltaMax (Katalyst Street) against Databricks Unity Catalog, Fivetran + Monte Carlo, Snowflake ML Functions, and Informatica IDMC — 20+ feature dimensions across detection, reconciliation, deployment, governance, and pricing.</p>
+    <p><b>Overall verdict:</b> DeltaMax is the purpose-built specialist for GCP data-migration quality assurance — scoring <b>42/50, ten points ahead of the nearest competitor</b> for GCP migration quality. It is the only platform in the comparison that treats cross-dataset reconciliation, statistical drift detection, and migration certification as first-class, out-of-box capabilities.</p>
+    <h3>DeltaMax — unique strengths for GCP migrations</h3>
+    <ul class="check-list">
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Intelligent mismatch reason codes</b> — every discrepancy auto-classified (Scale Mismatch 1000x, Truncation Error, Format Difference); investigation drops from weeks to hours</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Migration certification at petabyte scale</b> — compares source dataset A against migrated dataset B and produces a certifiable migration report on BigQuery's parallel engine</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>PSI + T-tests</b> — quantify post-migration distribution shifts column-by-column; PSI &gt; 0.2 triggers automatic investigation</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Data never leaves your GCP project</b> — VM-in-your-project deployment keeps validation inside your security boundary</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Synthetic data generator with anomaly injection</b> — test the entire validation pipeline before production data is ready</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>GCP Marketplace deployment</b> — billed through your existing GCP account; integrates natively with BigQuery, GCS, and Looker Studio</li>
+    </ul>
+    <h3>How competitors stack up</h3>
+    <div class="comp-grid">
+      <div class="comp-card"><h4>Monte Carlo</h4><p>Strong observability platform but no cross-dataset reconciliation or migration certification. Excels at ongoing monitoring post-migration, not pre-go-live validation.</p><span class="tagline">Post-migration monitoring · Not migration validation</span></div>
+      <div class="comp-card"><h4>Databricks</h4><p>No cross-dataset reconciliation whatsoever. If you're migrating into BigQuery, Databricks anomaly detection is the wrong tool — Unity Catalog is powerful but platform-locked.</p><span class="tagline">Wrong platform · No BigQuery native · No migration validation</span></div>
+      <div class="comp-card"><h4>Snowflake ML</h4><p>Time-series anomaly detection only — cannot compare two datasets from a migration event. Relevant only if your target warehouse is Snowflake, not BigQuery.</p><span class="tagline">Time-series only · Snowflake-locked · No migration use case</span></div>
+      <div class="comp-card"><h4>Informatica IDMC</h4><p>Full enterprise governance suite with migration workflow support — but at $50K–$200K+/year with months-long implementation. DeltaMax delivers ~80% of the validation capability at a fraction of the cost.</p><span class="tagline">Viable but expensive · 3–6 month setup · Heavy overhead</span></div>
+      <div class="comp-card"><h4>Fivetran + Monte Carlo</h4><p>Fivetran moves data; Monte Carlo monitors pipelines. Neither validates the integrity of migrated data or certifies that source equals target at the record level.</p><span class="tagline">Ingestion + monitoring · Not a migration validator</span></div>
+    </div>
+    <p><b>Bottom line for GCP migration projects:</b> DeltaMax is the only tool in the comparison providing a complete, out-of-box migration QA workflow — synthetic test data → pre-migration baseline → record-level reconciliation with reason codes → PSI/T-test distribution validation → Looker Studio certification dashboard. Read the full report on the <a href="https://www.neualto.com/solutions/deltamax/gcp/competitive-intel" target="_blank" rel="noopener" style="color:var(--red);font-weight:600">live intelligence report page ↗</a></p>
+  </div>
+</section>
+
+<section class="prod-section" id="gcp-started">
+  <div class="wrap">
+    <span class="prod-kicker">How to get started · DeltaMax V1.0</span>
+    <h2>From Marketplace to Looker Studio, step by step</h2>
+    <p>This guide walks through the complete DeltaMax workflow — generating synthetic credit-bureau data, running data quality checks (anomaly detection, T-test, PSI, mismatches), uploading outputs to Google Cloud Storage, and loading them into BigQuery for reporting and visualization in Looker Studio. It is organized into three main phases:</p>
+    <ol class="step-list">
+      <li><b>Deploy</b> — search for DeltaMax on Google Cloud Marketplace, create a project on your corporate billing account, deploy the DeltaMax virtual machine, and prepare Python on the VM.</li>
+      <li><b>Data generation</b> — run <code>DeltaMax_synthetic_data_generator.py</code> to produce previous-month and current-month datasets, with anomalies intentionally injected into the current month for training and validation.</li>
+      <li><b>Data quality checks (modules M1–M13)</b> — M1 data loading &amp; initial checks · M2 column type analysis · M3 anomaly detection (IQR + Isolation Forest) · M4 variance analysis · M5 inter-file T-tests · M6 PSI · M7 decimal formatting mismatches · M9 string length mismatches · M10 data type mismatch detection · M11 preprocessing &amp; imputation · M12 business uniqueness analysis · M13 A/B merged file creation.</li>
+      <li><b>Cloud integration</b> — create a GCS bucket (<code>gcloud storage buckets create</code>), upload the CSV outputs, create a BigQuery dataset (<code>bq mk</code>), load tables (<code>bq load</code>), and run the provided anomaly-analysis SQL.</li>
+      <li><b>Visualize</b> — connect the BigQuery tables to Looker Studio for dashboards, or engage Katalyst Street professional services for custom visualizations and reports.</li>
+    </ol>
+    <h3>V1.0 walkthrough, screen by screen</h3>
+    <div class="shot-grid">
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started1.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started1.png" alt="DeltaMax V1 walkthrough step 1" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started2.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started2.png" alt="DeltaMax V1 walkthrough step 2" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started3.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started3.png" alt="DeltaMax V1 walkthrough step 3" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started4.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started4.png" alt="DeltaMax V1 walkthrough step 4" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started5.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started5.png" alt="DeltaMax V1 walkthrough step 5" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started6.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started6.png" alt="DeltaMax V1 walkthrough step 6" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started7.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started7.png" alt="DeltaMax V1 walkthrough step 7" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started8.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started8.png" alt="DeltaMax V1 walkthrough step 8" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started9.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started9.png" alt="DeltaMax V1 walkthrough step 9" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started10.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started10.png" alt="DeltaMax V1 walkthrough step 10" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started11.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started11.png" alt="DeltaMax V1 walkthrough step 11" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started12.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started12.png" alt="DeltaMax V1 walkthrough step 12" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started13.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started13.png" alt="DeltaMax V1 walkthrough step 13" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started14.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started14.png" alt="DeltaMax V1 walkthrough step 14" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started15.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started15.png" alt="DeltaMax V1 walkthrough step 15" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started16.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started16.png" alt="DeltaMax V1 walkthrough step 16" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started17.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started17.png" alt="DeltaMax V1 walkthrough step 17" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started18.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started18.png" alt="DeltaMax V1 walkthrough step 18" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started19.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started19.png" alt="DeltaMax V1 walkthrough step 19" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started20.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started20.png" alt="DeltaMax V1 walkthrough step 20" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started21.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started21.png" alt="DeltaMax V1 walkthrough step 21" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started22.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started22.png" alt="DeltaMax V1 walkthrough step 22" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started23.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started23.png" alt="DeltaMax V1 walkthrough step 23" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started24.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started24.png" alt="DeltaMax V1 walkthrough step 24" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started25.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started25.png" alt="DeltaMax V1 walkthrough step 25" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started26.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started26.png" alt="DeltaMax V1 walkthrough step 26" loading="lazy"></a>
+      <a href="pics/solutions/gcp/how-to-get-started/how-to-get-started27.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/how-to-get-started/how-to-get-started27.png" alt="DeltaMax V1 walkthrough step 27" loading="lazy"></a>
+    </div>
+    <h3>V2.0 walkthrough</h3>
+    <p>DeltaMax V2.0 extends the workflow with the H–A–B (Historical / Previous / Current) multi-period framework and Trust Score computation.</p>
+    <div class="shot-grid">
+      <a href="pics/solutions/gcp/v2/v1.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v1.png" alt="DeltaMax V2 GCP walkthrough step 1" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v2.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v2.png" alt="DeltaMax V2 GCP walkthrough step 2" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v3.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v3.png" alt="DeltaMax V2 GCP walkthrough step 3" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v4.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v4.png" alt="DeltaMax V2 GCP walkthrough step 4" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v5.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v5.png" alt="DeltaMax V2 GCP walkthrough step 5" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v6.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v6.png" alt="DeltaMax V2 GCP walkthrough step 6" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v7.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v7.png" alt="DeltaMax V2 GCP walkthrough step 7" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v8.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v8.png" alt="DeltaMax V2 GCP walkthrough step 8" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v9.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v9.png" alt="DeltaMax V2 GCP walkthrough step 9" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v10.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v10.png" alt="DeltaMax V2 GCP walkthrough step 10" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v11.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v11.png" alt="DeltaMax V2 GCP walkthrough step 11" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v12.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v12.png" alt="DeltaMax V2 GCP walkthrough step 12" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v13.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v13.png" alt="DeltaMax V2 GCP walkthrough step 13" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v14.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v14.png" alt="DeltaMax V2 GCP walkthrough step 14" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v15.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v15.png" alt="DeltaMax V2 GCP walkthrough step 15" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v16.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v16.png" alt="DeltaMax V2 GCP walkthrough step 16" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v17.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v17.png" alt="DeltaMax V2 GCP walkthrough step 17" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v18.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v18.png" alt="DeltaMax V2 GCP walkthrough step 18" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v19.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v19.png" alt="DeltaMax V2 GCP walkthrough step 19" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v20.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v20.png" alt="DeltaMax V2 GCP walkthrough step 20" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v21.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v21.png" alt="DeltaMax V2 GCP walkthrough step 21" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v22.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v22.png" alt="DeltaMax V2 GCP walkthrough step 22" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v23.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v23.png" alt="DeltaMax V2 GCP walkthrough step 23" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v24.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v24.png" alt="DeltaMax V2 GCP walkthrough step 24" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v25.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v25.png" alt="DeltaMax V2 GCP walkthrough step 25" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v26.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v26.png" alt="DeltaMax V2 GCP walkthrough step 26" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v27.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v27.png" alt="DeltaMax V2 GCP walkthrough step 27" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v28.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v28.png" alt="DeltaMax V2 GCP walkthrough step 28" loading="lazy"></a>
+      <a href="pics/solutions/gcp/v2/v29.png" target="_blank" rel="noopener"><img src="pics/solutions/gcp/v2/v29.png" alt="DeltaMax V2 GCP walkthrough step 29" loading="lazy"></a>
+    </div>
+  </div>
+</section>
+
+<section class="prod-section alt" id="gcp-results">
+  <div class="wrap">
+    <span class="prod-kicker">Results</span>
+    <h2>What the output looks like</h2>
+    <p>DeltaMax produces executive-ready results — anomaly tables, drift charts, and certification summaries — loaded into BigQuery and visualized in Looker Studio.</p>
+    <figure class="figure-card"><img src="pics/solutions/gcp/results/chart.png" alt="DeltaMax results chart" loading="lazy"><figcaption>Anomaly &amp; drift analysis</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/gcp/results/chart_2.png" alt="DeltaMax results chart 2" loading="lazy"><figcaption>Distribution shift visualization</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/gcp/results/chart_3.png" alt="DeltaMax results chart 3" loading="lazy"><figcaption>Executive summary view</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/gcp/results/table_1.png" alt="DeltaMax results table 1" loading="lazy"><figcaption>Mismatch reason-code table</figcaption></figure>
+    <figure class="figure-card"><img src="pics/solutions/gcp/results/table_2.png" alt="DeltaMax results table 2" loading="lazy"><figcaption>Validation results table</figcaption></figure>
+  </div>
+</section>
+
+<!-- ═══════════ AZURE ═══════════ -->
+<section class="prod-section" id="azure">
+  <div class="wrap">
+    <span class="cloud-badge">⛅ Microsoft Azure Version</span>
+    <h2>DeltaMax V2.0 — Azure Integration</h2>
+    <p>DeltaMax V2.0 is an advanced data quality and anomaly detection framework developed by Katalyst Street. It enables organizations to perform multi-period data validation, statistical drift detection, and machine-learning-based anomaly identification — designed to work seamlessly with the Microsoft Azure ecosystem, replacing Google Cloud components with Azure-native services:</p>
+    <ul class="check-list">
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Azure Blob Storage</b> for scalable data storage</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Azure Synapse Analytics</b> for warehousing, querying, visualization and reporting</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Azure Agent</b> for agentic intelligence</li>
+      <li><svg width="15" height="15"><use href="#i-check"/></svg> <b>Power BI</b> for real-time dashboards connected to Synapse</li>
+    </ul>
+    <h3>Key capabilities of V2.0</h3>
+    <ol class="step-list">
+      <li><b>Multi-period data generation (H–A–B framework)</b> — generates Historical (H), Previous (A), and Current (B) datasets to enable drift and stability analysis. January–June act as Historical, July as Previous, August as Current with controlled variations injected.</li>
+      <li><b>Trust Score computation</b> — combines anomaly signals, drift metrics, and validation checks into a weighted, normalized 0–100 score: a single interpretable risk metric for the current month.</li>
+      <li><b>Data quality checks</b> — Isolation Forest &amp; IQR anomaly detection (M1) · variance drift analysis (M2) · Welch's T-test drift detection (M3) · missing-value anomaly detection (M4) · PSI analysis (M5) · decimal formatting mismatches (M6) · string length anomalies (M7) · unique business integrity (M8).</li>
+      <li><b>Azure integration</b> — outputs automatically upload to Blob Storage containers and load into Synapse tables, with automatic container/table creation.</li>
+      <li><b>Visualization &amp; agentic intelligence</b> — dashboards through Azure Analytic Studio and Power BI; Katalyst Street can tailor dashboards and reporting to your environment.</li>
+    </ol>
+    <h3>Azure reference architecture</h3>
+    <figure class="figure-card"><img src="pics/solutions/azure/architecture.png" alt="DeltaMax architecture on Microsoft Azure" loading="lazy"><figcaption>DeltaMax on Azure — VM → Blob Storage → Synapse Analytics → Power BI</figcaption></figure>
+    <h3>Azure V2 walkthrough</h3>
+    <div class="shot-grid">
+      <a href="pics/solutions/azure/v2/v1.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v1.png" alt="DeltaMax V2 Azure walkthrough step 1" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v2.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v2.png" alt="DeltaMax V2 Azure walkthrough step 2" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v3.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v3.png" alt="DeltaMax V2 Azure walkthrough step 3" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v4.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v4.png" alt="DeltaMax V2 Azure walkthrough step 4" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v5.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v5.png" alt="DeltaMax V2 Azure walkthrough step 5" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v6.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v6.png" alt="DeltaMax V2 Azure walkthrough step 6" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v7.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v7.png" alt="DeltaMax V2 Azure walkthrough step 7" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v8.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v8.png" alt="DeltaMax V2 Azure walkthrough step 8" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v9.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v9.png" alt="DeltaMax V2 Azure walkthrough step 9" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v10.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v10.png" alt="DeltaMax V2 Azure walkthrough step 10" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v11.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v11.png" alt="DeltaMax V2 Azure walkthrough step 11" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v12.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v12.png" alt="DeltaMax V2 Azure walkthrough step 12" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v13.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v13.png" alt="DeltaMax V2 Azure walkthrough step 13" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v14.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v14.png" alt="DeltaMax V2 Azure walkthrough step 14" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v15.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v15.png" alt="DeltaMax V2 Azure walkthrough step 15" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v16.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v16.png" alt="DeltaMax V2 Azure walkthrough step 16" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v17.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v17.png" alt="DeltaMax V2 Azure walkthrough step 17" loading="lazy"></a>
+      <a href="pics/solutions/azure/v2/v18.png" target="_blank" rel="noopener"><img src="pics/solutions/azure/v2/v18.png" alt="DeltaMax V2 Azure walkthrough step 18" loading="lazy"></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FAQs ═══════════ -->
+<section class="prod-section alt" id="faqs">
+  <div class="wrap">
+    <span class="prod-kicker">FAQs</span>
+    <h2>DeltaMax, answered</h2>
+    <div class="faq-details">
+      <details>
+        <summary>What exactly is DeltaMax, and what problem does it solve?</summary>
+        <div>DeltaMax is a comprehensive data quality and governance solution available on the Google Cloud Marketplace. It provides a pre-built framework to automate critical data validation checks — anomaly detection, population drift analysis (PSI), statistical comparisons (T-tests), and data type consistency — before loading data into BigQuery for reporting. It ensures the data behind tools like Looker Studio is reliable, consistent, and of high quality.</div>
+      </details>
+      <details>
+        <summary>How do I deploy and run DeltaMax in my cloud environment?</summary>
+        <div>DeltaMax is deployed as a virtual machine within your own cloud project. After subscribing via the marketplace, you configure the VM with your network settings (VPC, subnets, etc.). Once running, you interact via the command line, executing a series of provided Python modules that guide you through the entire data generation and quality-check workflow.</div>
+      </details>
+      <details>
+        <summary>What specific data quality checks does DeltaMax perform?</summary>
+        <div>The pipeline goes well beyond simple anomaly detection:
+          <ul>
+            <li><b>Anomaly detection</b> — statistical (IQR) and machine learning (Isolation Forest) methods</li>
+            <li><b>Statistical drift</b> — Population Stability Index (PSI) between datasets</li>
+            <li><b>Comparative analysis</b> — T-tests for statistically significant mean changes</li>
+            <li><b>Data integrity</b> — data type mismatches, decimal formatting, string length changes</li>
+            <li><b>Business logic</b> — new or churned entities appearing in only one period's dataset</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>I don't have my own data to start with. Can I still test DeltaMax?</summary>
+        <div>Yes. The "How to get started" guide includes a data generation step — <code>DeltaMax_synthetic_data_generator.py</code> creates synthetic datasets, including one with injected anomalies, so you can run the entire pipeline and understand its outputs without touching production data.</div>
+      </details>
+      <details>
+        <summary>How does DeltaMax integrate with the rest of the cloud ecosystem?</summary>
+        <div>On GCP: outputs upload to Google Cloud Storage, load into BigQuery tables, and connect to Looker Studio for dashboards that monitor data health over time. On Azure: outputs upload to Blob Storage, load into Synapse Analytics, and report through Power BI.</div>
+      </details>
+      <details>
+        <summary>What support and customization options are available?</summary>
+        <div>Technical documentation and support pages are part of the product. For custom visualizations, tailored reports, or adapting the pipeline to specific business rules, Katalyst Street offers professional services — reach out via <a href="mailto:info@neualto.com" style="color:var(--red);font-weight:600">info@neualto.com</a>.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ BUY ═══════════ -->
+<section class="prod-section" id="buy">
+  <div class="wrap">
+    <span class="prod-kicker">Get DeltaMax</span>
+    <h2>Deploy it in your cloud today</h2>
+    <div class="buy-band">
+      <div>
+        <h3>☁️ Google Cloud Marketplace</h3>
+        <p>Purchased and billed directly through your existing GCP billing account — no new vendor contracts.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="https://console.cloud.google.com/marketplace/product/katalyststreet-public/sq-33833" target="_blank" rel="noopener">Buy on GCP Marketplace <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+    <div class="buy-band">
+      <div>
+        <h3>⛅ Microsoft Azure</h3>
+        <p>DeltaMax V2.0 deploys with Azure-native services — Blob Storage, Synapse Analytics, and Power BI. Contact us for Azure deployment.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="mailto:info@neualto.com?subject=DeltaMax%20Azure%20Deployment">Contact for Azure <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+      </div>
+    </div>
+    <div class="buy-band">
+      <div>
+        <h3>📄 Technical documentation &amp; live product site</h3>
+        <p>Full technical documentation, EULA, support, and the product blog are maintained on the DeltaMax product site.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="https://deltamax.katalyststreet.com" target="_blank" rel="noopener">deltamax.katalyststreet.com</a>
+        <a class="btn btn-ghost" href="mailto:info@neualto.com?subject=DeltaMax%20Demo%20Request">Schedule a Demo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>© 2026 NeuAlto Technologies. All rights reserved.</span>
+    <div class="foot-links">
+      <a href="index.html">Home</a>
+      <a href="solutions.html">Solutions</a>
+      <a href="blog.html">Blog</a>
+      <a href="optimax.html">OptiMax</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="https://www.linkedin.com/company/neualto-technologies-pvt-ltd/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+</button>
+
+<script src="app.js"></script>
+
+</body>
+</html>
