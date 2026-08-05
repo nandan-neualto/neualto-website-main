@@ -6,6 +6,11 @@
 <title>NeuAlto Technologies — Enterprise AI, Cloud & Engineering Services</title>
 <meta name="description" content="NeuAlto Technologies is a software services and consulting firm in Bangalore and the USA — managed AI services, DevSecOps & Kubernetes, EDI data migration, engineering, QA automation, and vCISO cybersecurity.">
 <link rel="canonical" href="https://neualto.com/">
+<!-- D&B's seal script injects its iframe over plain http://. On an https site
+     that is mixed content and browsers block it, so the seal would silently
+     disappear in production. This upgrades such subresource requests to https,
+     which dunsregistered.dnb.com serves correctly. -->
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f0708" media="(prefers-color-scheme: dark)">
@@ -725,9 +730,22 @@
         <a class="social" href="https://www.linkedin.com/company/neualto-technologies-pvt-ltd/" aria-label="NeuAlto on LinkedIn" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V23h-4v-7.9c0-1.88-.03-4.3-2.62-4.3-2.62 0-3.02 2.05-3.02 4.16V23H8V8z"/></svg>
         </a>
-        <div class="compliance" aria-label="D-U-N-S Registered">
-          <iframe class="duns-seal" src="https://dunsregistered.dnb.com/SealAuthentication.aspx?Cid=1" title="D-U-N-S Registered Seal — live verification" loading="lazy" scrolling="no"></iframe>
-          <img src="pics/Certificate.png" alt="D-U-N-S Registered — NeuAlto Technologies Private Limited" width="515" height="105" loading="lazy">
+        <!--
+          D-U-N-S Registered Seal.
+
+          This is D&B's official install snippet (per their DRS installation
+          instructions): a plain synchronous script placed in the body. It must
+          stay synchronous — the seal is written out at this position, so defer
+          or async would detach it from its container.
+
+          It only renders on the registered production domain (neualto.com), so
+          on localhost / staging the container stays empty and the static
+          certificate below is shown instead. `duns-seal.js` hides that fallback
+          as soon as the real seal appears.
+        -->
+        <div class="compliance" id="dunsSeal" aria-label="D-U-N-S Registered">
+          <script src="https://dunsregistered.dnb.com"></script>
+          <img class="duns-fallback" src="pics/Certificate.png" alt="D-U-N-S Registered — NeuAlto Technologies Private Limited" width="515" height="105" loading="lazy">
         </div>
       </div>
       <div class="foot-col">
