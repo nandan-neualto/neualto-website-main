@@ -804,8 +804,11 @@
         if (isNaN(target)) return;
 
         var startedAt = null;
-        element.textContent = '0';
-
+        // Deliberately NOT blanking to "0" here. The first animation frame
+        // writes 0 anyway (progress is ~0), and leaving the real figure in the
+        // markup until then means a throttled or never-firing rAF — a
+        // background tab on load, say — degrades to the true number rather
+        // than to a row of zeros.
         var step = function (timestamp) {
           if (!startedAt) startedAt = timestamp;
           var progress = Math.min((timestamp - startedAt) / DURATION, 1);
@@ -893,14 +896,34 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var data = new FormData(form);
-        var subject = 'Website enquiry — ' + (data.get('name') || 'New contact');
-        var body = [
-          'Name: ' + (data.get('name') || ''),
-          'Email: ' + (data.get('email') || ''),
-          'Phone: ' + (data.get('phone') || '-'),
+        var value = function (key, fallback) {
+          var raw = data.get(key);
+          return (raw && String(raw).trim()) || fallback || '';
+        };
+
+        // Subject leads with the company and what they want to see, so the
+        // inbox is triageable without opening anything.
+        var who = value('company') || value('name', 'New enquiry');
+        var interest = value('interest');
+        // Middots, not dashes: the interest option text contains its own em
+        // dash ("DeltaMax™ — data quality monitoring"), and three dashes in one
+        // subject line reads as a run-on in an inbox list.
+        var subject = 'Demo request · ' + who + (interest ? ' · ' + interest : '');
+
+        var notes = value('message');
+        var lines = [
+          'Demo request from the NeuAlto website.',
           '',
-          data.get('message') || ''
-        ].join('\n');
+          'Name:          ' + value('name'),
+          'Company:       ' + value('company'),
+          'Email:         ' + value('email'),
+          'Phone:         ' + value('phone', '-'),
+          'Interested in: ' + (interest || '-')
+        ];
+        // Only append the notes block when there is something in it, so an
+        // empty optional field does not leave a dangling "Notes:" heading.
+        if (notes) lines.push('', 'Notes:', notes);
+        var body = lines.join('\n');
 
         window.location.href = 'mailto:' + RECIPIENT +
           '?subject=' + encodeURIComponent(subject) +
@@ -910,11 +933,16 @@
   };
 
   /**
-   * Blog feed — renders cards from `window.NEUALTO_POSTS` (declared inline in
-   * blog.html) and mounts the official LinkedIn embed for each.
+   * Blog feed — renders cards from `window.NEUALTO_POSTS` (posts-data.js) and
+   * mounts the official LinkedIn embed for each.
    *
-   * Post data lives in the HTML rather than a JSON file so the page keeps
+   * Post data is a plain script rather than a JSON file so the page keeps
    * working from `file://`, where `fetch` of a local path is blocked.
+   *
+   * Everything an editor could get wrong is absorbed here rather than pushed
+   * onto them: they paste a LinkedIn URL in whatever shape LinkedIn gave it,
+   * in any order, and the ordering, the filter buttons, and the embed URLs are
+   * all derived. See posts-data.js for the authoring contract.
    */
   var blogFeed = {
     name: 'blogFeed',
@@ -922,25 +950,73 @@
       var grid = document.getElementById('postGrid');
       if (!grid || !window.NEUALTO_POSTS) return;
 
-      var posts = window.NEUALTO_POSTS;
       var emptyMessage = document.getElementById('postEmpty');
+      var filterRow = document.getElementById('filterRow');
       var EMBED_BASE = 'https://www.linkedin.com/embed/feed/update/urn:li:activity:';
       var PERMALINK_BASE = 'https://www.linkedin.com/feed/update/urn:li:activity:';
 
-      /** Renders an ISO date as e.g. "Jul 23, 2026". */
+      /**
+       * Pulls the numeric activity id out of whatever LinkedIn handed over:
+       * a /posts/ share link ("…-activity-7486023292294754304-uhN5"), a
+       * /feed/update/ permalink ("urn:li:activity:7486023292294754304"), or an
+       * id someone pasted on its own. Returns null when there is no id to find,
+       * which is the signal to drop the post rather than render a dead embed.
+       */
+      var extractUrn = function (value) {
+        var raw = String(value == null ? '' : value).trim();
+        if (!raw) return null;
+        if (/^\d{6,}$/.test(raw)) return raw;
+        var match = raw.match(/activity[:\-](\d{6,})/i);
+        return match ? match[1] : null;
+      };
+
+      /** Renders an ISO date as e.g. "Jul 23, 2026"; passes anything else through. */
       var formatDate = function (iso) {
+        if (!iso) return '';
         var date = new Date(iso + 'T00:00:00');
         return isNaN(date) ? iso
           : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
       };
 
+      var sortTime = function (iso) {
+        var time = Date.parse(iso + 'T00:00:00');
+        return isNaN(time) ? 0 : time; // undated posts sink to the bottom
+      };
+
+      // `link` is the documented field; `urn` is still accepted so older
+      // entries keep working.
+      var posts = window.NEUALTO_POSTS
+        .map(function (post) {
+          var urn = extractUrn(post.link || post.urn);
+          if (!urn) {
+            if (window.console && console.warn) {
+              console.warn('[NeuAlto] blog post skipped — no LinkedIn id found in "' +
+                (post.link || post.urn) + '" (post: "' + (post.title || 'untitled') + '")');
+            }
+            return null;
+          }
+          return {
+            urn: urn,
+            title: post.title || '',
+            summary: post.summary || '',
+            date: post.date || '',
+            tags: post.tags || []
+          };
+        })
+        .filter(Boolean)
+        .sort(function (a, b) { return sortTime(b.date) - sortTime(a.date); });
+
+      if (!posts.length) {
+        if (emptyMessage) emptyMessage.hidden = false;
+        return;
+      }
+
       var renderCard = function (post) {
-        var tags = post.tags || [];
-        var pills = tags.map(function (tag) {
+        var pills = post.tags.map(function (tag) {
           return '<span class="pill">' + escapeHtml(tag) + '</span>';
         }).join('');
 
-        return '<article class="post-card" data-tags="' + escapeHtml(tags.join('|')) + '">' +
+        return '<article class="post-card" data-tags="' + escapeHtml(post.tags.join('|')) + '">' +
             '<div class="post-body">' +
               '<div class="post-meta">' +
                 '<time datetime="' + escapeHtml(post.date) + '">' +
@@ -956,7 +1032,7 @@
               '<div class="embed-skeleton"><span></span><span></span><span></span></div>' +
             '</div>' +
             '<a class="svc-link post-link" href="' +
-                escapeHtml(PERMALINK_BASE + encodeURIComponent(post.urn)) +
+                escapeHtml(PERMALINK_BASE + post.urn) +
                 '" target="_blank" rel="noopener">' +
               'Discuss on LinkedIn <svg width="15" height="15"><use href="#i-arrow"/></svg>' +
             '</a>' +
@@ -981,6 +1057,27 @@
         });
         holder.appendChild(iframe);
       });
+
+      // Filter buttons are built from the tags actually in use, so adding a
+      // post with a new tag needs no second edit — and a tag can never point at
+      // a button that does not exist (or vice versa).
+      if (filterRow) {
+        var seen = {};
+        var tags = [];
+        posts.forEach(function (post) {
+          post.tags.forEach(function (tag) {
+            if (!seen[tag]) { seen[tag] = true; tags.push(tag); }
+          });
+        });
+        tags.sort();
+
+        filterRow.innerHTML =
+          '<button class="filter-chip active" data-filter="all">All Posts</button>' +
+          tags.map(function (tag) {
+            return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '">' +
+              escapeHtml(tag) + '</button>';
+          }).join('');
+      }
 
       // Topic filtering. Tags are matched against a pipe-delimited list so that
       // a tag is never a substring match of another ("AI" vs "AI & ML").
@@ -1007,9 +1104,15 @@
   /**
    * D-U-N-S Registered Seal fallback.
    *
-   * D&B's seal script only renders on the registered production domain. When it
-   * does render, this hides the static certificate image so the two do not
-   * appear side by side; off production the image remains as the visible proof.
+   * D&B's seal script only renders on the domain registered with them. Off that
+   * domain it still injects its <iframe>, but the frame paints nothing — so
+   * treating "an iframe exists" as "the seal rendered" hid our certificate and
+   * left an empty white plate in the footer on localhost and any staging host.
+   *
+   * The frame's contents are cross-origin, so whether it actually drew anything
+   * cannot be inspected. The hostname can be, and it is what D&B keys off, so
+   * that is the signal used here: trust the injected seal on the registered
+   * domain, and everywhere else drop the blank frame and keep the certificate.
    */
   var dunsSeal = {
     name: 'dunsSeal',
@@ -1020,19 +1123,40 @@
       var fallback = $('.duns-fallback', container);
       if (!fallback) return;
 
-      var hideFallbackIfSealRendered = function () {
+      /** The domain registered with D&B — the only place the seal renders. */
+      var onRegisteredHost = /(^|\.)neualto\.com$/i.test(location.hostname);
+
+      var settle = function () {
         // Anything the D&B script injected that is not our own fallback image.
         var injected = $$('img, a, iframe, object, embed', container).filter(function (node) {
           return node !== fallback;
         });
-        if (injected.length) fallback.hidden = true;
+
+        // D&B writes an http:// iframe. On an https page every modern browser
+        // blocks that as mixed content and the seal silently never paints, so
+        // upgrade the scheme rather than inherit a blank box in production.
+        injected.forEach(function (node) {
+          var src = node.getAttribute && node.getAttribute('src');
+          if (src && src.slice(0, 7) === 'http://') {
+            node.setAttribute('src', 'https://' + src.slice(7));
+          }
+        });
+
+        if (injected.length && onRegisteredHost) {
+          fallback.hidden = true;
+        } else {
+          injected.forEach(function (node) {
+            if (node.parentNode) node.parentNode.removeChild(node);
+          });
+          fallback.hidden = false;
+        }
       };
 
       // The seal is written out synchronously, but give late-arriving markup a
       // moment before deciding the script did nothing.
-      hideFallbackIfSealRendered();
-      window.addEventListener('load', hideFallbackIfSealRendered);
-      setTimeout(hideFallbackIfSealRendered, 2000);
+      settle();
+      window.addEventListener('load', settle);
+      setTimeout(settle, 2000);
     }
   };
 

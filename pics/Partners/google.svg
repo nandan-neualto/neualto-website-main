@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 80" width="248" height="80" role="img" aria-label="Google">
+  <title>Google</title>
+  <!-- PLACEHOLDER WORDMARK — not an official Google asset.
+       Letter colours are Google's published brand hexes, but the letterforms
+       are system-font approximations of the Product Sans original. Replace
+       with the official SVG from Google's partner/brand kit before launch. -->
+  <text x="4" y="60"
+        font-family="'Product Sans','Google Sans','Segoe UI',Arial,Helvetica,sans-serif"
+        font-size="64" font-weight="500" letter-spacing="-1.5">
+    <tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan>
+  </text>
+</svg>

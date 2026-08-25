@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 248 80" width="248" height="80" role="img" aria-label="Wipro">
+  <title>Wipro</title>
+  <!-- PLACEHOLDER WORDMARK — not an official Wipro asset.
+       Approximates the wordmark plus the multi-petal mark. Replace with the
+       official SVG from Wipro's brand/media resources before launch. -->
+  <g>
+    <circle cx="30" cy="24" r="7.5" fill="#E5372B"/>
+    <circle cx="46" cy="33" r="7.5" fill="#F5A623"/>
+    <circle cx="46" cy="51" r="7.5" fill="#F7D117"/>
+    <circle cx="30" cy="60" r="7.5" fill="#3FA34D"/>
+    <circle cx="14" cy="51" r="7.5" fill="#2E7DD1"/>
+    <circle cx="14" cy="33" r="7.5" fill="#7B4EA3"/>
+  </g>
+  <text x="70" y="56"
+        font-family="'Segoe UI',Inter,Arial,Helvetica,sans-serif"
+        font-size="46" font-weight="700" letter-spacing="-0.5" fill="#4B2E83">Wipro</text>
+</svg>

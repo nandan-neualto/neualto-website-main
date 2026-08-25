@@ -1,0 +1,1331 @@
+/**
+ * NeuAlto Assistant — knowledge base
+ * =====================================================================
+ *
+ * This is the ONLY place the chatbot's content lives. Edit an entry here,
+ * reload the page — no build step, no compiling, nothing else to touch.
+ *
+ * This file doubles as both:
+ *   - a <script> the browser loads (sets window.NEUALTO_KB)
+ *   - a Node module (module.exports = the same array), which is what lets
+ *     assistant-widget.test.js and build-kb-docs.js read it directly
+ *
+ * WHEN YOU EDIT THIS FILE, ALSO RUN:
+ *     node build-kb-docs.js
+ * That regenerates kb.json (plain JSON export) and kb-review.md (a clean,
+ * client-readable FAQ document with a checkbox per entry) FROM this file —
+ * so whatever you hand a client to review is guaranteed to match what the
+ * bot actually says. Never hand-edit kb.json or kb-review.md directly;
+ * they get overwritten the next time this script runs.
+ *
+ * FIELD REFERENCE
+ * ----------------
+ *   id     Unique, never reused (chip links / addEntries() reference it).
+ *          kebab-case, e.g. 'deltamax-buy'.
+ *   c      Category — controls grouping in the Browse tab. Keep the same
+ *          spelling as other entries in that category ('Company',
+ *          'Services', 'Engagement', 'DeltaMax', 'OptiMax', 'Careers',
+ *          'Contact', 'Site').
+ *   q      The canonical question, shown as-is in the Browse tab and as a
+ *          chip label. Write it the way a visitor would actually ask.
+ *   alts   Alternate phrasings the search engine should also recognize —
+ *          shorthand, typos, and rewordings. These do NOT need to be
+ *          grammatically perfect; a couple of realistic typos per entry
+ *          measurably improves match quality. Not shown to users.
+ *   k      Keywords / synonyms that might appear in a query without being
+ *          in the question itself (acronyms, product names, jargon).
+ *          Not shown to users.
+ *   a      The answer. Supports a tiny markdown subset: **bold**,
+ *          [link text](url), "- " bullet lists, "1. " numbered lists,
+ *          and blank-line-separated paragraphs. Nothing else is parsed —
+ *          italics (*like this*) or headings (# like this) render as
+ *          literal characters, not formatting.
+ *   href   Where the "Show me on this site →" button goes. Use
+ *          'page.html#section-id' for an in-page anchor, or a full
+ *          'https://...' URL for an external link.
+ *   rel    Up to 3 entry ids to offer as "Related" chips under the answer.
+ *
+ * Every fact in here should trace back to something actually published on
+ * the live site — this file is the whole reason the bot doesn't have to
+ * guess.
+ */
+(function (root, factory) {
+  var data = factory();
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = data;
+  } else {
+    root.NEUALTO_KB = data;
+  }
+})(typeof window !== 'undefined' ? window : this, function () {
+  return [
+      {
+        "id": "company-overview",
+        "c": "Company",
+        "q": "What does NeuAlto do?",
+        "alts": [
+          "what is neualto",
+          "who is neualto",
+          "tell me about neualto",
+          "what kind of company is this",
+          "wut does neualto do"
+        ],
+        "k": [
+          "about",
+          "overview",
+          "company",
+          "technologies"
+        ],
+        "a": "NeuAlto Technologies is an enterprise software services and consulting firm, headquartered in **Bangalore, India** with a presence in the **USA**. We work across six practices — managed AI services, DevSecOps & Kubernetes, EDI data transformation, engineering & IT, testing & automation, and cybersecurity consulting — and we build two products of our own, **DeltaMax™** and **OptiMax**.",
+        "href": "index.html#about",
+        "rel": [
+          "services-overview",
+          "company-locations",
+          "company-founders"
+        ]
+      },
+      {
+        "id": "company-locations",
+        "c": "Company",
+        "q": "Where is NeuAlto located?",
+        "alts": [
+          "where are you based",
+          "where are your offices",
+          "what countries do you operate in",
+          "where is neualto headquartered",
+          "wher is neualto located"
+        ],
+        "k": [
+          "location",
+          "office",
+          "bangalore",
+          "bengaluru",
+          "usa",
+          "india",
+          "address",
+          "headquarters",
+          "hq",
+          "atlanta"
+        ],
+        "a": "We're headquartered in **Bengaluru, India** — our development and delivery centre — with a presence in the **Greater Atlanta area, USA** for client engagement and consulting. That gives clients follow-the-sun coverage and senior contacts in both regions.\n\n- India: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004\n- USA: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097",
+        "href": "index.html#contact",
+        "rel": [
+          "contact-general",
+          "company-overview"
+        ]
+      },
+      {
+        "id": "company-founders",
+        "c": "Company",
+        "q": "Who founded NeuAlto?",
+        "alts": [
+          "who runs neualto",
+          "who are the founders",
+          "who is the ceo",
+          "tell me about the leadership",
+          "who leads neualto",
+          "who founde neualto"
+        ],
+        "k": [
+          "founder",
+          "leadership",
+          "hemanth",
+          "mohan",
+          "managing director",
+          "ceo",
+          "management"
+        ],
+        "a": "NeuAlto is led by two co-founders:\n\n- **Hemanth K Rajasekhar** — Founder & Managing Director, Bangalore, leading the India delivery organization\n- **Mohan Bethur** — Founder & Managing Director, United States, driving client engagement, strategy, and partnerships",
+        "href": "index.html#founders",
+        "rel": [
+          "company-overview",
+          "company-locations"
+        ]
+      },
+      {
+        "id": "company-why",
+        "c": "Company",
+        "q": "Why should we choose NeuAlto?",
+        "alts": [
+          "why work with neualto",
+          "what makes neualto different",
+          "why choose you over a competitor",
+          "whats your differentiator",
+          "y choose neualto"
+        ],
+        "k": [
+          "differentiator",
+          "why us",
+          "value proposition",
+          "unique",
+          "better"
+        ],
+        "a": "Four commitments shape every engagement:\n\n- **Extensive Expertise** — deep experience across software design, development, and security\n- **Customer Satisfaction** — measured by outcomes, not hours billed\n- **Quality Assurance** — experienced consultants who set the standard every time\n- **Strategic Scalability** — we scale resources up or down to match demand",
+        "href": "index.html#why",
+        "rel": [
+          "company-overview",
+          "engagement-models"
+        ]
+      },
+      {
+        "id": "company-clients",
+        "c": "Company",
+        "q": "Which companies has NeuAlto worked with?",
+        "alts": [
+          "who are your clients",
+          "do you have case studies",
+          "what companies use neualto",
+          "client list",
+          "who have you worked wit",
+          "references"
+        ],
+        "k": [
+          "clients",
+          "customers",
+          "testimonials",
+          "case study",
+          "portfolio"
+        ],
+        "a": "We've worked with 12+ enterprise and startup clients — including Cleo, Mytonomy, CrashPlan, Nirmata, Lodestar, ZeeSense, SafEnces, NetSequre, Stockholm, and funtoot. Engineering and security leaders including Srihari Hosahalli (Asato Technology), Damien Toledo (Nirmata), and Mangesh Bhamre (Cybird) have shared feedback on working with our teams.",
+        "href": "index.html#clients",
+        "rel": [
+          "company-industries",
+          "company-partners"
+        ]
+      },
+      {
+        "id": "company-industries",
+        "c": "Company",
+        "q": "What industries do you work in?",
+        "alts": [
+          "which sectors do you serve",
+          "do you work in healthcare",
+          "what verticals do you cover",
+          "industry experience"
+        ],
+        "k": [
+          "industries",
+          "sectors",
+          "verticals",
+          "healthcare",
+          "edtech",
+          "retail",
+          "banking",
+          "telecom",
+          "ecommerce"
+        ],
+        "a": "Our client work spans **healthcare, security, integration, and edtech**, from enterprise platforms to fast-moving startups. On the product side, OptiMax is aimed particularly at enterprises in **retail, banking, telecom, and e-commerce**.",
+        "href": "index.html#clients",
+        "rel": [
+          "company-clients",
+          "optimax-who"
+        ]
+      },
+      {
+        "id": "company-partners",
+        "c": "Company",
+        "q": "Who are NeuAlto's partners?",
+        "alts": [
+          "do you have technology partners",
+          "who do you partner with",
+          "strategic partners",
+          "partnerships"
+        ],
+        "k": [
+          "partner",
+          "katalyst street",
+          "crashplan",
+          "google",
+          "wipro",
+          "ecosystem",
+          "alliance"
+        ],
+        "a": "We work with four partners:\n\n- **Katalyst Street** — strategic partner for digital ecosystems, and the company behind DeltaMax and OptiMax\n- **CrashPlan** — endpoint data-resilience partner for enterprise backup and recovery\n- **Google** — Google Cloud partner; DeltaMax™ and OptiMax are published on Google Cloud Marketplace, and we deliver GCP migration, BigQuery, and Looker Studio work on the platform\n- **Wipro** — enterprise delivery partner for large-scale systems integration, data transformation, and managed engineering programmes",
+        "href": "index.html#partners",
+        "rel": [
+          "company-clients",
+          "deltamax-what"
+        ]
+      },
+      {
+        "id": "company-tech",
+        "c": "Company",
+        "q": "What technologies do you work with?",
+        "alts": [
+          "what is your tech stack",
+          "which cloud platforms do you support",
+          "what languages do you use",
+          "do you work with react"
+        ],
+        "k": [
+          "stack",
+          "technology",
+          "tools",
+          "platforms",
+          "react",
+          "node",
+          "typescript",
+          "python",
+          "kubernetes"
+        ],
+        "a": "Across our practices we work with **AWS, Azure, and GCP** (plus hybrid and private cloud), **Kubernetes** and containers, CI/CD pipelines, and modern application stacks — **TypeScript, React, Node.js**, DynamoDB, S3, and Redis on the product-engineering side, with Python-based data and ML tooling for AI workloads.",
+        "href": "services.html",
+        "rel": [
+          "service-devsecops",
+          "service-engineering"
+        ]
+      },
+      {
+        "id": "company-linkedin",
+        "c": "Company",
+        "q": "Are you on LinkedIn?",
+        "alts": [
+          "do you have social media",
+          "wheres your linkedin page",
+          "follow neualto online"
+        ],
+        "k": [
+          "linkedin",
+          "social media",
+          "follow"
+        ],
+        "a": "Yes — find us at [linkedin.com/company/neualto-technologies-pvt-ltd](https://www.linkedin.com/company/neualto-technologies-pvt-ltd/). It's where we post first, before mirroring articles to our [blog](blog.html).",
+        "href": "https://www.linkedin.com/company/neualto-technologies-pvt-ltd/",
+        "rel": [
+          "blog-what"
+        ]
+      },
+      {
+        "id": "services-overview",
+        "c": "Services",
+        "q": "What services does NeuAlto offer?",
+        "alts": [
+          "what do you offer",
+          "list your services",
+          "what can neualto help with",
+          "what are your six practices",
+          "wat services do u have"
+        ],
+        "k": [
+          "services",
+          "practices",
+          "offerings",
+          "capabilities"
+        ],
+        "a": "Six core practices:\n\n- **Managed AI Services** — end-to-end AI/ML workload operations\n- **DevSecOps, Cloud & Kubernetes** — cloud migration and secure delivery pipelines\n- **Data Transformation & EDI** — B2B and EDI integration\n- **Engineering & IT** — product engineering and IT operations\n- **Testing & Automation** — QA workflows and regression automation\n- **Cybersecurity Consulting & vCISO** — security strategy and compliance leadership",
+        "href": "services.html",
+        "rel": [
+          "service-managed-ai",
+          "service-devsecops",
+          "service-cybersecurity"
+        ]
+      },
+      {
+        "id": "service-managed-ai",
+        "c": "Services",
+        "q": "What is Managed AI Services?",
+        "alts": [
+          "do you offer managed ai",
+          "tell me about your ai services",
+          "can you manage our ml models",
+          "ai and ml services",
+          "managd ai service"
+        ],
+        "k": [
+          "ai",
+          "ml",
+          "genai",
+          "mlops",
+          "model strategy",
+          "managed ai",
+          "machine learning",
+          "data science"
+        ],
+        "a": "Our Managed AI team — DevOps, AI/ML, Data Science, Security, and Data Engineering specialists — offloads the complexity of generative AI/ML workflows end to end: developing, deploying, supporting, and monitoring models so you deliver faster and at scale.\n\nWe cover discovery and onboarding, implementation and deployment, and continuous monitoring, with a focus on high availability, scalability, risk management, and security.",
+        "href": "services.html#managed-ai",
+        "rel": [
+          "services-overview",
+          "deltamax-what"
+        ]
+      },
+      {
+        "id": "service-devsecops",
+        "c": "Services",
+        "q": "What is DevSecOps, Cloud & Kubernetes?",
+        "alts": [
+          "do you do cloud migration",
+          "what about kubernetes",
+          "devsecops services",
+          "can you help with aws azure gcp",
+          "devsecop services"
+        ],
+        "k": [
+          "devsecops",
+          "cloud",
+          "kubernetes",
+          "k8s",
+          "ci/cd",
+          "aws",
+          "azure",
+          "gcp",
+          "container",
+          "migration",
+          "devops"
+        ],
+        "a": "We help companies ship quickly using agile, CI/CD-based DevSecOps, with security built into every stage of the pipeline. We drive cloud-first transformations across **AWS, Azure, GCP**, or hybrid environments, and our Kubernetes experts manage the security and operations of containerized infrastructure.\n\nOfferings: Cloud Migration and Modernisation, DevSecOps Managed Services, Kubernetes and Containers, Cloud Security.",
+        "href": "services.html#devsecops",
+        "rel": [
+          "services-overview",
+          "service-cybersecurity"
+        ]
+      },
+      {
+        "id": "service-edi",
+        "c": "Services",
+        "q": "What is Data Transformation & EDI?",
+        "alts": [
+          "do you do edi integration",
+          "what is edi migration",
+          "can you help with x12 edi",
+          "b2b integration services",
+          "edi migraton help"
+        ],
+        "k": [
+          "edi",
+          "x12",
+          "edifact",
+          "data migration",
+          "b2b integration",
+          "cleo",
+          "erp",
+          "trading partner"
+        ],
+        "a": "Electronic Data Interchange (EDI) migration is one of our specialties. We guide clients through planning, information gathering, and analysis; configure and integrate with ERP platforms; coordinate with EDI partners; and test and validate rigorously — covering onboarding of large B2B partner networks and standardized, cloud-based EDI across industries.",
+        "href": "services.html#edi",
+        "rel": [
+          "service-devsecops",
+          "careers-edi-role"
+        ]
+      },
+      {
+        "id": "service-engineering",
+        "c": "Services",
+        "q": "What is Engineering & IT?",
+        "alts": [
+          "do you build software products",
+          "custom software development",
+          "mobile app development services",
+          "engineering and it services"
+        ],
+        "k": [
+          "engineering",
+          "product development",
+          "mobile app",
+          "full stack",
+          "embedded",
+          "r&d"
+        ],
+        "a": "We partner on product innovation, design, and development across hardware and software alike. Offerings include Full Stack Software Development, Mobile Application Development, Embedded Software, Patient Monitoring Systems, Networking and Communication Systems, Operating Systems, and Board Designs.",
+        "href": "services.html#engineering",
+        "rel": [
+          "services-overview",
+          "service-testing"
+        ]
+      },
+      {
+        "id": "service-testing",
+        "c": "Services",
+        "q": "What is Testing & Automation?",
+        "alts": [
+          "do you do qa automation",
+          "test automation services",
+          "can you help with regression testing",
+          "qa testing service"
+        ],
+        "k": [
+          "qa",
+          "testing",
+          "automation",
+          "regression",
+          "test",
+          "quality"
+        ],
+        "a": "Test automation cuts regression timelines and cost, removes human error from high-risk processes, and catches issues immediately. Our approach: evaluation, review of any existing solution, tool identification, developing and executing tests, and building durable regression suites.",
+        "href": "services.html#testing",
+        "rel": [
+          "service-engineering",
+          "services-overview"
+        ]
+      },
+      {
+        "id": "service-cybersecurity",
+        "c": "Services",
+        "q": "What is Cybersecurity Consulting & vCISO?",
+        "alts": [
+          "do you offer vciso services",
+          "cybersecurity consulting",
+          "can you help with compliance",
+          "virtual ciso services",
+          "cybersecurty consulting"
+        ],
+        "k": [
+          "cybersecurity",
+          "vciso",
+          "security",
+          "compliance",
+          "ciso",
+          "risk",
+          "posture"
+        ],
+        "a": "We cover the strategic, operational, and technical sides of security, helping you build a resilient program with controls specific to your organization.\n\nOfferings: Cybersecurity Strategy and Advisory, Security Program Design, Security Controls and Compliance, and **virtual Chief Information Security Officer (vCISO)** services for organizations needing dedicated security leadership.",
+        "href": "services.html#cybersecurity",
+        "rel": [
+          "security-compliance",
+          "services-overview"
+        ]
+      },
+      {
+        "id": "engagement-models",
+        "c": "Engagement",
+        "q": "What engagement models do you offer?",
+        "alts": [
+          "how can we work with you",
+          "how do you structure engagements",
+          "ways to engage neualto",
+          "contract models"
+        ],
+        "k": [
+          "engagement",
+          "model",
+          "extended engineering",
+          "fixed price",
+          "consulting",
+          "t&m",
+          "contract"
+        ],
+        "a": "Three ways to bring NeuAlto onto your team:\n\n- **Extended Product Engineering** — a dedicated build-operate team, a true extension of your org\n- **Fixed-Price Delivery** — a well-scoped outcome on a committed budget and timeline\n- **Consulting & Time-and-Materials** — senior expertise on demand, billed flexibly",
+        "href": "index.html#engage",
+        "rel": [
+          "engagement-extended",
+          "engagement-fixed",
+          "engagement-consulting"
+        ]
+      },
+      {
+        "id": "engagement-extended",
+        "c": "Engagement",
+        "q": "What is Extended Product Engineering?",
+        "alts": [
+          "extended engineering team model",
+          "dedicated team engagement",
+          "staff augmentation model"
+        ],
+        "k": [
+          "extended engineering",
+          "dedicated team",
+          "build-operate",
+          "squad"
+        ],
+        "a": "A dedicated build-operate team that works as a true extension of your organization — your roadmap, your rituals, our engineers. Long-running teams aligned to your business goals, with headcount that scales as demand changes. Ideal for startups and scale-ups shipping fast.",
+        "href": "index.html#engage",
+        "rel": [
+          "engagement-models",
+          "engagement-scale"
+        ]
+      },
+      {
+        "id": "engagement-fixed",
+        "c": "Engagement",
+        "q": "What is Fixed-Price Delivery?",
+        "alts": [
+          "fixed price project model",
+          "fixed cost engagement",
+          "fixed-bid delivery"
+        ],
+        "k": [
+          "fixed price",
+          "fixed cost",
+          "milestone delivery",
+          "budget"
+        ],
+        "a": "A well-scoped outcome delivered on a committed budget and timeline — we carry the delivery risk so you can plan with certainty. Milestone-based delivery with clear acceptance criteria and predictable cost. Best for migrations, EDI projects, and clearly defined builds.",
+        "href": "index.html#engage",
+        "rel": [
+          "engagement-models",
+          "service-edi"
+        ]
+      },
+      {
+        "id": "engagement-consulting",
+        "c": "Engagement",
+        "q": "What is Consulting & Time-and-Materials?",
+        "alts": [
+          "t and m engagement",
+          "hourly consulting model",
+          "on-demand consulting"
+        ],
+        "k": [
+          "consulting",
+          "time and materials",
+          "t&m",
+          "advisory",
+          "hourly"
+        ],
+        "a": "Senior expertise on demand — architecture reviews, vCISO leadership, AI strategy — billed flexibly as your needs evolve. Start small and expand as value is proven, with access to principal-level consultants and architects. Perfect for audits, strategy, and evolving scopes.",
+        "href": "index.html#engage",
+        "rel": [
+          "engagement-models",
+          "service-cybersecurity"
+        ]
+      },
+      {
+        "id": "engagement-typical",
+        "c": "Engagement",
+        "q": "What does a typical engagement look like?",
+        "alts": [
+          "how do we get started with neualto",
+          "whats the onboarding process",
+          "how long until a team is ready",
+          "what happens after we contact you"
+        ],
+        "k": [
+          "onboarding",
+          "discovery",
+          "kickoff",
+          "getting started",
+          "process",
+          "workshop"
+        ],
+        "a": "We start with a short discovery workshop to understand your goals, then propose the engagement model that fits — extended engineering, fixed-price delivery, or flexible consulting. Most clients are up and running with a NeuAlto team within **weeks**.",
+        "href": "index.html#faq",
+        "rel": [
+          "engagement-models",
+          "contact-general"
+        ]
+      },
+      {
+        "id": "engagement-startups",
+        "c": "Engagement",
+        "q": "Do you work with startups as well as enterprises?",
+        "alts": [
+          "do you only work with big companies",
+          "can a small startup hire neualto",
+          "do you work with early stage companies",
+          "do u work wit startups"
+        ],
+        "k": [
+          "startup",
+          "enterprise",
+          "early stage",
+          "scale-up",
+          "small company"
+        ],
+        "a": "Yes — product engineering for startups is a core offering. We help early teams accelerate time-to-market with build-operate squads, while enterprises typically engage us for managed AI, cloud migration, EDI, and security programs.",
+        "href": "index.html#faq",
+        "rel": [
+          "engagement-extended",
+          "engagement-typical"
+        ]
+      },
+      {
+        "id": "engagement-scale",
+        "c": "Engagement",
+        "q": "How quickly can you scale a team up or down?",
+        "alts": [
+          "can you add more engineers quickly",
+          "how flexible is your staffing",
+          "can you ramp down a team fast",
+          "how fast can u scale team"
+        ],
+        "k": [
+          "scale",
+          "ramp up",
+          "ramp down",
+          "flexibility",
+          "capacity",
+          "bench"
+        ],
+        "a": "Strategic scalability is one of our core commitments. Because we maintain a bench of proficient engineers across AI, cloud, QA, and security, we can typically add or reshape capacity within a **sprint or two**, without disrupting delivery.",
+        "href": "index.html#faq",
+        "rel": [
+          "engagement-extended",
+          "company-why"
+        ]
+      },
+      {
+        "id": "security-compliance",
+        "c": "Engagement",
+        "q": "How do you handle security and compliance?",
+        "alts": [
+          "is your development process secure",
+          "do you follow compliance standards",
+          "how do you approach data security",
+          "security n compliance"
+        ],
+        "k": [
+          "security",
+          "compliance",
+          "secure development",
+          "vciso",
+          "sdlc",
+          "regulatory"
+        ],
+        "a": "Secure development practices are built into every engagement, not bolted on. For organizations that need dedicated leadership, our **vCISO** service provides strategic security direction, regulatory compliance guidance, and posture assessments.",
+        "href": "services.html#cybersecurity",
+        "rel": [
+          "service-cybersecurity",
+          "privacy-policy"
+        ]
+      },
+      {
+        "id": "deltamax-what",
+        "c": "DeltaMax",
+        "q": "What is DeltaMax?",
+        "alts": [
+          "what does deltamax do",
+          "tell me about deltamax",
+          "deltamax overview",
+          "wat is deltamax"
+        ],
+        "k": [
+          "deltamax",
+          "data quality",
+          "anomaly detection",
+          "never fly blind",
+          "monitoring"
+        ],
+        "a": "**DeltaMax™** is an AI-driven data quality monitoring platform — **Never Fly Blind Again**. Unlike rule-based systems, it proactively identifies, analyzes, and helps resolve hidden data quality issues, even ones you didn't anticipate, giving continuous visibility into data health. It's built by Katalyst Street, our strategic partner.",
+        "href": "solutions.html#deltamax",
+        "rel": [
+          "deltamax-problem",
+          "deltamax-features",
+          "deltamax-buy"
+        ]
+      },
+      {
+        "id": "deltamax-problem",
+        "c": "DeltaMax",
+        "q": "What problem does DeltaMax solve?",
+        "alts": [
+          "why do i need deltamax",
+          "what data problems does deltamax fix",
+          "whats the business case for deltamax"
+        ],
+        "k": [
+          "data pipeline",
+          "invisible",
+          "hidden issues",
+          "migration risk",
+          "alert fatigue"
+        ],
+        "a": "Modern data pipelines are hard to track — data arrives from many sources with different formats, volumes, and timings. Common problems DeltaMax addresses:\n\n- Sudden data changes that pass validation checks\n- Inconsistencies during system migrations\n- Excessive time spent investigating alerts\n\nIt focuses on **Anomaly Detection** and **Reliability of Data**, helping identify root causes instead of just flagging issues.",
+        "href": "solutions.html#deltamax",
+        "rel": [
+          "deltamax-what",
+          "deltamax-features"
+        ]
+      },
+      {
+        "id": "deltamax-features",
+        "c": "DeltaMax",
+        "q": "What are DeltaMax's key features?",
+        "alts": [
+          "what can deltamax do",
+          "deltamax feature list",
+          "what does deltamax include",
+          "deltamax capabilities"
+        ],
+        "k": [
+          "features",
+          "anomaly detection",
+          "trust score",
+          "master data management",
+          "mdm"
+        ],
+        "a": "Key features:\n\n- **Anomaly Detection** — learns normal patterns per source and flags meaningful deviations, no hand-written rules\n- **Trust Score & Agent Summary** — a real-time reliability score plus plain-language context on what changed\n- **Data cleaning workflows** — isolate or remove problematic records once anomalies are understood\n- **Cloud-to-cloud migration validation** — continuous checks before, during, and after migration\n- **Master Data Management** — links and standardizes duplicate or inconsistent entity records",
+        "href": "solutions.html#deltamax",
+        "rel": [
+          "deltamax-trust-score",
+          "deltamax-migration"
+        ]
+      },
+      {
+        "id": "deltamax-trust-score",
+        "c": "DeltaMax",
+        "q": "What is the DeltaMax Trust Score?",
+        "alts": [
+          "how does the trust score work",
+          "what is agent summary in deltamax",
+          "trust score explained"
+        ],
+        "k": [
+          "trust score",
+          "agent summary",
+          "data reliability score",
+          "scoring"
+        ],
+        "a": "The **Trust Score** is a real-time indicator of data reliability — it evaluates anomalies, inconsistencies, and deviations from expected behavior and converts them into a single, easy-to-understand score. Alongside it, the **Agent Summary** explains what changed in the data, where, and whether it's expected, minor, or critical.",
+        "href": "solutions.html#deltamax",
+        "rel": [
+          "deltamax-features",
+          "deltamax-what"
+        ]
+      },
+      {
+        "id": "deltamax-migration",
+        "c": "DeltaMax",
+        "q": "Does DeltaMax help with data migration?",
+        "alts": [
+          "can deltamax validate a cloud migration",
+          "does deltamax check migrated data",
+          "migration data quality tool"
+        ],
+        "k": [
+          "migration",
+          "cloud-to-cloud",
+          "validation",
+          "recovery",
+          "psi",
+          "t-test"
+        ],
+        "a": "Yes — data quality is treated as a continuous process throughout migration, not a one-time checkpoint: understanding structure and gaps beforehand, continuously monitoring that source matches target during, and validating again afterward.\n\nDeltaMax also supports **recovery validation** — comparing a known-good backup against recovered or migrated data using statistical rigor (T-tests, PSI, Isolation Forest).",
+        "href": "deltamax.html#gcp-recovery",
+        "rel": [
+          "deltamax-features",
+          "deltamax-gcp"
+        ]
+      },
+      {
+        "id": "deltamax-gcp",
+        "c": "DeltaMax",
+        "q": "Is DeltaMax available on Google Cloud?",
+        "alts": [
+          "does deltamax run on gcp",
+          "deltamax gcp version",
+          "google cloud deltamax"
+        ],
+        "k": [
+          "gcp",
+          "google cloud",
+          "bigquery",
+          "looker studio",
+          "marketplace"
+        ],
+        "a": "Yes — DeltaMax deploys as a virtual machine inside your own **Google Cloud** project, so your data never leaves your security boundary. Outputs flow to Google Cloud Storage, load into BigQuery, and visualize in Looker Studio.",
+        "href": "deltamax.html#gcp",
+        "rel": [
+          "deltamax-buy",
+          "deltamax-getting-started"
+        ]
+      },
+      {
+        "id": "deltamax-azure",
+        "c": "DeltaMax",
+        "q": "Is DeltaMax available on Azure?",
+        "alts": [
+          "does deltamax work on microsoft azure",
+          "deltamax azure version",
+          "azure data quality"
+        ],
+        "k": [
+          "azure",
+          "synapse",
+          "power bi",
+          "blob storage",
+          "microsoft"
+        ],
+        "a": "Yes — **DeltaMax V2.0** works with the Microsoft Azure ecosystem: Azure Blob Storage for data, Azure Synapse Analytics for warehousing and reporting, an Azure Agent for agentic intelligence, and Power BI for real-time dashboards. Contact us for Azure deployment.",
+        "href": "deltamax.html#azure",
+        "rel": [
+          "deltamax-gcp",
+          "deltamax-buy"
+        ]
+      },
+      {
+        "id": "deltamax-getting-started",
+        "c": "DeltaMax",
+        "q": "How do I get started with DeltaMax?",
+        "alts": [
+          "how do i deploy deltamax",
+          "deltamax setup guide",
+          "deltamax onboarding steps",
+          "how 2 start deltamax"
+        ],
+        "k": [
+          "getting started",
+          "setup",
+          "deploy",
+          "synthetic data",
+          "install"
+        ],
+        "a": "Three phases: **deploy** the DeltaMax VM from the Google Cloud Marketplace into your own project; **generate data** with the included synthetic data generator (useful even before your own data is ready); then run the **data quality check modules** — anomaly detection, T-tests, PSI, mismatch checks — before loading results into BigQuery and visualizing in Looker Studio.",
+        "href": "deltamax.html#gcp-started",
+        "rel": [
+          "deltamax-gcp",
+          "deltamax-buy"
+        ]
+      },
+      {
+        "id": "deltamax-competitive",
+        "c": "DeltaMax",
+        "q": "How does DeltaMax compare to competitors?",
+        "alts": [
+          "deltamax vs monte carlo",
+          "deltamax vs databricks",
+          "is deltamax better than informatica",
+          "how does deltamax stack up"
+        ],
+        "k": [
+          "competitors",
+          "monte carlo",
+          "databricks",
+          "informatica",
+          "snowflake",
+          "comparison",
+          "alternative"
+        ],
+        "a": "An independent AI-assisted analysis scored DeltaMax **42/50 — ten points ahead of the nearest competitor** for GCP migration data quality, against Databricks Unity Catalog, Fivetran + Monte Carlo, Snowflake ML Functions, and Informatica IDMC.\n\nDeltaMax is the only platform in that comparison treating cross-dataset reconciliation, statistical drift detection, and migration certification as first-class, out-of-the-box capabilities.",
+        "href": "deltamax.html#gcp-competitive",
+        "rel": [
+          "deltamax-what",
+          "deltamax-buy"
+        ]
+      },
+      {
+        "id": "deltamax-buy",
+        "c": "DeltaMax",
+        "q": "How do I buy DeltaMax? What does it cost?",
+        "alts": [
+          "deltamax pricing",
+          "where can i purchase deltamax",
+          "deltamax marketplace listing",
+          "how much is deltamax",
+          "deltmax price"
+        ],
+        "k": [
+          "buy",
+          "price",
+          "pricing",
+          "cost",
+          "marketplace",
+          "purchase",
+          "subscribe",
+          "license"
+        ],
+        "a": "DeltaMax is purchased and billed through your existing **Google Cloud Marketplace** billing account — no new vendor contracts. For Azure, [contact us](mailto:info@neualto.com?subject=DeltaMax%20Azure%20Deployment) directly.\n\nWe don't publish a fixed price list here, because Marketplace pricing depends on your deployment. The fastest route to exact numbers is the Marketplace listing or a note to our team.",
+        "href": "deltamax.html#buy",
+        "rel": [
+          "deltamax-gcp",
+          "deltamax-azure",
+          "pricing-general"
+        ]
+      },
+      {
+        "id": "deltamax-docs",
+        "c": "DeltaMax",
+        "q": "Where can I find DeltaMax technical documentation?",
+        "alts": [
+          "deltamax user guide",
+          "deltamax eula",
+          "deltamax support docs",
+          "deltamax documentaton"
+        ],
+        "k": [
+          "documentation",
+          "docs",
+          "eula",
+          "support",
+          "manual"
+        ],
+        "a": "Full technical documentation, the EULA, support resources, and the product blog live on the dedicated product site: **[deltamax.katalyststreet.com](https://deltamax.katalyststreet.com)**.",
+        "href": "deltamax.html#buy",
+        "rel": [
+          "deltamax-buy",
+          "deltamax-getting-started"
+        ]
+      },
+      {
+        "id": "optimax-what",
+        "c": "OptiMax",
+        "q": "What is OptiMax?",
+        "alts": [
+          "what does optimax do",
+          "tell me about optimax",
+          "optimax overview",
+          "wat is optimax"
+        ],
+        "k": [
+          "optimax",
+          "marketing ai",
+          "revenue engine",
+          "marketing"
+        ],
+        "a": "**OptiMax** is a data/AI-driven marketing framework that turns marketing from a cost center into a measurable, revenue-generating function. It integrates advanced analytics and machine learning to move organizations from intuition-based marketing to a scientific, outcome-focused approach. Also built by Katalyst Street.",
+        "href": "solutions.html#optimax",
+        "rel": [
+          "optimax-two-stage",
+          "optimax-who",
+          "optimax-buy"
+        ]
+      },
+      {
+        "id": "optimax-two-stage",
+        "c": "OptiMax",
+        "q": "How does OptiMax work?",
+        "alts": [
+          "whats the optimax methodology",
+          "how does optimax optimize marketing",
+          "optimax response and revenue optimization"
+        ],
+        "k": [
+          "response optimization",
+          "revenue optimization",
+          "two-stage",
+          "ltv",
+          "cltv",
+          "segmentation"
+        ],
+        "a": "OptiMax works in two stages:\n\n1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels\n2. **Revenue Optimization** — evaluates customer lifetime value (LTV), identifies high-value segments, and optimizes spend for long-term financial outcomes",
+        "href": "solutions.html#optimax",
+        "rel": [
+          "optimax-what",
+          "optimax-getting-started"
+        ]
+      },
+      {
+        "id": "optimax-who",
+        "c": "OptiMax",
+        "q": "Who is OptiMax for?",
+        "alts": [
+          "is optimax for my industry",
+          "what teams use optimax",
+          "who should use optimax"
+        ],
+        "k": [
+          "who is it for",
+          "target user",
+          "marketing teams",
+          "retail",
+          "banking",
+          "telecom",
+          "ecommerce"
+        ],
+        "a": "OptiMax is built for marketing teams improving performance and efficiency, business leaders aligning marketing with revenue goals, and data/analytics teams implementing AI-driven solutions — particularly in **retail, banking, telecom, and e-commerce**.",
+        "href": "solutions.html#optimax",
+        "rel": [
+          "optimax-what",
+          "optimax-two-stage"
+        ]
+      },
+      {
+        "id": "optimax-getting-started",
+        "c": "OptiMax",
+        "q": "How do I get started with OptiMax?",
+        "alts": [
+          "how do i deploy optimax",
+          "optimax setup guide",
+          "optimax onboarding"
+        ],
+        "k": [
+          "getting started",
+          "setup",
+          "deploy",
+          "chocky",
+          "install"
+        ],
+        "a": "Find OptiMax on the **Google Cloud Marketplace** and subscribe through your existing billing account, then deploy it as a VM inside your own project.\n\nFrom there the **\"Chocky — The Chocolate Shop\"** synthetic-data walkthrough teaches the framework end to end: generating data, descriptive statistics, propensity models, CLTV models, OptiMax segmentation, media-mix modeling, and Gen AI experiments.",
+        "href": "optimax.html#started",
+        "rel": [
+          "optimax-what",
+          "optimax-buy"
+        ]
+      },
+      {
+        "id": "optimax-demo",
+        "c": "OptiMax",
+        "q": "Can I see a demo of OptiMax?",
+        "alts": [
+          "is there an optimax walkthrough",
+          "can you show me optimax in action",
+          "optimax conceptual demo",
+          "book a demo"
+        ],
+        "k": [
+          "demo",
+          "walkthrough",
+          "conceptual demo",
+          "schedule a demo",
+          "trial"
+        ],
+        "a": "Yes — the conceptual demo walks through inputs, random campaign results, response optimization, profitability optimization, and a summary comparison. You can also [schedule a live demo](mailto:info@neualto.com?subject=OptiMax%20Demo%20Request) with our product team, on your own data or the Chocky demo dataset.",
+        "href": "optimax.html#demo",
+        "rel": [
+          "optimax-getting-started",
+          "optimax-buy"
+        ]
+      },
+      {
+        "id": "optimax-buy",
+        "c": "OptiMax",
+        "q": "How do I buy OptiMax? What does it cost?",
+        "alts": [
+          "optimax pricing",
+          "where can i purchase optimax",
+          "optimax marketplace listing",
+          "how much is optimax",
+          "optimax price"
+        ],
+        "k": [
+          "buy",
+          "price",
+          "pricing",
+          "cost",
+          "marketplace",
+          "purchase",
+          "subscribe",
+          "license"
+        ],
+        "a": "OptiMax is purchased and billed through your existing **Google Cloud Marketplace** billing account. As with DeltaMax we don't publish a fixed price list here — Marketplace pricing depends on your deployment. [Schedule a demo](mailto:info@neualto.com?subject=OptiMax%20Demo%20Request) and we'll walk through the numbers for your use case.",
+        "href": "optimax.html#buy",
+        "rel": [
+          "optimax-what",
+          "optimax-demo",
+          "pricing-general"
+        ]
+      },
+      {
+        "id": "careers-openings",
+        "c": "Careers",
+        "q": "What jobs are open at NeuAlto?",
+        "alts": [
+          "are you hiring",
+          "what roles are open",
+          "current job openings",
+          "wat jobs r open",
+          "any vacancies"
+        ],
+        "k": [
+          "careers",
+          "jobs",
+          "hiring",
+          "openings",
+          "vacancy",
+          "recruitment",
+          "position"
+        ],
+        "a": "Two roles are open right now, both on-site in **Bangalore**:\n\n- **EDI Senior Developer** — 4–6 years\n- **Sr. MERN Developer** — 5+ years\n\nDon't see your role? Send your resume to [careers@neualto.com](mailto:careers@neualto.com) and tell us what you'd like to work on.",
+        "href": "careers.html#openings",
+        "rel": [
+          "careers-edi-role",
+          "careers-mern-role",
+          "careers-apply"
+        ]
+      },
+      {
+        "id": "careers-edi-role",
+        "c": "Careers",
+        "q": "Tell me about the EDI Senior Developer role.",
+        "alts": [
+          "edi developer job description",
+          "what does the edi role require",
+          "edi senior developer requirements"
+        ],
+        "k": [
+          "edi developer",
+          "cleo integration cloud",
+          "x12",
+          "job",
+          "cic"
+        ],
+        "a": "**EDI Senior Developer** — Bangalore, on-site, 4–6 years, full-time.\n\nYou'll design, develop, and support EDI solutions on **Cleo Integration Cloud (CIC)**, build and maintain X12 maps (850, 856, 810, 940, 943, 944, 945), configure EDI partner profiles, and ensure ANSI X12/EDIFACT compliance. Requires a B.E/B.Tech or MCA and **mandatory hands-on CIC experience**.",
+        "href": "careers.html#edi-developer",
+        "rel": [
+          "careers-apply",
+          "service-edi"
+        ]
+      },
+      {
+        "id": "careers-mern-role",
+        "c": "Careers",
+        "q": "Tell me about the Sr. MERN Developer role.",
+        "alts": [
+          "mern developer job description",
+          "what does the mern role require",
+          "sr mern developer requirements",
+          "react developer job"
+        ],
+        "k": [
+          "mern developer",
+          "react",
+          "node.js",
+          "typescript",
+          "job",
+          "frontend"
+        ],
+        "a": "**Sr. MERN Developer** — Bangalore, on-site, 5+ years, full-time.\n\nYou'll build scalable web apps on a modern TypeScript stack — **React**, React Router 7, **Node.js with HAPI**, DynamoDB, S3, and Redis — in an Agile/Scrum environment, owning features end to end. Vitest/Jest testing and exposure to Temporal orchestration are a plus.",
+        "href": "careers.html#mern-developer",
+        "rel": [
+          "careers-apply",
+          "service-engineering"
+        ]
+      },
+      {
+        "id": "careers-apply",
+        "c": "Careers",
+        "q": "How do I apply for a job?",
+        "alts": [
+          "how do i send my resume",
+          "where do i apply",
+          "how to submit application",
+          "how 2 apply for job"
+        ],
+        "k": [
+          "apply",
+          "resume",
+          "cv",
+          "hr",
+          "application"
+        ],
+        "a": "Mail your resume to **[hr@neualto.com](mailto:hr@neualto.com)**, referencing the role in the subject line. You can also apply through our [LinkedIn jobs page](https://www.linkedin.com/company/neualto-technologies-pvt-ltd/jobs/), or if your background doesn't match an open role, send it to [careers@neualto.com](mailto:careers@neualto.com).",
+        "href": "careers.html#openings",
+        "rel": [
+          "careers-openings"
+        ]
+      },
+      {
+        "id": "contact-general",
+        "c": "Contact",
+        "q": "How do I contact NeuAlto?",
+        "alts": [
+          "how can i reach you",
+          "whats your email",
+          "how do i get in touch",
+          "contact information",
+          "how 2 contact neualto",
+          "phone number"
+        ],
+        "k": [
+          "contact",
+          "email",
+          "phone",
+          "get in touch",
+          "reach",
+          "call"
+        ],
+        "a": "Easiest ways to reach us:\n\n- [Request a demo](index.html#contact) — the quickest route in; it opens your email app addressed to info@neualto.com\n- Email **[info@neualto.com](mailto:info@neualto.com)** directly for anything else\n- Careers: **[hr@neualto.com](mailto:hr@neualto.com)**\n- India: [+91 733 855 5064](tel:+917338555064)\n- USA: [+1-408-218-0503](tel:+14082180503)",
+        "href": "index.html#contact",
+        "rel": [
+          "contact-form",
+          "company-locations"
+        ]
+      },
+      {
+        "id": "contact-form",
+        "c": "Contact",
+        "q": "How do I request a demo?",
+        "alts": [
+          "how does the contact form work",
+          "can i book a demo",
+          "i want to see a demo",
+          "schedule a walkthrough",
+          "what happens when i submit the form",
+          "is the form connected to a backend",
+          "book a demo"
+        ],
+        "k": [
+          "demo",
+          "request a demo",
+          "book",
+          "walkthrough",
+          "contact form",
+          "submit",
+          "mailto"
+        ],
+        "a": "Use the [demo request form](index.html#contact) on the home page. You tell us your name, work email, company, and which product or practice you'd like to see — DeltaMax™, OptiMax, or any of the six service lines — plus anything specific you want covered.\n\nSubmitting opens your own email app with the request pre-filled and addressed to **info@neualto.com** — nothing is sent silently in the background, so you see exactly what goes out. You can also write to [info@neualto.com](mailto:info@neualto.com?subject=Demo%20request) directly.",
+        "href": "index.html#contact",
+        "rel": [
+          "contact-general",
+          "optimax-demo"
+        ]
+      },
+      {
+        "id": "blog-what",
+        "c": "Site",
+        "q": "Does NeuAlto have a blog?",
+        "alts": [
+          "where can i read your articles",
+          "do you post updates anywhere",
+          "is there a neualto blog",
+          "company blog"
+        ],
+        "k": [
+          "blog",
+          "articles",
+          "updates",
+          "linkedin posts",
+          "news",
+          "insights"
+        ],
+        "a": "Yes — our blog collects field notes from the team on data quality, anomaly detection, AI reliability, DevSecOps, EDI, and cloud engineering. Posts go up on **LinkedIn** first and are mirrored here with our own summaries.",
+        "href": "blog.html",
+        "rel": [
+          "company-linkedin",
+          "contact-general"
+        ]
+      },
+      {
+        "id": "privacy-policy",
+        "c": "Site",
+        "q": "What is your privacy policy? How do you handle my data?",
+        "alts": [
+          "how is my data used",
+          "do you sell my information",
+          "wheres your privacy policy",
+          "gdpr compliance",
+          "privicy policy"
+        ],
+        "k": [
+          "privacy",
+          "data protection",
+          "gdpr",
+          "dpdp",
+          "cookies",
+          "personal data"
+        ],
+        "a": "We collect only what's needed to run the site and deliver services, and **we do not sell personal information**. The full policy covers what we collect, how it's used, cookie categories, retention, international transfers, and your rights under frameworks including India's DPDP Act and GDPR. Questions go to [general@neualto.com](mailto:general@neualto.com).",
+        "href": "privacy.html",
+        "rel": [
+          "security-compliance",
+          "contact-general"
+        ]
+      },
+      {
+        "id": "pricing-general",
+        "c": "Site",
+        "q": "How much does NeuAlto cost? What are your rates?",
+        "alts": [
+          "what do you charge",
+          "general pricing",
+          "how much does an engagement cost",
+          "whats the price",
+          "wat does it cost",
+          "quote"
+        ],
+        "k": [
+          "pricing",
+          "cost",
+          "rate",
+          "budget",
+          "quote",
+          "fees",
+          "expensive"
+        ],
+        "a": "There's no single price list — cost depends on the engagement model. **Fixed-Price Delivery** gives you a committed budget upfront; **Extended Engineering** and **Consulting/T&M** are scoped and quoted after a short discovery workshop. For DeltaMax or OptiMax, pricing runs through the **Google Cloud Marketplace** listing.\n\nThe fastest route to a real number is [talking to us directly](mailto:info@neualto.com).",
+        "href": "index.html#engage",
+        "rel": [
+          "engagement-models",
+          "deltamax-buy",
+          "optimax-buy"
+        ]
+      }
+    ];
+});

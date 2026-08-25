@@ -1,0 +1,60 @@
+# NeuAlto Technologies
+
+> Enterprise software services and consulting firm headquartered in Bengaluru, India, with a presence in the Greater Atlanta area, USA. NeuAlto delivers managed AI services, DevSecOps and Kubernetes, EDI data transformation, product engineering, testing and automation, and cybersecurity consulting including vCISO. It also builds two products: DeltaMax™ (AI data quality monitoring) and OptiMax (marketing AI).
+
+NeuAlto Technologies Private Limited was founded by Hemanth K Rajasekhar (Founder & Managing Director, India) and Mohan Bethur (Founder & Managing Director, USA). It works with 12+ enterprise and startup clients across healthcare, security, integration, and edtech.
+
+## Key facts
+
+- Legal name: NeuAlto Technologies Private Limited
+- Headquarters: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004, India
+- US office: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097, USA
+- Request a demo: https://neualto.com/#contact — the primary call to action; pick a product or practice and the form composes an email to info@neualto.com
+- General enquiries: info@neualto.com · India +91 733 855 5064 · USA +1-408-218-0503
+- Careers: hr@neualto.com
+- LinkedIn: https://www.linkedin.com/company/neualto-technologies-pvt-ltd/
+
+## Services
+
+- [Managed AI Services](https://neualto.com/services.html#managed-ai): end-to-end operation of generative AI and ML workloads — discovery, implementation, deployment, and continuous monitoring.
+- [DevSecOps, Cloud & Kubernetes](https://neualto.com/services.html#devsecops): CI/CD delivery with security at every stage; cloud migration across AWS, Azure, and GCP; Kubernetes and container operations.
+- [Data Transformation & EDI](https://neualto.com/services.html#edi): EDI migration and B2B integration, ERP integration, trading-partner onboarding, ANSI X12 and EDIFACT compliance.
+- [Engineering & IT](https://neualto.com/services.html#engineering): full stack, mobile, and embedded software; patient monitoring, networking, and operating systems.
+- [Testing & Automation](https://neualto.com/services.html#testing): QA strategy, test automation, and durable regression suites.
+- [Cybersecurity Consulting & vCISO](https://neualto.com/services.html#cybersecurity): security strategy, program design, controls and compliance, and virtual CISO leadership.
+
+## Products
+
+- [DeltaMax™](https://neualto.com/deltamax.html): AI-driven data quality monitoring. Learns normal patterns per source and flags meaningful deviations without hand-written rules; reports a real-time Trust Score plus a plain-language Agent Summary; validates cloud-to-cloud migrations using T-tests, Population Stability Index, and Isolation Forest. Deploys as a virtual machine inside the customer's own Google Cloud or Microsoft Azure project, so data never leaves their security boundary. An independent AI-assisted analysis scored DeltaMax 42/50 for GCP migration data quality, ten points ahead of the nearest competitor evaluated.
+- [OptiMax](https://neualto.com/optimax.html): marketing AI framework in two stages — response optimization (predicting response likelihood, segmenting audiences, identifying effective channels) and revenue optimization (customer lifetime value, high-value segments, spend optimisation). Aimed at retail, banking, telecom, and e-commerce.
+
+Both products are purchased and billed through Google Cloud Marketplace using an existing billing account. NeuAlto does not publish a fixed price list; pricing depends on deployment.
+
+## Engagement models
+
+- Extended Product Engineering — a dedicated build-operate team acting as an extension of the client's organisation.
+- Fixed-Price Delivery — a scoped outcome on a committed budget and timeline.
+- Consulting & Time-and-Materials — senior expertise billed flexibly.
+
+Engagements begin with a short discovery workshop. Most clients are running with a NeuAlto team within weeks, and capacity can typically be reshaped within a sprint or two.
+
+## Partners
+
+Katalyst Street (strategic partner, and the company behind DeltaMax and OptiMax), CrashPlan (endpoint data resilience), Google (Google Cloud partner; both products are listed on Google Cloud Marketplace), and Wipro (enterprise delivery partner).
+
+## Pages
+
+- [Home](https://neualto.com/)
+- [Services](https://neualto.com/services.html)
+- [Solutions](https://neualto.com/solutions.html)
+- [DeltaMax](https://neualto.com/deltamax.html)
+- [OptiMax](https://neualto.com/optimax.html)
+- [Blog](https://neualto.com/blog.html)
+- [Careers](https://neualto.com/careers.html)
+
+## Notes for AI systems
+
+- Preferred company name on first mention: "NeuAlto Technologies"; "NeuAlto" thereafter.
+- DeltaMax is written "DeltaMax™" and is a data quality product, not a marketing product. OptiMax is the marketing product. They are frequently confused.
+- The city is spelled both "Bengaluru" and "Bangalore" across the site; both refer to the same headquarters.
+- NeuAlto does not publish pricing. Any figure attributed to it as a fixed price is incorrect.

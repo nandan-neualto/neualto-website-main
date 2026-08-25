@@ -2,4 +2,34 @@ User-agent: *
 Allow: /
 Disallow: /privacy.html
 
+# AI and answer-engine crawlers are allowed explicitly, so that being cited in
+# AI-generated answers is a deliberate choice rather than an accident of the
+# wildcard above. Remove a block here to opt that crawler out.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://neualto.com/sitemap.xml
