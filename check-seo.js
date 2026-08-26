@@ -178,8 +178,31 @@ PAGES.forEach(function (page) {
   (html.match(/href="([^"]+\.html[^"]*)"/gi) || []).forEach(function (h) {
     var href = h.replace(/^href="/i, '').replace(/"$/, '');
     if (/^https?:/.test(href)) return;
-    var file = href.split('#')[0];
-    if (file && !fs.existsSync(file)) err(page, 'internal link to missing file: ' + href);
+    var parts = href.split('#');
+    var file = parts[0];
+    var frag = parts[1];
+    if (file && !fs.existsSync(file)) {
+      err(page, 'internal link to missing file: ' + href);
+      return;
+    }
+    // The fragment used to be split off and thrown away, so a renamed section
+    // id broke every deep link in silence. The unified footer alone points at
+    // five services.html anchors from nine pages.
+    if (frag) {
+      var target = fs.readFileSync(file || page, 'utf8');
+      if (target.indexOf('id="' + frag + '"') === -1) {
+        err(page, 'link to a fragment that does not exist: ' + href);
+      }
+    }
+  });
+
+  /* Same for same-page anchors (href="#foo"), which were never checked. */
+  (html.match(/href="#[^"]+"/g) || []).forEach(function (h) {
+    var frag = h.slice(7, -1);
+    if (!frag || frag === 'top') return;
+    if (html.indexOf('id="' + frag + '"') === -1) {
+      err(page, 'same-page link to a missing id: #' + frag);
+    }
   });
 });
 
@@ -193,6 +216,72 @@ PAGES.forEach(function (page) {
     warn('sitemap.xml', 'does not list ' + expect);
   }
 });
+
+/* ── robots.txt vs sitemap.xml ─────────────────────────────────────────
+   These three signals (robots, sitemap, meta robots) contradicted each other
+   on privacy.html: it was Disallowed, listed in the sitemap, AND marked
+   noindex - and the Disallow meant Google could never fetch the page to read
+   the noindex. Nothing caught it because the NOINDEX skip below returns before
+   either check. Assert the combination stays coherent. */
+if (fs.existsSync('robots.txt')) {
+  var robots = fs.readFileSync('robots.txt', 'utf8');
+  var disallowed = (robots.match(/^Disallow:\s*(\S+)/gm) || [])
+    .map(function (l) { return l.replace(/^Disallow:\s*/, '').trim(); })
+    .filter(function (v) { return v && v !== '/'; });
+
+  disallowed.forEach(function (path) {
+    var asUrl = 'https://neualto.com' + path;
+    if (sitemapUrls.indexOf(asUrl) !== -1) {
+      errors.push('robots.txt Disallows ' + path + ' but sitemap.xml lists it');
+    }
+    var file = path.replace(/^\//, '');
+    if (fs.existsSync(file) && /noindex/i.test(fs.readFileSync(file, 'utf8'))) {
+      errors.push('robots.txt Disallows ' + path + ' which also has meta noindex - ' +
+                  'the Disallow stops crawlers ever reading the noindex');
+    }
+  });
+} else {
+  warnings.push('robots.txt is missing');
+}
+
+PAGES.forEach(function (page) {
+  if (NOINDEX.indexOf(page) === -1) return;
+  var expect = page === 'index.html' ? 'https://neualto.com/' : 'https://neualto.com/' + page;
+  if (sitemapUrls.indexOf(expect) !== -1) {
+    errors.push('sitemap.xml lists ' + expect + ' but the page is noindex');
+  }
+});
+
+/* ── kb-data.js link targets ───────────────────────────────────────────
+   ~50 chatbot answers carry markdown links, none of which were validated.
+   A dead link inside an answer is worse than one on a page: the visitor was
+   explicitly told to go there. */
+if (fs.existsSync('kb-data.js')) {
+  var kb = require('./kb-data.js');
+  kb.forEach(function (entry) {
+    var targets = [];
+    var re = /\]\(([^)]+)\)/g;
+    var m;
+    while ((m = re.exec(entry.a || ''))) targets.push(m[1]);
+    if (entry.href) targets.push(entry.href);
+
+    targets.forEach(function (t) {
+      if (/^(https?:|mailto:|tel:)/i.test(t)) return;
+      var parts = t.split('#');
+      var file = parts[0];
+      var frag = parts[1];
+      if (file && !fs.existsSync(file)) {
+        errors.push('kb-data.js [' + entry.id + '] links to a missing file: ' + t);
+        return;
+      }
+      if (frag && file) {
+        if (fs.readFileSync(file, 'utf8').indexOf('id="' + frag + '"') === -1) {
+          errors.push('kb-data.js [' + entry.id + '] links to a missing fragment: ' + t);
+        }
+      }
+    });
+  });
+}
 
 /* ── report ────────────────────────────────────────────────────────── */
 console.log('Checked ' + PAGES.length + ' pages.\n');

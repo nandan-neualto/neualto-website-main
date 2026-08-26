@@ -1,6 +1,6 @@
 # NeuAlto Assistant — knowledge base review
 
-Generated 2026-08-25 from `kb-data.js` (50 entries). This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
+Generated 2026-08-26 from `kb-data.js` (50 entries). This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
 **To regenerate after an edit:** `node build-kb-docs.js`
 

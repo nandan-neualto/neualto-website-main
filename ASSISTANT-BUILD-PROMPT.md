@@ -1,5 +1,11 @@
 # Build prompt — NeuAlto site assistant (no LLM)
 
+> **Superseded — kept as a decision record.**
+> What shipped differs from this document. The site assistant is a
+> zero-dependency, no-LLM, offline lexical search widget
+> (`assistant-widget.js` + `kb-data.js`), not the approach described
+> below. See README.md for how it actually works.
+
 Copy everything below the line into your code generator. It is self-contained — it carries the design tokens, code conventions, page map, and FAQ content, so the model does not need access to the repo.
 
 ---

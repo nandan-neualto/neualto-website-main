@@ -35,8 +35,23 @@ Then open <http://localhost:4173>.
 | `404.html` | Not-found page |
 | `app.js` | All site behaviour (see *JavaScript*) |
 | `styles.css` | All styling (see *CSS*) |
-| `pics/` | Images: logos, founders, client marks, product screenshots |
+| `pics/` | Images: logos, founders, client marks, product screenshots (WebP) |
 | `sitemap.xml`, `robots.txt` | Crawler directives — **update the sitemap when adding a page** |
+| `llms.txt` | Plain-language facts for AI crawlers — update when contacts or products change |
+| `_headers` | Netlify/Cloudflare caching + security headers |
+| **Chatbot** | |
+| `assistant-widget.js` | The site assistant: search engine + Shadow-DOM UI. No dependencies, no network calls |
+| `kb-data.js` | **The chatbot's content.** The only file to edit when changing what it says |
+| `kb.json`, `kb-review.md` | Generated from `kb-data.js` by `build-kb-docs.js` — **do not hand-edit** |
+| **Blog** | |
+| `posts-data.js` | **Blog post list.** Paste a LinkedIn URL here (see *Adding a blog post*) |
+| **Checks** (see *Checks*) | |
+| `check-seo.js` | Structured data, meta, canonicals, links, image alts |
+| `check-chrome.js` | Header/footer parity across all 9 pages |
+| `check-posts.js` | Blog post entries |
+| `assistant-widget.test.js` | Chatbot search accuracy + intent boundaries |
+| `build-kb-docs.js` | Regenerates `kb.json` and `kb-review.md` |
+| `tools/png-to-webp.py` | One-time image migration (already run; kept for reference) |
 
 ---
 
@@ -116,28 +131,58 @@ Conventions:
 
 ## Adding a blog post
 
-Posts are official LinkedIn embeds, curated by hand.
+Posts are official LinkedIn embeds, curated by hand. They live in
+**`posts-data.js`** — that is the only file you edit.
 
 1. On LinkedIn, open the post → **⋯ → Copy link to post**.
-2. From the URL, take the long number after `activity-`.
-3. Add an entry to the `NEUALTO_POSTS` array near the bottom of `blog.html`:
+2. Paste the whole URL into a new entry. Any of these shapes works — the site
+   extracts the post id for you:
 
 ```js
 {
-  urn: "7486023292294754304",
+  link: "https://www.linkedin.com/posts/neualto_x-activity-7486023292294754304-uhN5",
   title: "Your headline",
   date: "2026-07-23",                  // YYYY-MM-DD
-  tags: ["DeltaMax", "Data Quality"],  // must match the filter buttons
+  tags: ["DeltaMax", "Data Quality"],
   summary: "Two or three sentences in your own words."
 }
 ```
+
+3. Run `node check-posts.js` — it catches unreadable links, duplicates, bad
+   dates, missing summaries, and tags that differ only by capitalisation.
+
+Order does not matter (posts sort newest-first automatically) and the filter
+buttons are generated from whatever tags you use, so a new tag needs no other
+edit.
 
 The `summary` is not optional decoration — embedded post text lives in an iframe
 on LinkedIn's domain and is **not indexed as your content**. The summary is the
 only part search engines attribute to this site.
 
-Post data lives in the HTML rather than a JSON file so the page keeps working
+Post data is a plain script rather than a JSON file so the page keeps working
 from `file://`, where fetching a local path is blocked.
+
+---
+
+## Checks
+
+Four dependency-free Node scripts. They run in CI on every push, and each exits
+non-zero on failure so they can gate a deploy:
+
+```bash
+npm test
+```
+
+| Command | Checks |
+| --- | --- |
+| `node check-seo.js` | JSON-LD parses; FAQ schema matches visible text; titles/descriptions within display length; canonicals absolute and in the sitemap; in-page anchors resolve; robots.txt and sitemap.xml do not contradict each other; every `<img>` has alt and exists on disk; `kb-data.js` links resolve |
+| `node check-chrome.js` | The header and footer are identical across all 9 pages |
+| `node check-posts.js` | Blog entries in `posts-data.js` |
+| `node assistant-widget.test.js` | Chatbot answers the right entry, refuses off-topic questions, and small talk does not swallow real questions |
+
+After editing `kb-data.js`, run `node build-kb-docs.js` to regenerate `kb.json`
+and `kb-review.md`. CI fails if you forget. `kb-review.md` is the client-facing
+review document — send it to have answers signed off.
 
 ---
 

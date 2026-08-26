@@ -586,10 +586,6 @@
 
   var doc = document;
 
-  function isExternal(href) {
-    return /^https?:\/\//i.test(href) || /^mailto:/i.test(href) || /^tel:/i.test(href);
-  }
-
   function makeLink(text, href) {
     var a = doc.createElement('a');
     a.textContent = text;

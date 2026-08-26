@@ -1,5 +1,11 @@
 # Website Assistant — Options Research
 
+> **Superseded — kept as a decision record.**
+> What shipped differs from this document. The site assistant is a
+> zero-dependency, no-LLM, offline lexical search widget
+> (`assistant-widget.js` + `kb-data.js`), not the approach described
+> below. See README.md for how it actually works.
+
 **Question:** how do we add a small chatbot that helps visitors learn about NeuAlto?
 **Date:** August 4, 2026
 **Scope:** every realistic option, from hosted third-party widgets to building it ourselves.

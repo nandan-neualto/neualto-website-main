@@ -1,0 +1,40 @@
+name: checks
+
+# The repo already had four checkers documented as deploy gates, and nothing
+# ran them. This runs them on every push and PR. No install step: the checkers
+# are dependency-free Node scripts.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: SEO, structured data, links
+        run: node check-seo.js
+
+      - name: Header/footer parity
+        run: node check-chrome.js
+
+      - name: Blog posts
+        run: node check-posts.js
+
+      - name: Chatbot search accuracy
+        run: node assistant-widget.test.js
+
+      - name: kb.json / kb-review.md are in sync with kb-data.js
+        # build-kb-docs.js regenerates these. If someone edits kb-data.js and
+        # forgets to regenerate, the committed copies silently go stale - so
+        # regenerate here and fail if anything changed.
+        run: |
+          node build-kb-docs.js
+          git diff --exit-code kb.json kb-review.md

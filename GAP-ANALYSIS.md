@@ -50,7 +50,7 @@ Home · Insights · Why DeltaMax · **Architecture** · Recovery Events · Compe
 - `gcp/insights/In1–In7.png` — 7 insight visuals
 - `gcp/results/` — 3 charts + 2 tables
 - `gcp/v2/` (29 imgs), `azure/v2/` (18 imgs) — V2 walkthroughs
-- `common/why-deltamax1–4.png`, `common/Home1.png`, `common/Home2.png`
+- `common/why-deltamax1–4.png`, `common/Home1.png (removed - unused)`, `common/Home2.png (removed - unused)`
 - `Deltamax-page3/4/5/7.png`, `Optimax-page2/3/4/5.png`
 
 ### 2.3 OptiMax sub-pages

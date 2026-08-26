@@ -45,7 +45,10 @@ ENTRIES.forEach(function (entry) {
   byCategory[entry.c].push(entry);
 });
 
-var today = new Date().toISOString().slice(0, 10);
+/* Dated from the SOURCE file's mtime, not from "now". Regenerating without
+   editing kb-data.js must produce byte-identical output, or the CI check that
+   asserts these files are in sync would fail every day on the date alone. */
+var today = fs.statSync(path.join(__dirname, 'kb-data.js')).mtime.toISOString().slice(0, 10);
 var lines = [];
 
 lines.push('# NeuAlto Assistant — knowledge base review');
