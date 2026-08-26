@@ -1,0 +1,13 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Tooling (this repo has no build step; node is only used for the checkers)
+node_modules/
+*.log
+
+# Local rollback copies of images replaced by the WebP migration.
+# Kept on disk so a conversion can be undone, never pushed — the originals
+# are already recoverable from git history if they were ever committed.
+pics-original/
