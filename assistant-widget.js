@@ -42,7 +42,7 @@
     subtitle: opt('subtitle', 'Your friendly helper'),
     accent: opt('accent', '#dc2626'),
     accentDeep: opt('accentDeep', '#a61b1b'),
-    mascot: opt('mascot', 'pics/chat-widget.png'),
+    mascot: opt('mascot', 'pics/chat-widget.webp'),
     position: userConfig.position === 'left' ? 'left' : 'right',
     storageKey: opt('storageKey', 'neualto_assistant_v2'),
     insightsKey: opt('insightsKey', 'neualto_assistant_insights'),
