@@ -639,7 +639,9 @@
 
       if (toTop) {
         toTop.addEventListener('click', function () {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          // Honour the OS preference: the CSS reduced-motion block cannot reach
+          // a scroll issued from script.
+          window.scrollTo({ top: 0, behavior: Env.reducedMotion ? 'auto' : 'smooth' });
         });
       }
     }
@@ -773,6 +775,10 @@
         if (started) return;
         started = true;
         setInterval(function () {
+          // The headline rotates on a timer, not a CSS animation, so the
+          // motionToggle module's animation-play-state cannot reach it. Check
+          // the same attribute here so one control governs both.
+          if (document.documentElement.getAttribute('data-motion') === 'paused') return;
           element.classList.add('out');
           setTimeout(function () {
             index = (index + 1) % WORDS.length;
@@ -1071,13 +1077,23 @@
         });
         tags.sort();
 
+        // aria-pressed, not just a class: without it a screen-reader user has no
+        // way to tell which filter is currently applied.
         filterRow.innerHTML =
-          '<button class="filter-chip active" data-filter="all">All Posts</button>' +
+          '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
           tags.map(function (tag) {
-            return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '">' +
+            return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '" aria-pressed="false">' +
               escapeHtml(tag) + '</button>';
           }).join('');
       }
+
+      // Filtering changes the result set silently. A polite live region is the
+      // only way that reaches a screen reader.
+      var liveStatus = document.createElement('p');
+      liveStatus.className = 'sr-only';
+      liveStatus.setAttribute('role', 'status');
+      liveStatus.setAttribute('aria-live', 'polite');
+      grid.parentNode.insertBefore(liveStatus, grid);
 
       // Topic filtering. Tags are matched against a pipe-delimited list so that
       // a tag is never a substring match of another ("AI" vs "AI & ML").
@@ -1085,7 +1101,11 @@
       chips.forEach(function (chip) {
         chip.addEventListener('click', function () {
           var filter = chip.getAttribute('data-filter');
-          chips.forEach(function (c) { c.classList.toggle('active', c === chip); });
+          chips.forEach(function (c) {
+            var on = c === chip;
+            c.classList.toggle('active', on);
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
 
           var shown = 0;
           $$('.post-card', grid).forEach(function (card) {
@@ -1096,6 +1116,10 @@
           });
 
           if (emptyMessage) emptyMessage.hidden = shown > 0;
+          liveStatus.textContent = shown
+            ? shown + (shown === 1 ? ' post' : ' posts') + ' shown for ' +
+              (filter === 'all' ? 'all topics' : filter)
+            : 'No posts in ' + filter;
         });
       });
     }
@@ -1160,6 +1184,50 @@
     }
   };
 
+  /**
+   * Motion pause control — WCAG 2.2.2 (Level A).
+   *
+   * The marquees run on 36s/42s infinite loops and the hero headline rotates
+   * every 3s. Both previously paused only on :hover, which is mouse-only, so a
+   * keyboard or touch user had no way to stop content that moves automatically
+   * for more than five seconds. prefers-reduced-motion does not satisfy this
+   * criterion either — it needs a mechanism, not just a preference.
+   *
+   * Injects one button into the marquee section rather than shipping it in nine
+   * copies of hand-pasted markup.
+   */
+  var motionToggle = {
+    name: 'motionToggle',
+    init: function () {
+      var host = $('.clients .sec-head') || $('.clients .wrap');
+      if (!host) return;
+      if (Env.reducedMotion) return; // nothing is moving; a pause button would be noise
+
+      var KEY = 'motion';
+      var paused = false;
+      try { paused = localStorage.getItem(KEY) === 'paused'; } catch (e) { /* private mode */ }
+
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'motion-toggle';
+
+      var apply = function () {
+        document.documentElement.setAttribute('data-motion', paused ? 'paused' : 'running');
+        button.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        button.textContent = paused ? '▶ Resume motion' : '⏸ Pause motion';
+      };
+      apply();
+
+      button.addEventListener('click', function () {
+        paused = !paused;
+        apply();
+        try { localStorage.setItem(KEY, paused ? 'paused' : 'running'); } catch (e) { /* non-fatal */ }
+      });
+
+      host.appendChild(button);
+    }
+  };
+
   /** Mounts every decorative background canvas present on the page. */
   var backgrounds = {
     name: 'backgrounds',
@@ -1186,6 +1254,7 @@
     contactForm,
     blogFeed,
     dunsSeal,
+    motionToggle,
     backgrounds
   ];
 

@@ -81,6 +81,10 @@
     --red-tint: #fdf0f0;
     --red-tint-2: #fadede;
     --line: #f0e4e5;
+    /* --line is a 1.24:1 hairline: correct for card edges, but it fails the
+       3:1 non-text minimum when it is the ONLY thing identifying a form
+       control. --line-strong is for those borders. */
+    --line-strong: #9c8388;
     --bg: #ffffff;
     --bg-soft: #fcf8f8;
     --card: #ffffff;
@@ -116,11 +120,20 @@
   --ink: #f6ebec;
   --ink-soft: #cdb2b6;
   --ink-faint: #9d8085;
-  --red: #ef4444;
+  /* #ef4444 gave white button text only 3.76:1. Darkening to #d92d2d lifts
+     that to 4.81:1 while still clearing 3:1 (4.14) as a colour against --bg,
+     which is the balance point - going darker to favour button text starts
+     failing red-on-dark text instead. */
+  --red: #d92d2d;
+  /* Previously absent from this block entirely, so the light-theme #a61b1b
+     leaked into dark mode at 2.49:1 on --card (the CTA-band button). The
+     ad-hoc #ffb3a3 overrides scattered further down were symptoms of this. */
+  --red-deep: #ff9f8c;
   --coral: #ff8f70;
   --red-tint: #2a1216;
   --red-tint-2: #46191e;
   --line: #2f191d;
+  --line-strong: #8a656d;
   --bg: #0f0708;
   --bg-soft: #150a0c;
   --card: #1c0e11;
@@ -143,7 +156,6 @@
 [data-theme="dark"] .pill,
 [data-theme="dark"] .ftag,
 [data-theme="dark"] .meta-pill,
-[data-theme="dark"] .eyebrow { color: #ffb3a3; }
 [data-theme="dark"] .sticker { background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
 [data-theme="dark"] .spot-card:hover,
 [data-theme="dark"] .faq-item.open { border-color: #55272e; }
@@ -176,7 +188,6 @@ section { padding: 96px 0; }
   border-radius: 100px; padding: 9px 18px; transition: all .2s ease;
 }
 .jump-chips a:hover { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 6px 16px rgba(220,38,38,.3); }
-[data-theme="dark"] .jump-chips a { color: #ffb3a3; }
 [data-theme="dark"] .jump-chips a:hover { color: #fff; }
 
 /* ==========================================================================
@@ -205,9 +216,16 @@ section { padding: 96px 0; }
 }
 .skip-link:focus { transform: none; outline: 2px solid #fff; outline-offset: 2px; }
 
+/* Visually hidden but readable by assistive tech. Used for live-region
+   announcements and for labelling controls whose visible content is an icon. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
 /* visible keyboard focus everywhere */
 a:focus-visible, button:focus-visible, summary:focus-visible,
-input:focus-visible, textarea:focus-visible {
+input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 2px solid var(--red); outline-offset: 2px; border-radius: 6px;
 }
 
@@ -356,6 +374,22 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .compliance iframe { display: block; max-width: 100%; border: 0; }
 .compliance [hidden] { display: none; }
 
+/* ── Motion pause control (WCAG 2.2.2) ───────────────────────────────── */
+/* Injected by the motionToggle module in app.js. The attribute lives on <html>
+   so one control governs every auto-playing animation on the page. */
+.motion-toggle {
+  margin-top: 14px; cursor: pointer;
+  background: var(--card); color: var(--ink-soft);
+  border: 1px solid var(--line-strong); border-radius: 100px;
+  font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+  padding: 7px 14px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.motion-toggle:hover { color: var(--red-deep); border-color: var(--red); }
+[data-motion="paused"] .marquee-track,
+[data-motion="paused"] .rotator .word,
+[data-motion="paused"] .announce a { animation-play-state: paused; }
+
 /* ── Back to top ─────────────────────────────────────────────────────── */
 #toTop {
   position: fixed; right: 26px; bottom: 26px; z-index: 150;
@@ -365,8 +399,11 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   box-shadow: 0 10px 24px rgba(220,38,38,.4);
   opacity: 0; pointer-events: none; transform: translateY(12px);
   transition: opacity .3s, transform .3s, background .2s;
+  visibility: hidden;
 }
-#toTop.show { opacity: 1; pointer-events: auto; transform: none; }
+/* visibility, not just opacity: pointer-events:none stops the mouse but not
+   Tab, so without this a keyboard user lands on an invisible button. */
+#toTop.show { opacity: 1; pointer-events: auto; transform: none; visibility: visible; }
 #toTop:hover { background: var(--red-deep); }
 
 /* ==========================================================================
@@ -413,7 +450,10 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .rotator {
   display: inline-block; position: relative; text-align: left;
-  background: linear-gradient(100deg, var(--red-deep), var(--red) 45%, var(--coral));
+  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
+     gradient-filled headings, so the tail of every word fell below the 3:1
+     large-text minimum. --red is 4.83:1. */
+  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 .rotator .word { display: inline-block; }
@@ -549,7 +589,18 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .faq-item.open .chev { transform: rotate(180deg); background: var(--red); color: #fff; }
 .faq-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
 .faq-item.open .faq-a { grid-template-rows: 1fr; }
-.faq-a > div { overflow: hidden; }
+/* `visibility` here is load-bearing, not decoration. Collapsing with 0fr +
+   overflow:hidden hides the answer visually but leaves it in the accessibility
+   tree, so a screen reader read every answer in sequence while each button
+   still reported aria-expanded="false".
+   Deliberately NOT transitioned. Both transition formulations were tried and
+   both desynced from aria-expanded in one direction: `visibility 0s .35s`
+   never settled to hidden on close, and `visibility .35s` stayed hidden
+   through the open. The cost of leaving it untransitioned is that the answer
+   text disappears at once while the row animates shut; the benefit is that the
+   a11y tree always matches the announced state. That trade is not close. */
+.faq-a > div { overflow: hidden; visibility: hidden; }
+.faq-item.open .faq-a > div { visibility: visible; }
 .faq-a p { font-size: 14.5px; color: var(--ink-soft); padding: 0 26px 22px; }
 
 /* ── Clients: dual-direction marquee ─────────────────────────────────── */
@@ -623,7 +674,8 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: rgba(255,255,255,.08);
 }
 .cta-inner h2 { color: #fff; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; margin-bottom: 12px; }
-.cta-inner p { color: #ffd6cb; font-size: 16.5px; max-width: 520px; }
+/* #ffd6cb was 2.42:1 against the coral end of the band gradient. */
+.cta-inner p { color: #fff; font-size: 16.5px; max-width: 520px; }
 .cta-inner .btn { background: var(--card); color: var(--red-deep); position: relative; z-index: 1; white-space: nowrap; }
 .cta-inner .btn:hover { box-shadow: 0 12px 28px rgba(0,0,0,.25); }
 
@@ -924,11 +976,11 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .contact-form label { font-size: 13.5px; font-weight: 600; color: var(--ink); display: grid; gap: 7px; }
 .contact-form input, .contact-form select, .contact-form textarea {
   font-family: 'Inter', sans-serif; font-size: 14.5px; color: var(--ink);
-  background: var(--bg-soft); border: 1.5px solid var(--line); border-radius: 12px;
+  background: var(--bg-soft); border: 1.5px solid var(--line-strong); border-radius: 12px;
   padding: 12px 14px; width: 100%; resize: vertical;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-.contact-form input:focus, .contact-form select:focus, .contact-form textarea:focus {
+.contact-form input:focus-visible, .contact-form select:focus-visible, .contact-form textarea:focus-visible {
   outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,.12);
 }
 /* Native select chrome differs wildly per OS and ignores the styling above, so
@@ -988,7 +1040,10 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .prod-head { margin-bottom: 38px; }
 .sec-head h2.prod-name {
   font-size: clamp(38px, 5.4vw, 56px);
-  background: linear-gradient(100deg, var(--red-deep), var(--red) 45%, var(--coral));
+  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
+     gradient-filled headings, so the tail of every word fell below the 3:1
+     large-text minimum. --red is 4.83:1. */
+  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
   -webkit-background-clip: text; background-clip: text; color: transparent;
   margin-bottom: 10px;
 }
@@ -1013,7 +1068,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   padding: 32px 30px; margin-top: 24px; box-shadow: var(--shadow-sm);
 }
 .sol-feature h4 { font-family: 'Sora'; font-size: 17px; font-weight: 700; color: var(--red-deep); margin-bottom: 12px; }
-[data-theme="dark"] .sol-feature h4 { color: #ffb3a3; }
 .sol-feature p { font-size: 14.5px; color: var(--ink-soft); margin-bottom: 14px; max-width: none; }
 .sol-feature .check-list { margin-top: 4px; }
 @media (max-width: 780px) { .sol-duo { grid-template-columns: 1fr; } }
@@ -1031,7 +1085,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   color: var(--red-deep); background: var(--red-tint); border: 1px solid var(--red-tint-2);
   border-radius: 100px; padding: 7px 16px; margin-bottom: 14px;
 }
-[data-theme="dark"] .cloud-badge { color: #ffb3a3; }
 .shot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 22px 0; }
 .shot-grid a { display: block; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
 .shot-grid a:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
@@ -1079,7 +1132,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .vs-table { width: 100%; min-width: 640px; border-collapse: collapse; background: var(--card); font-size: 13.5px; }
 .vs-table th, .vs-table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-soft); }
 .vs-table th { font-family: 'Sora'; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--red-deep); background: var(--red-tint); }
-[data-theme="dark"] .vs-table th { color: #ffb3a3; }
 .vs-table tr:last-child td { border-bottom: none; }
 .vs-table td:first-child { font-weight: 600; color: var(--ink); }
 .comp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 18px 0; }
@@ -1087,7 +1139,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .comp-card h4 { font-family: 'Sora'; font-size: 15px; margin-bottom: 8px; color: var(--ink); }
 .comp-card p { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 8px; }
 .comp-card .tagline { font-size: 12px; font-weight: 600; color: var(--red-deep); }
-[data-theme="dark"] .comp-card .tagline { color: #ffb3a3; }
 @media (max-width: 720px) { .comp-grid { grid-template-columns: 1fr; } }
 
 /* ── Blog / LinkedIn post feed ───────────────────────────────────────── */
@@ -1202,7 +1253,10 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 
 .hero h1 .accent {
-  background: linear-gradient(100deg, var(--red-deep), var(--red) 45%, var(--coral));
+  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
+     gradient-filled headings, so the tail of every word fell below the 3:1
+     large-text minimum. --red is 4.83:1. */
+  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
@@ -1230,7 +1284,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .legal table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .legal th, .legal td { text-align: left; padding: 12px 16px; font-size: 14px; border-bottom: 1px solid var(--line); }
 .legal th { font-family: 'Sora'; font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--red-deep); background: var(--red-tint); }
-[data-theme="dark"] .legal th { color: #ffb3a3; }
 .legal td { color: var(--ink-soft); }
 .legal tr:last-child td { border-bottom: none; }
 
@@ -1238,7 +1291,10 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .err-hero { padding: 110px 0 120px; }
 .err-code {
   font-family: 'Sora'; font-size: clamp(90px, 17vw, 190px); font-weight: 800; line-height: 1;
-  background: linear-gradient(100deg, var(--red-deep), var(--red) 45%, var(--coral));
+  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
+     gradient-filled headings, so the tail of every word fell below the 3:1
+     large-text minimum. --red is 4.83:1. */
+  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
   -webkit-background-clip: text; background-clip: text; color: transparent;
   margin-bottom: 6px; letter-spacing: -0.04em;
 }
@@ -1302,6 +1358,11 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 
   /* Hover/steady-state transitions that would otherwise slide. */
   .tab-ind, .founder-card { transition: none; }
+
+  /* Previously missing from this block despite the note above. */
+  html { scroll-behavior: auto; }
+  .eyebrow .dot { animation: none; }
+  .tab-panel.active { animation: none; }
 
   /* Logos are greyscale-until-hover; show them in colour immediately instead. */
   .logo-chip img { filter: none; opacity: 1; }

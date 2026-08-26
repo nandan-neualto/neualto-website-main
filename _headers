@@ -1,0 +1,33 @@
+# Netlify / Cloudflare Pages header rules.
+# (On Vercel these belong in vercel.json "headers" instead.)
+#
+# Compression is already handled by the host, so this file exists for caching
+# and security headers only.
+
+# Images are content-stable and now the bulk of transfer, so they get the
+# longest cache. Deliberately NOT "immutable" with a 1-year max-age: filenames
+# are not content-hashed, so replacing an image in place would leave returning
+# visitors on the stale copy until it expired. A week plus
+# stale-while-revalidate keeps repeat visits fast while capping how long a
+# swapped image can be wrong.
+/pics/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# Same reasoning, shorter window: these change more often than images.
+/*.css
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+/*.js
+  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
+
+# HTML must always revalidate or a deploy will not be seen.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Applied site-wide.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()

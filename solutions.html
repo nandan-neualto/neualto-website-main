@@ -130,7 +130,7 @@
       <img class="logo-mark-img" src="pics/logo.png" alt="" width="229" height="202">
       <span>Neu<span class="alto">Alto</span></span>
     </a>
-    <nav class="nav-links">
+    <nav class="nav-links" aria-label="Primary">
       <a href="services.html">Services</a>
       <a href="solutions.html" class="active">Solutions</a>
       <a href="blog.html">Blog</a>
@@ -141,8 +141,8 @@
     </nav>
     <div class="nav-right">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       </button>
       <a class="btn btn-primary nav-cta" href="index.html#contact">Request a Demo</a>
       <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-controls="mobileNav" aria-expanded="false">
@@ -150,7 +150,7 @@
       </button>
     </div>
   </div>
-  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
+  <nav class="mobile-nav" id="mobileNav" aria-label="Primary (mobile)">
     <a href="services.html">Services</a>
     <a href="solutions.html">Solutions</a>
       <a href="blog.html">Blog</a>
@@ -162,7 +162,7 @@
   </nav>
 </header>
 
-<main id="main">
+<main id="main" tabindex="-1">
 
 <section class="hero">
   <div class="aurora"><span class="a1"></span><span class="a2"></span></div>
@@ -197,17 +197,17 @@
         <h3>The Problem: When Data Pipelines Become Invisible</h3>
         <p>Modern businesses rely on data, but managing it has become increasingly complex. Data flows from multiple sources with different formats, volumes, and timings, making it hard to track and control. Common challenges include:</p>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Sudden data changes that pass validation checks</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Inconsistencies during system migrations</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Excessive time spent investigating alerts</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Sudden data changes that pass validation checks</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Inconsistencies during system migrations</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Excessive time spent investigating alerts</li>
         </ul>
       </div>
       <div class="sol-card">
         <h3>The Solution: DeltaMax™</h3>
         <p>DeltaMax™ provides intelligent visibility into your data ecosystem. Built for scalable environments, it uses adaptive machine learning to monitor, validate, and analyze data continuously. It focuses on:</p>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Anomaly Detection</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Reliability of Data</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Anomaly Detection</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Reliability of Data</li>
         </ul>
         <p>Instead of just flagging issues, DeltaMax helps identify root causes — reducing investigation time and improving data trust.</p>
       </div>
@@ -220,9 +220,9 @@
       <p>Not all data issues are obvious. Many appear as small deviations — slight drops in volume, unexpected spikes, or subtle shifts in patterns. These often go unnoticed because they don't violate predefined checks.</p>
       <p>DeltaMax™ continuously observes how data behaves across sources and over time. It learns normal patterns and establishes a baseline for comparison. When data deviates from this baseline in a meaningful way, it is automatically flagged — eliminating the need to manually define every possible rule.</p>
       <ul class="check-list">
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Hidden issues are detected early</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Only meaningful deviations are highlighted, reducing noise</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Teams gain a deeper understanding of data behavior across systems</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Hidden issues are detected early</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Only meaningful deviations are highlighted, reducing noise</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Teams gain a deeper understanding of data behavior across systems</li>
       </ul>
     </div>
 
@@ -233,9 +233,9 @@
       <p>Alongside it, the <b>Agent Summary</b> provides contextual explanation — what exactly changed in the data, where the change occurred, and whether it is expected, minor, or critical.</p>
       <p>Beyond detection and explanation, DeltaMax™ also enables <b>data correction workflows</b>. Once anomalies are identified and understood, the platform can isolate or remove problematic records, allowing teams to work with a clean, trusted dataset. In practice, this means:</p>
       <ul class="check-list">
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Data health is no longer abstract — it's measurable and visible</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Investigation effort is significantly reduced because context is built-in</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Decisions can be made faster, with clear awareness of risk and impact</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Data health is no longer abstract — it's measurable and visible</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Investigation effort is significantly reduced because context is built-in</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Decisions can be made faster, with clear awareness of risk and impact</li>
       </ul>
     </div>
 
@@ -251,10 +251,10 @@
       <p>As data grows across systems, the same entity starts appearing in multiple forms — slightly different names, formats, or missing attributes. Over time this leads to duplication, inconsistency, and confusion about which version is correct.</p>
       <p>DeltaMax™ brings intelligence into how master data is identified and managed. Instead of relying only on exact matches, it understands relationships between records — linking similar entries even when they are not identical — then standardizes and aligns them into a single, consistent representation.</p>
       <ul class="check-list">
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> A unified, consistent view of core entities across systems</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Elimination of duplicate and conflicting records</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Standardized formats and aligned data definitions</li>
-        <li><svg width="15" height="15"><use href="#i-check"/></svg> Stronger control over how critical data is created and updated</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> A unified, consistent view of core entities across systems</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Elimination of duplicate and conflicting records</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Standardized formats and aligned data definitions</li>
+        <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Stronger control over how critical data is created and updated</li>
       </ul>
     </div>
 
@@ -277,7 +277,7 @@
         <p>Architecture, competitive intel, step-by-step walkthroughs, results, FAQs — and the marketplace listing.</p>
       </div>
       <div class="btn-row">
-        <a class="btn btn-primary" href="deltamax.html">Explore the full DeltaMax site <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-primary" href="deltamax.html">Explore the full DeltaMax site <svg width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>
         <a class="btn btn-ghost" href="https://console.cloud.google.com/marketplace/product/katalyststreet-public/sq-33833" target="_blank" rel="noopener">Buy on GCP Marketplace</a>
       </div>
     </div>
@@ -307,12 +307,12 @@
       <div class="sol-card">
         <h3>What Problem Does OptiMax Solve?</h3>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Difficulty linking marketing activities directly to revenue</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Inefficient allocation of budgets across channels</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Limited understanding of customer motivations and behaviors</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> High customer acquisition costs (CAC)</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Lack of personalization and precise targeting</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Inadequate frameworks to measure and justify ROI</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Difficulty linking marketing activities directly to revenue</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Inefficient allocation of budgets across channels</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Limited understanding of customer motivations and behaviors</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> High customer acquisition costs (CAC)</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Lack of personalization and precise targeting</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Inadequate frameworks to measure and justify ROI</li>
         </ul>
       </div>
     </div>
@@ -323,9 +323,9 @@
         <h3>1 · Response Optimization</h3>
         <p>The first step is maximizing customer engagement and conversion. Using AI and machine learning models, OptiMax:</p>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Analyzes customer data to predict response likelihood</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Segments audiences based on engagement potential</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Identifies the most effective channels for communication</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Analyzes customer data to predict response likelihood</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Segments audiences based on engagement potential</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Identifies the most effective channels for communication</li>
         </ul>
         <p>By targeting the right customers through the right channels, organizations significantly improve response rates and campaign efficiency.</p>
       </div>
@@ -333,9 +333,9 @@
         <h3>2 · Revenue Optimization</h3>
         <p>While response is important, true business impact comes from profitability. OptiMax extends its capabilities to:</p>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Evaluate customer lifetime value (LTV)</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Identify high-value customer segments</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Optimize marketing spend based on revenue potential</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Evaluate customer lifetime value (LTV)</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Identify high-value customer segments</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Optimize marketing spend based on revenue potential</li>
         </ul>
         <p>This ensures marketing strategies are effective at driving engagement and aligned with long-term financial outcomes.</p>
       </div>
@@ -345,21 +345,21 @@
       <div class="sol-card">
         <h3>Who Is It For?</h3>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Marketing teams aiming to improve performance and efficiency</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Business leaders aligning marketing with revenue goals</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Data and analytics teams implementing AI-driven solutions</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Enterprises in retail, banking, telecom, and e-commerce</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Marketing teams aiming to improve performance and efficiency</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Business leaders aligning marketing with revenue goals</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Data and analytics teams implementing AI-driven solutions</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Enterprises in retail, banking, telecom, and e-commerce</li>
         </ul>
       </div>
       <div class="sol-card">
         <h3>What OptiMax Delivers</h3>
         <ul class="check-list">
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Data-driven marketing decisions</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Better customer targeting and segmentation</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Optimized channel performance and budget allocation</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Reduced customer acquisition costs</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Maximized customer lifetime value (CLTV)</li>
-          <li><svg width="15" height="15"><use href="#i-check"/></svg> Clearly measured and justified ROI</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Data-driven marketing decisions</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Better customer targeting and segmentation</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Optimized channel performance and budget allocation</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Reduced customer acquisition costs</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Maximized customer lifetime value (CLTV)</li>
+          <li><svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> Clearly measured and justified ROI</li>
         </ul>
       </div>
     </div>
@@ -369,7 +369,7 @@
         <p>Strategy insights, the conceptual demo, hands-on setup with the Chocky demo dataset, real agentic outputs — and the marketplace listing.</p>
       </div>
       <div class="btn-row">
-        <a class="btn btn-primary" href="optimax.html">Explore the full OptiMax site <svg width="16" height="16"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-primary" href="optimax.html">Explore the full OptiMax site <svg width="16" height="16" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>
         <a class="btn btn-ghost" href="https://console.cloud.google.com/marketplace/product/katalyststreet-public/optimax" target="_blank" rel="noopener">Buy on GCP Marketplace</a>
       </div>
     </div>
@@ -404,7 +404,7 @@
 </footer>
 
 <button id="toTop" aria-label="Back to top">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
 </button>
 
 <script src="app.js" defer></script>
