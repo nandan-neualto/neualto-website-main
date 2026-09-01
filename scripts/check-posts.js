@@ -1,7 +1,7 @@
 /**
  * Validates posts-data.js before it reaches the page.
  *
- *   node check-posts.js
+ *   node scripts/check-posts.js
  *
  * Catches the mistakes that are invisible until someone loads the blog and
  * sees a dead embed or a duplicated filter button: an unreadable LinkedIn
@@ -13,7 +13,7 @@
  */
 'use strict';
 
-var POSTS = require('./posts-data.js');
+var POSTS = require('../assets/posts-data.js');
 
 var errors = [];
 var warnings = [];

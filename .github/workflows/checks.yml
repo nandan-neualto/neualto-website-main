@@ -20,23 +20,23 @@ jobs:
           node-version: '20'
 
       - name: SEO, structured data, links
-        run: node check-seo.js
+        run: node scripts/check-seo.js
 
       - name: Header/footer parity
-        run: node check-chrome.js
+        run: node scripts/check-chrome.js
 
       - name: Blog posts
-        run: node check-posts.js
+        run: node scripts/check-posts.js
 
       - name: Chatbot search accuracy
-        run: node assistant-widget.test.js
+        run: node scripts/assistant-widget.test.js
 
-      - name: kb.json / kb-review.md are in sync with kb-data.js
-        # build-kb-docs.js regenerates these. If someone edits kb-data.js and
+      - name: docs/kb.json and docs/kb-review.md are in sync with assets/kb-data.js
+        # build-kb-docs.js regenerates these. If someone edits assets/kb-data.js and
         # forgets to regenerate, the committed copies silently go stale - so
         # regenerate here and fail if anything changed.
         run: |
-          node build-kb-docs.js
+          node scripts/build-kb-docs.js
           # '--' so a DELETED generated file is reported as a diff rather than
           # making git treat the name as a revision and error out.
-          git diff --exit-code -- kb.json kb-review.md
+          git diff --exit-code -- docs/kb.json docs/kb-review.md

@@ -1,7 +1,7 @@
 /**
  * Static SEO / structured-data linter for the NeuAlto site.
  *
- *   node check-seo.js
+ *   node scripts/check-seo.js
  *
  * Checks the things that silently cost rankings or break rich results and are
  * invisible until a crawler complains:
@@ -174,6 +174,26 @@ PAGES.forEach(function (page) {
     }
   });
 
+  /* ── Stylesheets and scripts ──────────────────────────── */
+  /* A page that links a stylesheet or script that is not on disk renders
+     unstyled or dead, and nothing else here would notice: the img check only
+     covers <img>, and the internal-link check only matches .html hrefs. This
+     gap let a mistyped asset path pass CI silently. */
+  (html.match(/<link\s[^>]*rel="stylesheet"[^>]*>/gi) || []).forEach(function (tag) {
+    var href = attr(tag, 'href');
+    if (href && !/^https?:|^data:|^\/\//.test(href)) {
+      var f = decodeURIComponent(href.split('?')[0]);
+      if (!fs.existsSync(f)) err(page, 'stylesheet not found on disk: ' + f);
+    }
+  });
+  (html.match(/<script\s[^>]*src="[^"]*"[^>]*>/gi) || []).forEach(function (tag) {
+    var src = attr(tag, 'src');
+    if (src && !/^https?:|^data:|^\/\//.test(src)) {
+      var f = decodeURIComponent(src.split('?')[0]);
+      if (!fs.existsSync(f)) err(page, 'script src not found on disk: ' + f);
+    }
+  });
+
   /* ── Internal links ──────────────────────────────────────────────── */
   (html.match(/href="([^"]+\.html[^"]*)"/gi) || []).forEach(function (h) {
     var href = h.replace(/^href="/i, '').replace(/"$/, '');
@@ -256,8 +276,8 @@ PAGES.forEach(function (page) {
    ~50 chatbot answers carry markdown links, none of which were validated.
    A dead link inside an answer is worse than one on a page: the visitor was
    explicitly told to go there. */
-if (fs.existsSync('kb-data.js')) {
-  var kb = require('./kb-data.js');
+if (fs.existsSync('assets/kb-data.js')) {
+  var kb = require('../assets/kb-data.js');
   kb.forEach(function (entry) {
     var targets = [];
     var re = /\]\(([^)]+)\)/g;

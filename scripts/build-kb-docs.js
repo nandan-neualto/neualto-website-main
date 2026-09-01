@@ -1,7 +1,7 @@
 /**
  * Regenerates kb.json and kb-review.md FROM kb-data.js.
  *
- *   node build-kb-docs.js
+ *   node scripts/build-kb-docs.js
  *
  * kb-data.js is the only file you should hand-edit. This script mechanically
  * derives the other two from it, so what a client reviews in kb-review.md is
@@ -20,13 +20,13 @@ var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
 
-var ENTRIES = require('./kb-data.js');
+var ENTRIES = require('../assets/kb-data.js');
 
 /* ── kb.json ─────────────────────────────────────────────────────────── */
 
 var json = JSON.stringify(ENTRIES, null, 2) + '\n';
 
-fs.writeFileSync(path.join(__dirname, 'kb.json'), json);
+fs.writeFileSync(path.join(__dirname, '..', 'docs', 'kb.json'), json);
 
 /* ── kb-review.md ────────────────────────────────────────────────────── */
 
@@ -63,7 +63,7 @@ lines.push('Generated from `kb-data.js` — ' + ENTRIES.length + ' entries, cont
   'paraphrased or summarized, so approving an answer below is the same as approving what ' +
   'visitors will see.');
 lines.push('');
-lines.push('**To regenerate after an edit:** `node build-kb-docs.js`');
+lines.push('**To regenerate after an edit:** `node scripts/build-kb-docs.js`');
 lines.push('');
 lines.push('---');
 lines.push('');
@@ -121,6 +121,6 @@ order.forEach(function (category) {
   });
 });
 
-fs.writeFileSync(path.join(__dirname, 'kb-review.md'), lines.join('\n'));
+fs.writeFileSync(path.join(__dirname, '..', 'docs', 'kb-review.md'), lines.join('\n'));
 
 console.log('Wrote kb.json (' + ENTRIES.length + ' entries) and kb-review.md.');

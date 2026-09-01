@@ -3,7 +3,7 @@
  *
  * Runs under plain Node (no browser, no test framework):
  *
- *   node assistant-widget.test.js
+ *   node scripts/assistant-widget.test.js
  *
  * It scores every query below against search(), finds where the top hit's
  * score lands relative to the expected entry, and reports:
@@ -13,7 +13,7 @@
  *     sit inside, with headroom on both sides)
  *   - intent-boundary checks (smalltalk regexes must not swallow real questions)
  */
-var assistant = require('./assistant-widget.js');
+var assistant = require('../assets/assistant-widget.js');
 var search = assistant.search;
 var suggestions = assistant.suggestions;
 var detectIntent = assistant.detectIntent;

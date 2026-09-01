@@ -11,7 +11,7 @@
  *     assistant-widget.test.js and build-kb-docs.js read it directly
  *
  * WHEN YOU EDIT THIS FILE, ALSO RUN:
- *     node build-kb-docs.js
+ *     node scripts/build-kb-docs.js
  * That regenerates kb.json (plain JSON export) and kb-review.md (a clean,
  * client-readable FAQ document with a checkbox per entry) FROM this file —
  * so whatever you hand a client to review is guaranteed to match what the

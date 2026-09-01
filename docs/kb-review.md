@@ -2,7 +2,7 @@
 
 Generated from `kb-data.js` — 50 entries, content id `bb7a8172d70f`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
-**To regenerate after an edit:** `node build-kb-docs.js`
+**To regenerate after an edit:** `node scripts/build-kb-docs.js`
 
 ---
 

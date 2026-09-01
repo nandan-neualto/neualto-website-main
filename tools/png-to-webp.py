@@ -44,13 +44,13 @@ BACKUP = os.path.join(ROOT, 'pics-original')
 
 SKIP = {'og-card.png', 'logo.png'}
 
-# Files whose text references need rewriting. assistant-widget.js matters:
+# Files whose text references need rewriting. assets/assistant-widget.js matters:
 # it carries `mascot: opt('mascot', 'pics/chat-widget.png')` as a JS default,
 # which an HTML-only pass would silently miss and break the chat avatar.
 REWRITE_TARGETS = [
     '404.html', 'blog.html', 'careers.html', 'deltamax.html', 'index.html',
     'optimax.html', 'privacy.html', 'services.html', 'solutions.html',
-    'assistant-widget.js',
+    'assets/assistant-widget.js',
 ]
 
 DRY = '--dry-run' in sys.argv

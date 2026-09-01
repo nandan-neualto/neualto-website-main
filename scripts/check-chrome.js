@@ -1,7 +1,7 @@
 /**
  * Header / footer parity checker.
  *
- *   node check-chrome.js
+ *   node scripts/check-chrome.js
  *
  * The 9 pages each carry a hand-pasted copy of the site header and footer —
  * ~490 lines of duplication. That is a deliberate architectural choice for a

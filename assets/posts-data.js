@@ -24,7 +24,7 @@
  * so a new tag needs no other edit. (Tags are case-sensitive, so keep
  * "AI & ML" spelled the same way each time or you'll get two buttons.)
  *
- * After editing, optionally run:  node check-posts.js
+ * After editing, optionally run:  node scripts/check-posts.js
  * It flags unreadable links, duplicates, bad dates, and missing text
  * before you find out from a broken page.
  *

@@ -33,29 +33,30 @@ Then open <http://localhost:4173>.
 | `careers.html` | Open roles, with `JobPosting` structured data |
 | `privacy.html` | Privacy policy |
 | `404.html` | Not-found page |
-| `app.js` | All site behaviour (see *JavaScript*) |
-| `styles.css` | All styling (see *CSS*) |
+| `assets/app.js` | All site behaviour (see *JavaScript*) |
+| `assets/styles.css` | All styling (see *CSS*) |
 | `pics/` | Images: logos, founders, client marks, product screenshots (WebP) |
 | `sitemap.xml`, `robots.txt` | Crawler directives — **update the sitemap when adding a page** |
 | `llms.txt` | Plain-language facts for AI crawlers — update when contacts or products change |
 | `_headers` | Netlify/Cloudflare caching + security headers |
 | **Chatbot** | |
-| `assistant-widget.js` | The site assistant: search engine + Shadow-DOM UI. No dependencies, no network calls |
-| `kb-data.js` | **The chatbot's content.** The only file to edit when changing what it says |
-| `kb.json`, `kb-review.md` | Generated from `kb-data.js` by `build-kb-docs.js` — **do not hand-edit** |
+| `assets/assistant-widget.js` | The site assistant: search engine + Shadow-DOM UI. No dependencies, no network calls |
+| `assets/kb-data.js` | **The chatbot's content.** The only file to edit when changing what it says |
+| `docs/kb.json`, `docs/kb-review.md` | Generated from `assets/kb-data.js` by `scripts/build-kb-docs.js` — **do not hand-edit** |
 | **Blog** | |
-| `posts-data.js` | **Blog post list.** Paste a LinkedIn URL here (see *Adding a blog post*) |
+| `assets/posts-data.js` | **Blog post list.** Paste a LinkedIn URL here (see *Adding a blog post*) |
 | **Checks** (see *Checks*) | |
-| `check-seo.js` | Structured data, meta, canonicals, links, image alts |
-| `check-chrome.js` | Header/footer parity across all 9 pages |
-| `check-posts.js` | Blog post entries |
-| `assistant-widget.test.js` | Chatbot search accuracy + intent boundaries |
-| `build-kb-docs.js` | Regenerates `kb.json` and `kb-review.md` |
+| `scripts/check-seo.js` | Structured data, meta, canonicals, links, image alts |
+| `scripts/check-chrome.js` | Header/footer parity across all 9 pages |
+| `scripts/check-posts.js` | Blog post entries |
+| `scripts/assistant-widget.test.js` | Chatbot search accuracy + intent boundaries |
+| `scripts/build-kb-docs.js` | Regenerates `docs/kb.json` and `docs/kb-review.md` |
 | `tools/png-to-webp.py` | One-time image migration (already run; kept for reference) |
+| `docs/WEBSITE-IMPROVEMENTS.md` | Past improvement audit, kept for reference |
 
 ---
 
-## JavaScript (`app.js`)
+## JavaScript (`assets/app.js`)
 
 One file, loaded by every page, structured as a **registry of independent
 feature modules**. Each module declares the DOM it needs and exits quietly when
@@ -101,7 +102,7 @@ are pointer-reactive, so there is nothing to gain there and battery to lose.
 
 ---
 
-## CSS (`styles.css`)
+## CSS (`assets/styles.css`)
 
 Ordered **broadest to narrowest**, so a rule's position tells you its scope:
 
@@ -132,7 +133,7 @@ Conventions:
 ## Adding a blog post
 
 Posts are official LinkedIn embeds, curated by hand. They live in
-**`posts-data.js`** — that is the only file you edit.
+**`assets/posts-data.js`** — that is the only file you edit.
 
 1. On LinkedIn, open the post → **⋯ → Copy link to post**.
 2. Paste the whole URL into a new entry. Any of these shapes works — the site
@@ -148,7 +149,7 @@ Posts are official LinkedIn embeds, curated by hand. They live in
 }
 ```
 
-3. Run `node check-posts.js` — it catches unreadable links, duplicates, bad
+3. Run `node scripts/check-posts.js` — it catches unreadable links, duplicates, bad
    dates, missing summaries, and tags that differ only by capitalisation.
 
 Order does not matter (posts sort newest-first automatically) and the filter
@@ -175,13 +176,13 @@ npm test
 
 | Command | Checks |
 | --- | --- |
-| `node check-seo.js` | JSON-LD parses; FAQ schema matches visible text; titles/descriptions within display length; canonicals absolute and in the sitemap; in-page anchors resolve; robots.txt and sitemap.xml do not contradict each other; every `<img>` has alt and exists on disk; `kb-data.js` links resolve |
-| `node check-chrome.js` | The header and footer are identical across all 9 pages |
-| `node check-posts.js` | Blog entries in `posts-data.js` |
-| `node assistant-widget.test.js` | Chatbot answers the right entry, refuses off-topic questions, and small talk does not swallow real questions |
+| `node scripts/check-seo.js` | JSON-LD parses; FAQ schema matches visible text; titles/descriptions within display length; canonicals absolute and in the sitemap; in-page anchors resolve; robots.txt and sitemap.xml do not contradict each other; every `<img>` has alt and exists on disk; `assets/kb-data.js` links resolve |
+| `node scripts/check-chrome.js` | The header and footer are identical across all 9 pages |
+| `node scripts/check-posts.js` | Blog entries in `assets/posts-data.js` |
+| `node scripts/assistant-widget.test.js` | Chatbot answers the right entry, refuses off-topic questions, and small talk does not swallow real questions |
 
-After editing `kb-data.js`, run `node build-kb-docs.js` to regenerate `kb.json`
-and `kb-review.md`. CI fails if you forget. `kb-review.md` is the client-facing
+After editing `assets/kb-data.js`, run `node scripts/build-kb-docs.js` to
+regenerate `docs/kb.json` and `docs/kb-review.md`. CI fails if you forget. `kb-review.md` is the client-facing
 review document — send it to have answers signed off.
 
 ---
@@ -204,7 +205,7 @@ Things that will break it, all learned the hard way:
   proportion.
 - **It renders only on the registered production domain.** Everywhere else the
   container stays empty and the static `pics/Certificate.png` is shown instead;
-  `app.js` hides that fallback as soon as the real seal appears.
+  `assets/app.js` hides that fallback as soon as the real seal appears.
 - The injected iframe uses `http://`, which is mixed content on an https site.
   The `upgrade-insecure-requests` meta tag in `index.html` fixes that — remove
   it and the seal disappears in production.
@@ -217,7 +218,7 @@ Things that will break it, all learned the hard way:
   tabs implement the full ARIA pattern (roving tabindex, arrow keys); the FAQ
   keeps `aria-expanded` in sync. Colour choices target WCAG AA.
 - **Theme flash.** Each page sets `data-theme` from an inline `<head>` script
-  *before* first paint. Keep it inline — moving it to `app.js` reintroduces a
+  *before* first paint. Keep it inline — moving it to `assets/app.js` reintroduces a
   flash of the wrong theme.
 - **Adding a page:** copy the header/footer from an existing page, then update
   the nav on the other pages, `sitemap.xml`, and the footer link lists.

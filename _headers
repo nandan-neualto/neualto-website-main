@@ -14,9 +14,11 @@
   Cache-Control: public, max-age=604800, stale-while-revalidate=86400
 
 # Same reasoning, shorter window: these change more often than images.
-/*.css
-  Cache-Control: public, max-age=86400, stale-while-revalidate=3600
-/*.js
+# Path-scoped to /assets/*, where the CSS and JS now live. A bare /*.css rule
+# would not match them - Netlify matches these patterns against the whole
+# path, so /*.css covers /styles.css but never /assets/styles.css, and the
+# files would quietly lose their cache headers.
+/assets/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=3600
 
 # HTML must always revalidate or a deploy will not be seen.
