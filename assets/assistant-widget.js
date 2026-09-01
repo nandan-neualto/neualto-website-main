@@ -1563,12 +1563,25 @@
     width: 396px; max-width: calc(100vw - var(--nw-edge) * 2);
     height: 604px; max-height: calc(100vh - var(--nw-lift) - var(--nw-size) - 34px);
     background: var(--nw-bg); border-radius: 24px; box-shadow: var(--nw-shadow);
-    display: flex; flex-direction: column; overflow: hidden; pointer-events: auto;
+    display: flex; flex-direction: column; overflow: hidden;
     opacity: 0; transform: translateY(14px) scale(.97); transform-origin: bottom right;
+    /* Not interactive until opened. opacity:0 is still hit-tested, so during
+       the 280ms close fade - before close() sets [hidden] - this box would
+       otherwise keep swallowing clicks. .is-open restores pointer-events. */
+    pointer-events: none;
     transition: opacity .28s cubic-bezier(.2,.9,.3,1), transform .28s cubic-bezier(.2,.9,.3,1);
   }
+  /* THE fix for a dead theme toggle. The card is created with card.hidden =
+     true and close() sets it again, but [hidden] only carries display:none in
+     the UA stylesheet, which .nw-card{display:flex} above outranks. Without
+     this rule the card stayed display:flex from first paint on every page: an
+     invisible 396x604 panel pinned over the top-right corner, eating real
+     mouse clicks on the theme toggle and the nav CTA and holding 10 controls
+     in the tab order. .nw-panel[hidden] below already does this; .nw-card was
+     missed. Scripted .click() bypasses hit-testing, so tests never saw it. */
+  .nw-card[hidden] { display: none; }
   .nw-pos-left .nw-card { right: auto; left: var(--nw-edge); transform-origin: bottom left; }
-  .nw-card.is-open { opacity: 1; transform: none; }
+  .nw-card.is-open { opacity: 1; transform: none; pointer-events: auto; }
 
   /* ── Header ───────────────────────────────────────────────────────── */
   .nw-header {
