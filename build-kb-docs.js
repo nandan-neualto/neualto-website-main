@@ -18,15 +18,15 @@
 
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
 
 var ENTRIES = require('./kb-data.js');
 
 /* ── kb.json ─────────────────────────────────────────────────────────── */
 
-fs.writeFileSync(
-  path.join(__dirname, 'kb.json'),
-  JSON.stringify(ENTRIES, null, 2) + '\n'
-);
+var json = JSON.stringify(ENTRIES, null, 2) + '\n';
+
+fs.writeFileSync(path.join(__dirname, 'kb.json'), json);
 
 /* ── kb-review.md ────────────────────────────────────────────────────── */
 
@@ -45,15 +45,20 @@ ENTRIES.forEach(function (entry) {
   byCategory[entry.c].push(entry);
 });
 
-/* Dated from the SOURCE file's mtime, not from "now". Regenerating without
-   editing kb-data.js must produce byte-identical output, or the CI check that
-   asserts these files are in sync would fail every day on the date alone. */
-var today = fs.statSync(path.join(__dirname, 'kb-data.js')).mtime.toISOString().slice(0, 10);
+/* Stamped with a hash of the CONTENT, not a date. Regenerating without editing
+   kb-data.js must produce byte-identical output, or the CI check asserting these
+   files are in sync would fail on the stamp alone. An mtime cannot do this job:
+   git does not preserve mtimes, so on a fresh CI clone it resolves to the CHECKOUT
+   date and the gate goes red on an untouched repo. The hash is also the better
+   stamp for what this file is FOR - "is this the version I approved?" is a
+   question about content, not about when the file was written. */
+var contentId = crypto.createHash('sha256').update(json).digest('hex').slice(0, 12);
 var lines = [];
 
 lines.push('# NeuAlto Assistant — knowledge base review');
 lines.push('');
-lines.push('Generated ' + today + ' from `kb-data.js` (' + ENTRIES.length + ' entries). ' +
+lines.push('Generated from `kb-data.js` — ' + ENTRIES.length + ' entries, content id `' +
+  contentId + '`. ' +
   'This is a direct export of what the chatbot actually answers with — nothing here is ' +
   'paraphrased or summarized, so approving an answer below is the same as approving what ' +
   'visitors will see.');

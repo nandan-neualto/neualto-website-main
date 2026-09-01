@@ -10,7 +10,7 @@ NeuAlto Technologies Private Limited was founded by Hemanth K Rajasekhar (Founde
 - Headquarters: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004, India
 - US office: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097, USA
 - Request a demo: https://neualto.com/#contact — the primary call to action; pick a product or practice and the form composes an email to info@neualto.com
-- General enquiries: info@neualto.com · India +91 733 855 5064 · USA +1-408-218-0503
+- General inquiries: info@neualto.com · India +91 733 855 5064 · USA +1-408-218-0503
 - Careers: hr@neualto.com (open roles) · careers@neualto.com (speculative applications)
 - Privacy / data-rights requests (GDPR, DPDP): general@neualto.com
 - LinkedIn: https://www.linkedin.com/company/neualto-technologies-pvt-ltd/
@@ -27,13 +27,13 @@ NeuAlto Technologies Private Limited was founded by Hemanth K Rajasekhar (Founde
 ## Products
 
 - [DeltaMax™](https://neualto.com/deltamax.html): AI-driven data quality monitoring. Learns normal patterns per source and flags meaningful deviations without hand-written rules; reports a real-time Trust Score plus a plain-language Agent Summary; validates cloud-to-cloud migrations using T-tests, Population Stability Index, and Isolation Forest. Deploys as a virtual machine inside the customer's own Google Cloud or Microsoft Azure project, so data never leaves their security boundary. An independent AI-assisted analysis scored DeltaMax 42/50 for GCP migration data quality, ten points ahead of the nearest competitor evaluated.
-- [OptiMax](https://neualto.com/optimax.html): marketing AI framework in two stages — response optimization (predicting response likelihood, segmenting audiences, identifying effective channels) and revenue optimization (customer lifetime value, high-value segments, spend optimisation). Aimed at retail, banking, telecom, and e-commerce.
+- [OptiMax](https://neualto.com/optimax.html): marketing AI framework in two stages — response optimization (predicting response likelihood, segmenting audiences, identifying effective channels) and revenue optimization (customer lifetime value, high-value segments, spend optimization). Aimed at retail, banking, telecom, and e-commerce.
 
 Both products are purchased and billed through Google Cloud Marketplace using an existing billing account. NeuAlto does not publish a fixed price list; pricing depends on deployment.
 
 ## Engagement models
 
-- Extended Product Engineering — a dedicated build-operate team acting as an extension of the client's organisation.
+- Extended Product Engineering — a dedicated build-operate team acting as an extension of the client's organization.
 - Fixed-Price Delivery — a scoped outcome on a committed budget and timeline.
 - Consulting & Time-and-Materials — senior expertise billed flexibly.
 

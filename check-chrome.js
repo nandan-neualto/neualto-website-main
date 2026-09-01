@@ -80,6 +80,31 @@ function links(block) {
   return out;
 }
 
+/* A nav that lists the same href twice. This is its own check because the
+   link-set comparison below cannot see it: that compares membership with
+   indexOf, so a repeated link is present in both sets and reads as identical.
+   careers.html shipped with a duplicated "Founders" in the desktop nav and
+   none in the mobile nav, and the set comparison downgraded it to a markup
+   warning. Scoped per <nav> deliberately - a <header> holds both the desktop
+   and the mobile nav, so every href legitimately appears twice at header
+   level, and footers have no <nav> at all. */
+function duplicateHrefs(page, block, tag) {
+  var navs = block.match(/<nav\b[\s\S]*?<\/nav>/g) || [];
+  navs.forEach(function (nav) {
+    var label = (nav.match(/aria-label="([^"]*)"/) || [])[1] || tag;
+    var seen = {};
+    var dupes = [];
+    (nav.match(/href="([^"]*)"/g) || []).forEach(function (h) {
+      if (seen[h] && dupes.indexOf(h) === -1) dupes.push(h);
+      seen[h] = true;
+    });
+    if (dupes.length) {
+      errors.push(page + ' <' + tag + '> nav "' + label + '" lists the same link twice: ' +
+                  dupes.join(', '));
+    }
+  });
+}
+
 function majority(values) {
   var counts = {};
   values.forEach(function (v) { counts[v] = (counts[v] || 0) + 1; });
@@ -101,6 +126,8 @@ function compare(tag, pages) {
 
   var names = Object.keys(blocks);
   if (!names.length) return;
+
+  names.forEach(function (p) { duplicateHrefs(p, blocks[p], tag); });
 
   var normalised = {};
   names.forEach(function (p) { normalised[p] = normalise(blocks[p]); });

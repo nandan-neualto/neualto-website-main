@@ -106,7 +106,7 @@
           "hq",
           "atlanta"
         ],
-        "a": "We're headquartered in **Bengaluru, India** — our development and delivery centre — with a presence in the **Greater Atlanta area, USA** for client engagement and consulting. That gives clients follow-the-sun coverage and senior contacts in both regions.\n\n- India: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004\n- USA: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097",
+        "a": "We're headquartered in **Bengaluru, India** — our development and delivery center — with a presence in the **Greater Atlanta area, USA** for client engagement and consulting. That gives clients follow-the-sun coverage and senior contacts in both regions.\n\n- India: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004\n- USA: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097",
         "href": "index.html#contact",
         "rel": [
           "contact-general",
@@ -239,7 +239,7 @@
           "ecosystem",
           "alliance"
         ],
-        "a": "We work with four partners:\n\n- **Katalyst Street** — strategic partner for digital ecosystems, and the company behind DeltaMax and OptiMax\n- **CrashPlan** — endpoint data-resilience partner for enterprise backup and recovery\n- **Google** — Google Cloud partner; DeltaMax™ and OptiMax are published on Google Cloud Marketplace, and we deliver GCP migration, BigQuery, and Looker Studio work on the platform\n- **Wipro** — enterprise delivery partner for large-scale systems integration, data transformation, and managed engineering programmes",
+        "a": "We work with four partners:\n\n- **Katalyst Street** — strategic partner for digital ecosystems, and the company behind DeltaMax and OptiMax\n- **CrashPlan** — endpoint data-resilience partner for enterprise backup and recovery\n- **Google** — Google Cloud partner; DeltaMax™ and OptiMax are published on Google Cloud Marketplace, and we deliver GCP migration, BigQuery, and Looker Studio work on the platform\n- **Wipro** — enterprise delivery partner for large-scale systems integration, data transformation, and managed engineering programs",
         "href": "index.html#partners",
         "rel": [
           "company-clients",
@@ -371,7 +371,7 @@
           "migration",
           "devops"
         ],
-        "a": "We help companies ship quickly using agile, CI/CD-based DevSecOps, with security built into every stage of the pipeline. We drive cloud-first transformations across **AWS, Azure, GCP**, or hybrid environments, and our Kubernetes experts manage the security and operations of containerized infrastructure.\n\nOfferings: Cloud Migration and Modernisation, DevSecOps Managed Services, Kubernetes and Containers, Cloud Security.",
+        "a": "We help companies ship quickly using agile, CI/CD-based DevSecOps, with security built into every stage of the pipeline. We drive cloud-first transformations across **AWS, Azure, GCP**, or hybrid environments, and our Kubernetes experts manage the security and operations of containerized infrastructure.\n\nOfferings: Cloud Migration and Modernization, DevSecOps Managed Services, Kubernetes and Containers, Cloud Security.",
         "href": "services.html#devsecops",
         "rel": [
           "services-overview",
@@ -984,7 +984,7 @@
           "cltv",
           "segmentation"
         ],
-        "a": "OptiMax works in two stages:\n\n1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels\n2. **Revenue Optimization** — evaluates customer lifetime value (LTV), identifies high-value segments, and optimizes spend for long-term financial outcomes",
+        "a": "OptiMax works in two stages:\n\n1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels\n2. **Revenue Optimization** — evaluates customer lifetime value (CLTV), identifies high-value segments, and optimizes spend for long-term financial outcomes",
         "href": "solutions.html#optimax",
         "rel": [
           "optimax-what",

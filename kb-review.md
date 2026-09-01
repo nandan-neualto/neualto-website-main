@@ -1,6 +1,6 @@
 # NeuAlto Assistant — knowledge base review
 
-Generated 2026-08-26 from `kb-data.js` (50 entries). This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
+Generated from `kb-data.js` — 50 entries, content id `bb7a8172d70f`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
 **To regenerate after an edit:** `node build-kb-docs.js`
 
@@ -35,7 +35,7 @@ Keywords: about, overview, company, technologies
 
 *ID: `company-locations`*
 
-We're headquartered in **Bengaluru, India** — our development and delivery centre — with a presence in the **Greater Atlanta area, USA** for client engagement and consulting. That gives clients follow-the-sun coverage and senior contacts in both regions.
+We're headquartered in **Bengaluru, India** — our development and delivery center — with a presence in the **Greater Atlanta area, USA** for client engagement and consulting. That gives clients follow-the-sun coverage and senior contacts in both regions.
 
 - India: 42, Old Kanakapura Rd, near Mecon Limited, Basavanagudi, Bengaluru, Karnataka 560004
 - USA: 6470 East Johns Crossing, Suite 160, Johns Creek, GA 30097
@@ -166,7 +166,7 @@ We work with four partners:
 - **Katalyst Street** — strategic partner for digital ecosystems, and the company behind DeltaMax and OptiMax
 - **CrashPlan** — endpoint data-resilience partner for enterprise backup and recovery
 - **Google** — Google Cloud partner; DeltaMax™ and OptiMax are published on Google Cloud Marketplace, and we deliver GCP migration, BigQuery, and Looker Studio work on the platform
-- **Wipro** — enterprise delivery partner for large-scale systems integration, data transformation, and managed engineering programmes
+- **Wipro** — enterprise delivery partner for large-scale systems integration, data transformation, and managed engineering programs
 
 **Links to:** `index.html#partners`
 
@@ -294,7 +294,7 @@ Keywords: ai, ml, genai, mlops, model strategy, managed ai, machine learning, da
 
 We help companies ship quickly using agile, CI/CD-based DevSecOps, with security built into every stage of the pipeline. We drive cloud-first transformations across **AWS, Azure, GCP**, or hybrid environments, and our Kubernetes experts manage the security and operations of containerized infrastructure.
 
-Offerings: Cloud Migration and Modernisation, DevSecOps Managed Services, Kubernetes and Containers, Cloud Security.
+Offerings: Cloud Migration and Modernization, DevSecOps Managed Services, Kubernetes and Containers, Cloud Security.
 
 **Links to:** `services.html#devsecops`
 
@@ -902,7 +902,7 @@ Keywords: optimax, marketing ai, revenue engine, marketing
 OptiMax works in two stages:
 
 1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels
-2. **Revenue Optimization** — evaluates customer lifetime value (LTV), identifies high-value segments, and optimizes spend for long-term financial outcomes
+2. **Revenue Optimization** — evaluates customer lifetime value (CLTV), identifies high-value segments, and optimizes spend for long-term financial outcomes
 
 **Links to:** `solutions.html#optimax`
 
