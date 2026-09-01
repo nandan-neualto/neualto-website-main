@@ -255,7 +255,11 @@ header {
 }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 74px; }
 .logo { display: flex; align-items: center; gap: 10px; font-family: 'Sora'; font-weight: 800; font-size: 22px; }
-.logo .alto { color: var(--red); }
+/* Wordmark: "Neu" red, "Alto" in the foreground ink. --ink is near-black in
+   light mode and near-white in dark, so the second half stays readable in both;
+   a literal black would disappear against the dark background. */
+.logo > span { color: var(--red); }
+.logo .alto { color: var(--ink); }
 .nav-links {
   display: flex; gap: 6px; font-size: 14px; font-weight: 500; color: var(--ink-soft);
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 100px; padding: 5px;
