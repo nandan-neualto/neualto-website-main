@@ -44,13 +44,17 @@ Then open <http://localhost:4173>.
 | `assets/kb-data.js` | **The chatbot's content.** The only file to edit when changing what it says |
 | `docs/kb.json`, `docs/kb-review.md` | Generated from `assets/kb-data.js` by `scripts/build-kb-docs.js` — **do not hand-edit** |
 | **Blog** | |
-| `assets/posts-data.js` | **Blog post list.** Paste a LinkedIn URL here (see *Adding a blog post*) |
+| `content/blog/`, `content/careers/` | **Blog posts and job openings.** The only content you edit (see *Editing content*) |
+| `assets/posts-data.js` | Generated from `content/blog/` — **do not hand-edit** |
+| `.pages.yml` | Pages CMS configuration — turns `content/` into edit forms |
 | **Checks** (see *Checks*) | |
 | `scripts/check-seo.js` | Structured data, meta, canonicals, links, image alts |
 | `scripts/check-chrome.js` | Header/footer parity across all 9 pages |
 | `scripts/check-posts.js` | Blog post entries |
 | `scripts/assistant-widget.test.js` | Chatbot search accuracy + intent boundaries |
 | `scripts/build-kb-docs.js` | Regenerates `docs/kb.json` and `docs/kb-review.md` |
+| `scripts/build-content.js` | Regenerates the blog and careers pages from `content/` |
+| `scripts/site-pages.js` | The page list the checkers validate (globbed, not hand-kept) |
 | `tools/png-to-webp.py` | One-time image migration (already run; kept for reference) |
 | `docs/WEBSITE-IMPROVEMENTS.md` | Past improvement audit, kept for reference |
 
@@ -130,38 +134,90 @@ Conventions:
 
 ---
 
-## Adding a blog post
+## Editing content (blog + careers)
 
-Posts are official LinkedIn embeds, curated by hand. They live in
-**`assets/posts-data.js`** — that is the only file you edit.
+Blog posts and job openings are files in **`content/`**. Two ways to edit them:
 
-1. On LinkedIn, open the post → **⋯ → Copy link to post**.
-2. Paste the whole URL into a new entry. Any of these shapes works — the site
-   extracts the post id for you:
+**Pages CMS** — sign in at [app.pagescms.org](https://app.pagescms.org) with
+GitHub and pick this repository. `.pages.yml` turns both collections into
+forms. Saving commits the file; the *Regenerate site content* Action then runs
+the generator and commits the HTML, so a published post is live in a minute or
+two without anyone touching code.
 
-```js
-{
-  link: "https://www.linkedin.com/posts/neualto_x-activity-7486023292294754304-uhN5",
-  title: "Your headline",
-  date: "2026-07-23",                  // YYYY-MM-DD
-  tags: ["DeltaMax", "Data Quality"],
-  summary: "Two or three sentences in your own words."
-}
+**By hand** — edit the `.md` file, then:
+
+```bash
+npm run content
 ```
 
-3. Run `node scripts/check-posts.js` — it catches unreadable links, duplicates, bad
-   dates, missing summaries, and tags that differ only by capitalisation.
+Both routes do exactly the same thing. The CMS is a convenience, not a
+dependency: there is no database and no service to go down.
 
-Order does not matter (posts sort newest-first automatically) and the filter
-buttons are generated from whatever tags you use, so a new tag needs no other
-edit.
+### How it works
 
-The `summary` is not optional decoration — embedded post text lives in an iframe
-on LinkedIn's domain and is **not indexed as your content**. The summary is the
-only part search engines attribute to this site.
+`content/blog/*.md` and `content/careers/*.md` are the source. Everything else
+is generated and committed:
 
-Post data is a plain script rather than a JSON file so the page keeps working
-from `file://`, where fetching a local path is blocked.
+| Generated | From |
+| --- | --- |
+| `blog.html` post cards + filter chips | `content/blog/` |
+| `blog-<slug>.html` article pages | posts that have a body |
+| `assets/posts-data.js` | `content/blog/` |
+| `careers.html` job cards + `JobPosting` JSON-LD | `content/careers/` |
+| `sitemap.xml`, `llms.txt` generated blocks | both |
+
+CI regenerates and fails if the committed output differs, so the pages can
+never drift from `content/`.
+
+**Why static HTML and not client-side rendering.** The cards used to be built
+in the browser from `posts-data.js` into an empty `<div>`, which meant a
+crawler that does not run JavaScript saw *nothing* — no title, no summary. The
+generator writes them into `blog.html` instead. `app.js` now only enhances what
+is already there (filtering, LinkedIn embeds), and falls back to rendering if
+the grid is empty.
+
+### A post
+
+Front matter is JSON between `---` fences, then optional markdown:
+
+```markdown
+---
+{
+  "title": "Your headline",
+  "date": "2026-07-23",
+  "tags": ["DeltaMax", "Data Quality"],
+  "summary": "Two or three sentences. Also used as the meta description.",
+  "linkedin": "https://www.linkedin.com/posts/...-activity-7486023292294754304-uhN5",
+  "linkedinOnly": false
+}
+---
+
+## A heading
+
+Your article.
+```
+
+The **filename is the URL** (`data-quality.md` → `blog-data-quality.html`) and
+is permanent — renaming it breaks the live link.
+
+Set `"linkedinOnly": true` for a card that just points at LinkedIn, with no
+article page. That is what both current posts use, because the original
+LinkedIn text was never written up as an article. Prefer a real body where you
+can: embedded post text lives in an iframe on LinkedIn's domain and is **not
+indexed as your content**.
+
+Markdown supported: `##`/`###`, paragraphs, `-` and `1.` lists, `>` quotes,
+fenced code, `---`, `**bold**`, `*italic*`, `` `code` ``, links, images, and
+`{{linkedin}}` on its own line to embed the post. Not supported: `#` (the title
+is the page's only H1 — using one is an error), nested lists, tables, raw HTML.
+
+### A job posting
+
+Same shape, under `content/careers/`. Fields map onto the card and the
+`JobPosting` structured data Google Jobs reads.
+
+`validThrough` is the one to watch: once that date passes **Google drops the
+listing**, so a stale date silently removes the role from job search.
 
 ---
 
@@ -179,6 +235,7 @@ npm test
 | `node scripts/check-seo.js` | JSON-LD parses; FAQ schema matches visible text; titles/descriptions within display length; canonicals absolute and in the sitemap; in-page anchors resolve; robots.txt and sitemap.xml do not contradict each other; every `<img>` has alt and exists on disk; `assets/kb-data.js` links resolve |
 | `node scripts/check-chrome.js` | The header and footer are identical across all 9 pages |
 | `node scripts/check-posts.js` | Blog entries in `assets/posts-data.js` |
+| `npm run content` | Regenerates blog + careers from `content/`; CI fails if the committed output differs |
 | `node scripts/assistant-widget.test.js` | Chatbot answers the right entry, refuses off-topic questions, and small talk does not swallow real questions |
 
 After editing `assets/kb-data.js`, run `node scripts/build-kb-docs.js` to

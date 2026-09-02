@@ -9,6 +9,7 @@
     "chrome": "node scripts/check-chrome.js",
     "posts": "node scripts/check-posts.js",
     "kb": "node scripts/build-kb-docs.js",
+    "content": "node scripts/build-content.js",
     "start": "npx http-server -p 4173 -c-1 ."
   },
   "license": "UNLICENSED"

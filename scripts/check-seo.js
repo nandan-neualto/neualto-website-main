@@ -25,11 +25,11 @@
 var fs = require('fs');
 var path = require('path');
 
-var PAGES = ['index.html', 'services.html', 'solutions.html', 'deltamax.html',
-             'optimax.html', 'blog.html', 'careers.html', '404.html', 'privacy.html'];
-
-// Pages deliberately kept out of search results.
-var NOINDEX = ['404.html', 'privacy.html'];
+// Discovered from the filesystem, so generated article pages are validated
+// too - see scripts/site-pages.js for why this is not a hardcoded list.
+var sitePages = require('./site-pages.js');
+var PAGES = sitePages.PAGES;
+var NOINDEX = sitePages.NOINDEX;
 
 var errors = [];
 var warnings = [];

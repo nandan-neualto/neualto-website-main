@@ -1045,7 +1045,14 @@
           '</article>';
       };
 
-      grid.innerHTML = posts.map(renderCard).join('');
+      /* The cards are static HTML, written into blog.html by
+         scripts/build-content.js, so the page works with JavaScript off and a
+         crawler sees real content. Only render client-side if the grid came
+         back empty - that keeps this module working on a page the generator
+         has not touched, instead of blanking it. */
+      if (!grid.querySelector('.post-card')) {
+        grid.innerHTML = posts.map(renderCard).join('');
+      }
 
       // Native lazy-loading defers the offscreen iframes: more reliable than an
       // IntersectionObserver, and the browser picks the moment to fetch.
@@ -1079,12 +1086,15 @@
 
         // aria-pressed, not just a class: without it a screen-reader user has no
         // way to tell which filter is currently applied.
-        filterRow.innerHTML =
-          '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
-          tags.map(function (tag) {
-            return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '" aria-pressed="false">' +
-              escapeHtml(tag) + '</button>';
-          }).join('');
+        // Same rule as the grid: generated chips win, this is the fallback.
+        if (!filterRow.querySelector('.filter-chip')) {
+          filterRow.innerHTML =
+            '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
+            tags.map(function (tag) {
+              return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '" aria-pressed="false">' +
+                escapeHtml(tag) + '</button>';
+            }).join('');
+        }
       }
 
       // Filtering changes the result set silently. A polite live region is the

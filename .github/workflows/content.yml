@@ -1,0 +1,57 @@
+# Regenerates the site after content/ changes.
+#
+# WHY THIS EXISTS
+# Pages CMS commits the .md file and stops there — it cannot run a generator.
+# Without this workflow a published post would sit in content/ and never reach
+# blog.html, so the editor would save, see nothing change, and save again.
+name: Regenerate site content
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'scripts/build-content.js'
+
+permissions:
+  contents: write        # needed to push the regenerated files back
+
+concurrency:
+  group: content-${{ github.ref }}
+  cancel-in-progress: false   # never interrupt a half-finished commit
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    # Loop guard. The push below only touches generated files, which are not in
+    # the `paths` filter above, so it should not retrigger this workflow — but
+    # if someone widens that filter later, this stops it recursing.
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Regenerate blog and careers pages
+        run: node scripts/build-content.js
+
+      # Runs HERE, not in checks.yml, and that is deliberate: a push made with
+      # GITHUB_TOKEN does not trigger other workflows, so checks.yml would
+      # never run on the commit this job creates. Testing before the push also
+      # means a broken generation is never committed in the first place.
+      - name: Run site checks
+        run: npm test
+
+      - name: Commit regenerated files
+        run: |
+          if git diff --quiet; then
+            echo "Nothing to regenerate — generated files already match content/."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Regenerate site content from content/ [skip ci]"
+          git push

@@ -1,0 +1,645 @@
+/**
+ * Regenerates the blog and careers pages FROM content/.
+ *
+ *   node scripts/build-content.js
+ *
+ * content/blog/<slug>.md and content/careers/<slug>.md are the only files you
+ * hand-edit (or that Pages CMS writes). Everything this script emits is a
+ * generated artifact, committed to git, and guarded by a `git diff --exit-code`
+ * freshness gate in CI - the same pattern build-kb-docs.js already uses.
+ *
+ * WHY GENERATE STATIC HTML AT ALL
+ * The blog used to render its cards client-side from posts-data.js into an
+ * empty <div id="postGrid">. That means a crawler which does not execute
+ * JavaScript saw zero blog content - the served HTML contained no post title,
+ * no summary, nothing. Writing the cards into blog.html at build time is the
+ * entire point of this script; the CMS is just a nicer way to edit the source.
+ *
+ * WHAT IT WRITES
+ *   assets/posts-data.js  - regenerated; app.js still uses it for filtering
+ *   blog.html             - static post cards + filter chips, between markers
+ *   blog-<slug>.html      - one article page per post that has a body
+ *   careers.html          - job cards + JobPosting JSON-LD, between markers
+ *   sitemap.xml           - generated URL block, between markers
+ *   llms.txt              - article index, between markers
+ *
+ * DETERMINISM
+ * Output must be a pure function of content/. No Date.now(), no mtime, no git:
+ * CI regenerates and fails if anything differs, so a wall-clock value would
+ * turn the gate red on an untouched repo. (build-kb-docs.js had exactly that
+ * bug via fs.statSync().mtime.) All reads normalise CRLF so local and CI agree.
+ */
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+
+var ROOT = path.join(__dirname, '..');
+var errors = [];
+
+function fail(where, message) { errors.push(where + ': ' + message); }
+
+/** Reads a file with line endings normalised, so CRLF checkouts match CI. */
+function read(file) {
+  return fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\r\n/g, '\n');
+}
+
+/** Writes with CRLF, matching what git's autocrlf hands back on this repo. */
+function write(file, text) {
+  fs.writeFileSync(path.join(ROOT, file), text.replace(/\n/g, '\r\n'));
+}
+
+/** For attribute values: quotes must be escaped or they break out of the attr. */
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+  });
+}
+
+/* For text nodes. Deliberately leaves quotes alone: &#39; renders the same as
+   ' but turns every apostrophe in the copy into noise in the diff, which is
+   how a real content change hides in a 200-line reformat. Only the three
+   characters that actually change parsing are escaped. */
+function escapeText(value) {
+  return String(value == null ? '' : value).replace(/[&<>]/g, function (ch) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch];
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. FRONT MATTER
+   JSON, not YAML: this repo has no dependencies and adding a YAML parser to
+   read four files would be the largest dependency in the project. JSON.parse
+   is built in and fails loudly on a typo, which is what you want from content
+   an editor just saved. Pages CMS writes this shape natively (json-frontmatter).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function parseFrontMatter(raw, where) {
+  var match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) { fail(where, 'no JSON front matter block (expected --- ... --- at the top)'); return null; }
+  var data;
+  try {
+    data = JSON.parse(match[1]);
+  } catch (e) {
+    fail(where, 'front matter is not valid JSON - ' + e.message);
+    return null;
+  }
+  data.body = match[2].trim();
+  return data;
+}
+
+function loadCollection(dir) {
+  var abs = path.join(ROOT, dir);
+  if (!fs.existsSync(abs)) return [];
+  return fs.readdirSync(abs).sort()          // sort: readdir order is not guaranteed
+    .filter(function (f) { return /\.md$/.test(f); })
+    .map(function (file) {
+      var slug = file.replace(/\.md$/, '');
+      var where = dir + '/' + file;
+      if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+        fail(where, 'slug must be lowercase letters, digits and hyphens - it becomes the URL');
+      }
+      var entry = parseFrontMatter(read(dir + '/' + file), where);
+      if (!entry) return null;
+      entry.slug = slug;
+      entry.where = where;
+      return entry;
+    })
+    .filter(Boolean);
+}
+
+function require_(entry, fields) {
+  fields.forEach(function (f) {
+    var v = entry[f];
+    if (v == null || v === '' || (Array.isArray(v) && !v.length)) {
+      fail(entry.where, 'missing required field "' + f + '"');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. MARKDOWN SUBSET
+   Hand-written rather than `marked`, for the same reason the front matter is
+   JSON: a dependency would make the generated bytes a function of a library
+   version, so an unrelated patch release could turn the freshness gate red.
+   The repo already documents subsets this way in kb-data.js.
+
+   Supported: ## / ### headings, paragraphs, single-level - and 1. lists,
+   > blockquote, fenced code, ---, **bold**, *italic*, `code`, [links](url),
+   ![images](src), and {{linkedin}} for the embed.
+   Not supported: # H1 (the page title is the only H1 - using one is an error),
+   nested lists, tables, raw HTML, reference links, footnotes.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Placeholders used while inline markup is rewritten in passes. Plain text,
+   not control characters: raw \u0000 works, but it makes git classify this
+   file as binary, so it gets no diff and cannot be code-reviewed. Any literal
+   occurrence in the content is stripped first so it can never collide. */
+var CODE_MARK = '@@NW-CODE@@';
+var CODE_RE = /@@NW-CODE@@(\d+)@@NW-CODE@@/g;
+var LINKEDIN_MARK = '@@NW-LINKEDIN@@';
+
+function inline(text) {
+  text = String(text).split(CODE_MARK).join('').split(LINKEDIN_MARK).join('');
+  var out = escapeHtml(text);
+  // Code first, and its content is left alone: markup inside `code` is literal.
+  var codes = [];
+  out = out.replace(/`([^`]+)`/g, function (_m, code) {
+    codes.push('<code>' + code + '</code>');
+    return CODE_MARK + (codes.length - 1) + CODE_MARK;
+  });
+  out = out.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (_m, alt, src) {
+    return '<img src="' + src + '" alt="' + alt + '" loading="lazy">';
+  });
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (_m, label, href) {
+    var external = /^https?:/.test(href);
+    return '<a href="' + href + '"' +
+      (external ? ' target="_blank" rel="noopener"' : '') + '>' + label + '</a>';
+  });
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  return out.replace(CODE_RE, function (_m, i) { return codes[Number(i)]; });
+}
+
+function renderMarkdown(md, ctx) {
+  var lines = md.split('\n');
+  var html = [];
+  var i = 0;
+
+  function flushList(ordered) {
+    var tag = ordered ? 'ol' : 'ul';
+    var items = [];
+    var re = ordered ? /^\s*\d+\.\s+(.*)$/ : /^\s*[-*]\s+(.*)$/;
+    while (i < lines.length && re.test(lines[i])) {
+      items.push('<li>' + inline(lines[i].match(re)[1]) + '</li>');
+      i++;
+    }
+    html.push('<' + tag + ' class="article-list">' + items.join('') + '</' + tag + '>');
+  }
+
+  while (i < lines.length) {
+    var line = lines[i];
+
+    if (!line.trim()) { i++; continue; }
+
+    if (/^#\s/.test(line)) {
+      fail(ctx, 'body uses a level-1 heading ("# ..."); the page title is the only <h1> - use ## instead');
+      i++; continue;
+    }
+    if (/^###\s+/.test(line)) { html.push('<h3>' + inline(line.replace(/^###\s+/, '')) + '</h3>'); i++; continue; }
+    if (/^##\s+/.test(line)) { html.push('<h2>' + inline(line.replace(/^##\s+/, '')) + '</h2>'); i++; continue; }
+    if (/^---+\s*$/.test(line)) { html.push('<hr>'); i++; continue; }
+
+    if (/^\{\{linkedin\}\}\s*$/.test(line.trim())) {
+      html.push(LINKEDIN_MARK); i++; continue;
+    }
+
+    if (/^```/.test(line)) {
+      i++;
+      var code = [];
+      while (i < lines.length && !/^```/.test(lines[i])) { code.push(escapeHtml(lines[i])); i++; }
+      i++; // closing fence
+      html.push('<pre><code>' + code.join('\n') + '</code></pre>');
+      continue;
+    }
+
+    if (/^\s*>\s?/.test(line)) {
+      var quote = [];
+      while (i < lines.length && /^\s*>\s?/.test(lines[i])) {
+        quote.push(lines[i].replace(/^\s*>\s?/, '')); i++;
+      }
+      html.push('<blockquote>' + inline(quote.join(' ')) + '</blockquote>');
+      continue;
+    }
+
+    if (/^\s*[-*]\s+/.test(line)) { flushList(false); continue; }
+    if (/^\s*\d+\.\s+/.test(line)) { flushList(true); continue; }
+
+    var para = [];
+    while (i < lines.length && lines[i].trim() &&
+           !/^(#{1,3}\s|```|\s*>|\s*[-*]\s|\s*\d+\.\s|---+\s*$)/.test(lines[i])) {
+      para.push(lines[i]); i++;
+    }
+    html.push('<p>' + inline(para.join(' ')) + '</p>');
+  }
+
+  return html.join('\n');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. MARKER REGIONS
+   Generated output is spliced between HTML comments rather than replacing a
+   whole file, so the hand-written parts of blog.html, careers.html,
+   sitemap.xml and llms.txt stay hand-written and reviewable in the diff.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function splice(text, name, replacement, where) {
+  var begin = '<!-- BEGIN generated: ' + name + ' -->';
+  var end = '<!-- END generated: ' + name + ' -->';
+  var start = text.indexOf(begin);
+  var stop = text.indexOf(end);
+  if (start === -1 || stop === -1) {
+    fail(where, 'missing marker pair for "' + name + '"');
+    return text;
+  }
+  return text.slice(0, start + begin.length) + '\n' + replacement + '\n' +
+         text.slice(stop);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. BLOG
+   ══════════════════════════════════════════════════════════════════════════ */
+
+var LINKEDIN_EMBED = 'https://www.linkedin.com/embed/feed/update/urn:li:activity:';
+var LINKEDIN_PERMALINK = 'https://www.linkedin.com/feed/update/urn:li:activity:';
+
+/** Same three URL shapes app.js accepts, so an editor can paste any of them. */
+function extractUrn(value) {
+  var raw = String(value == null ? '' : value).trim();
+  if (!raw) return null;
+  if (/^\d{6,}$/.test(raw)) return raw;
+  var m = raw.match(/activity[:\-](\d{6,})/i);
+  return m ? m[1] : null;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  var d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d)) return iso;
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // Built by hand from UTC parts: toLocaleDateString depends on the host ICU
+  // build, which would make output differ between a laptop and CI.
+  return months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
+}
+
+var posts = loadCollection('content/blog').filter(function (p) {
+  require_(p, ['title', 'date', 'tags', 'summary']);
+  if (p.draft) return false;           // draft: keep in git, keep off the site
+  return true;
+});
+
+posts.forEach(function (p) {
+  p.urn = extractUrn(p.linkedin);
+  if (p.linkedinOnly && !p.urn) {
+    fail(p.where, 'linkedinOnly is set but no LinkedIn activity id could be found in "linkedin"');
+  }
+  if (!p.linkedinOnly && !p.body) {
+    fail(p.where, 'no body. Either write the article, or set "linkedinOnly": true to publish it as a card only');
+  }
+  p.hasPage = !p.linkedinOnly && !!p.body;
+  p.url = p.hasPage ? 'blog-' + p.slug + '.html' : null;
+});
+
+// Newest first; ties broken by slug so the order never depends on readdir.
+posts.sort(function (a, b) {
+  if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+  return a.slug < b.slug ? -1 : 1;
+});
+
+function postCard(p) {
+  var pills = (p.tags || []).map(function (t) {
+    return '<span class="pill">' + escapeText(t) + '</span>';
+  }).join('');
+
+  var head =
+    '<div class="post-meta">' +
+      '<time datetime="' + escapeHtml(p.date) + '">' + escapeText(formatDate(p.date)) + '</time>' +
+      (p.urn ? '<span class="post-src">LinkedIn</span>' : '') +
+    '</div>' +
+    '<h2>' + (p.hasPage
+      ? '<a href="' + escapeHtml(p.url) + '">' + escapeText(p.title) + '</a>'
+      : escapeText(p.title)) + '</h2>' +
+    '<p>' + escapeText(p.summary) + '</p>' +
+    '<div class="pill-row">' + pills + '</div>';
+
+  // The embed placeholder is kept only for LinkedIn-only cards. Posts with a
+  // real article link to the article instead: N 480px cross-origin iframes on
+  // a listing page cost a lot and contribute nothing a crawler can read.
+  var embed = (!p.hasPage && p.urn)
+    ? '<div class="post-embed" data-urn="' + escapeHtml(p.urn) + '">' +
+        '<div class="embed-skeleton"><span></span><span></span><span></span></div>' +
+      '</div>'
+    : '';
+
+  var cta = p.hasPage
+    ? '<a class="svc-link post-link" href="' + escapeHtml(p.url) + '">' +
+        'Read the article <svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>'
+    : '<a class="svc-link post-link" href="' + escapeHtml(LINKEDIN_PERMALINK + p.urn) + '" target="_blank" rel="noopener">' +
+        'Discuss on LinkedIn <svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>';
+
+  return '<article class="post-card" data-tags="' + escapeHtml((p.tags || []).join('|')) + '">' +
+      '<div class="post-body">' + head + '</div>' + embed + cta +
+    '</article>';
+}
+
+function filterChips() {
+  var seen = {};
+  var tags = [];
+  posts.forEach(function (p) {
+    (p.tags || []).forEach(function (t) { if (!seen[t]) { seen[t] = true; tags.push(t); } });
+  });
+  tags.sort();
+  return '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
+    tags.map(function (t) {
+      return '<button class="filter-chip" data-filter="' + escapeHtml(t) +
+        '" aria-pressed="false">' + escapeText(t) + '</button>';
+    }).join('');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. CAREERS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+var jobs = loadCollection('content/careers').filter(function (j) {
+  require_(j, ['title', 'location', 'experience', 'employmentType', 'summary',
+               'responsibilities', 'requirements', 'datePosted', 'validThrough',
+               'seoDescription', 'applyEmail']);
+  if (j.draft) return false;
+  return true;
+});
+
+var CHECK = '<svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-check"/></svg> ';
+
+function checkList(items) {
+  return '<ul class="check-list">' + (items || []).map(function (t) {
+    return '<li>' + CHECK + escapeText(t) + '</li>';
+  }).join('') + '</ul>';
+}
+
+function jobCard(j) {
+  var subject = encodeURIComponent('Application — ' + j.title);
+  var mail = 'mailto:' + j.applyEmail + '?subject=' + subject;
+  return '<article class="job-card" id="' + escapeHtml(j.slug) + '">' +
+      '<div class="job-top">' +
+        '<h3>' + escapeText(j.title) + '</h3>' +
+        '<a class="btn btn-primary" href="' + escapeHtml(mail) + '">Apply Now' +
+          '<svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg>' +
+        '</a>' +
+      '</div>' +
+      '<div class="job-meta">' +
+        '<span class="meta-pill">📍 ' + escapeText(j.location) + '</span>' +
+        '<span class="meta-pill">🕓 ' + escapeText(j.experience) + '</span>' +
+        '<span class="meta-pill">💼 ' + escapeText(j.employmentType) + '</span>' +
+      '</div>' +
+      '<p class="job-summary">' + escapeText(j.summary) + '</p>' +
+      '<div class="job-cols">' +
+        '<div><h4>What you\'ll do</h4>' + checkList(j.responsibilities) + '</div>' +
+        '<div><h4>What you\'ll bring</h4>' + checkList(j.requirements) + '</div>' +
+      '</div>' +
+      '<div class="job-apply">' +
+        '<a class="btn btn-ghost" href="' + escapeHtml(mail) + '">Mail ' + escapeText(j.applyEmail) + '</a>' +
+        '<a class="btn btn-linkedin" href="https://www.linkedin.com/company/neualto-technologies-pvt-ltd/jobs/" target="_blank" rel="noopener">' +
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V23h-4v-7.9c0-1.88-.03-4.3-2.62-4.3-2.62 0-3.02 2.05-3.02 4.16V23H8V8z"/></svg>' +
+          'Apply via LinkedIn' +
+        '</a>' +
+      '</div>' +
+    '</article>';
+}
+
+function jobSchema(j) {
+  // Built with JSON.stringify so the output can never be malformed JSON-LD,
+  // which check-seo.js treats as a hard error.
+  var data = {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: j.title,
+    datePosted: j.datePosted,
+    validThrough: j.validThrough,
+    directApply: false,
+    employmentType: j.employmentType.toUpperCase().replace(/[^A-Z]+/g, '_'),
+    description: j.seoDescription,
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: 'NeuAlto Technologies',
+      sameAs: 'https://neualto.com/'
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Bangalore',
+        addressRegion: 'Karnataka',
+        addressCountry: 'IN'
+      }
+    },
+    experienceRequirements: {
+      '@type': 'OccupationalExperienceRequirements',
+      monthsOfExperience: j.monthsOfExperience
+    },
+    // Matches the page canonical. It previously pointed at /careers (no
+    // .html), which is a second URL for the same page and splits the signal.
+    url: 'https://neualto.com/careers.html#' + j.slug
+  };
+  return '<script type="application/ld+json">\n' +
+    JSON.stringify(data, null, 2) + '\n</script>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. ARTICLE PAGES
+   Chrome is lifted out of blog.html at generation time rather than duplicated
+   here, so there is still exactly one copy of the header and footer in the
+   repo and check-chrome.js keeps guarding it.
+
+   Article URLs are flat (blog-<slug>.html, not blog/<slug>.html) on purpose:
+   check-seo.js resolves internal links with a bare fs.existsSync(href) from
+   the repo root, so a page in a subdirectory linking to "services.html" would
+   PASS the checker and 404 in a browser. Flat files keep every relative path
+   in the lifted chrome correct by construction.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+function sliceBetween(html, startRe, endRe, name) {
+  var s = html.search(startRe);
+  var e = html.search(endRe);
+  if (s === -1 || e === -1) { fail('blog.html', 'could not lift chrome slice "' + name + '"'); return ''; }
+  return html.slice(s, e);
+}
+
+function buildArticle(p, chrome) {
+  var canonical = 'https://neualto.com/' + p.url;
+  var desc = p.description || p.summary;
+  if (desc.length > 160) {
+    var cut = desc.slice(0, 159);
+    desc = cut.slice(0, cut.lastIndexOf(' ')) + '…';
+  }
+  var schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: p.title,
+    datePublished: p.date,
+    dateModified: p.updated || p.date,
+    description: desc,
+    author: { '@type': 'Organization', name: p.author || 'NeuAlto Technologies' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'NeuAlto Technologies',
+      logo: { '@type': 'ImageObject', url: 'https://neualto.com/pics/logo.png' }
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+    url: canonical
+  };
+  var crumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://neualto.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://neualto.com/blog.html' },
+      { '@type': 'ListItem', position: 3, name: p.title, item: canonical }
+    ]
+  };
+
+  var body = renderMarkdown(p.body, p.where);
+  var embed = p.urn
+    ? '<div class="post-embed article-embed" data-urn="' + escapeHtml(p.urn) + '">' +
+        '<div class="embed-skeleton"><span></span><span></span><span></span></div></div>'
+    : '';
+  body = body.replace(LINKEDIN_MARK, embed);
+  body = body.split(LINKEDIN_MARK).join('');   // only the first is honoured
+
+  var pills = (p.tags || []).map(function (t) {
+    return '<span class="pill">' + escapeText(t) + '</span>';
+  }).join('');
+
+  return '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+    '<meta charset="UTF-8">\n' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+    '<title>' + escapeText(p.metaTitle || (p.title + ' | NeuAlto Technologies')) + '</title>\n' +
+    '<meta name="description" content="' + escapeHtml(desc) + '">\n' +
+    '<link rel="canonical" href="' + canonical + '">\n' +
+    '<meta property="og:type" content="article">\n' +
+    '<meta property="og:title" content="' + escapeHtml(p.title) + '">\n' +
+    '<meta property="og:description" content="' + escapeHtml(desc) + '">\n' +
+    '<meta property="og:url" content="' + canonical + '">\n' +
+    '<meta property="og:image" content="https://neualto.com/pics/og-card.png">\n' +
+    '<meta name="twitter:card" content="summary_large_image">\n' +
+    '<meta name="twitter:title" content="' + escapeHtml(p.title) + '">\n' +
+    '<meta name="twitter:description" content="' + escapeHtml(desc) + '">\n' +
+    '<meta name="twitter:image" content="https://neualto.com/pics/og-card.png">\n' +
+    chrome.headAssets +
+    '<script type="application/ld+json">\n' + JSON.stringify(schema, null, 2) + '\n</script>\n' +
+    '<script type="application/ld+json">\n' + JSON.stringify(crumbs, null, 2) + '\n</script>\n' +
+    '</head>\n<body>\n' +
+    chrome.bodyTop +
+    chrome.header +
+    '<main id="main">\n' +
+    '<article class="article-wrap">\n  <div class="wrap article-inner">\n' +
+    '    <nav class="article-crumbs" aria-label="Breadcrumb"><a href="blog.html">Blog</a></nav>\n' +
+    '    <h1>' + escapeText(p.title) + '</h1>\n' +
+    '    <div class="article-meta">' +
+      '<time datetime="' + escapeHtml(p.date) + '">' + escapeText(formatDate(p.date)) + '</time>' +
+      '<span class="pill-row">' + pills + '</span></div>\n' +
+    '    <div class="article-body">\n' + body + '\n    </div>\n' +
+    '    <a class="svc-link" href="blog.html">← All articles</a>\n' +
+    '  </div>\n</article>\n' +
+    '</main>\n' +
+    chrome.footer +
+    '</body>\n</html>\n';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. EMIT
+   ══════════════════════════════════════════════════════════════════════════ */
+
+var blogHtml = read('blog.html');
+
+var chrome = {
+  headAssets: sliceBetween(blogHtml, /<link rel="icon"/, /<script type="application\/ld\+json">/, 'head assets'),
+  bodyTop: sliceBetween(blogHtml, /<a class="skip-link"/, /<header/, 'body top'),
+  header: sliceBetween(blogHtml, /<header/, /<main/, 'header'),
+  footer: sliceBetween(blogHtml, /<footer/, /<script src="assets\/posts-data\.js"/, 'footer') +
+          '<script src="assets/app.js" defer></script>\n' +
+          '<script src="assets/kb-data.js" defer></script>\n' +
+          '<script src="assets/assistant-widget.js" defer></script>\n'
+};
+
+// --- blog.html: static cards + chips ---------------------------------------
+blogHtml = splice(blogHtml, 'blog cards',
+  posts.length ? posts.map(postCard).join('\n') : '', 'blog.html');
+blogHtml = splice(blogHtml, 'blog filters', filterChips(), 'blog.html');
+write('blog.html', blogHtml);
+
+// --- article pages ----------------------------------------------------------
+var written = [];
+posts.filter(function (p) { return p.hasPage; }).forEach(function (p) {
+  write(p.url, buildArticle(p, chrome));
+  written.push(p.url);
+});
+
+// Orphans are reported, never deleted: silently removing a page that search
+// engines have already indexed turns a rename into a 404 nobody notices.
+fs.readdirSync(ROOT).filter(function (f) { return /^blog-.*\.html$/.test(f); })
+  .forEach(function (f) {
+    if (written.indexOf(f) === -1) {
+      fail(f, 'orphan - no matching file in content/blog. Delete it deliberately, or restore the source');
+    }
+  });
+
+// --- posts-data.js ----------------------------------------------------------
+write('assets/posts-data.js',
+  '/**\n' +
+  ' * GENERATED by scripts/build-content.js from content/blog/*.md - do not edit.\n' +
+  ' *\n' +
+  ' * app.js reads this for tag filtering and for the LinkedIn embeds on\n' +
+  ' * linkedinOnly cards. The cards themselves are static HTML in blog.html, so\n' +
+  ' * the page still shows every post with JavaScript disabled.\n' +
+  ' */\n' +
+  '(function (root, factory) {\n' +
+  '  var data = factory();\n' +
+  "  if (typeof module === 'object' && module.exports) module.exports = data;\n" +
+  '  else root.NEUALTO_POSTS = data;\n' +
+  '}(typeof self !== \'undefined\' ? self : this, function () {\n' +
+  '  return ' + JSON.stringify(posts.map(function (p) {
+    return {
+      slug: p.slug,
+      title: p.title,
+      date: p.date,
+      tags: p.tags,
+      summary: p.summary,
+      link: p.linkedin || '',
+      url: p.url || ''
+    };
+  }), null, 2).split('\n').join('\n  ') + ';\n' +
+  '}));\n');
+
+// --- careers.html -----------------------------------------------------------
+var careersHtml = read('careers.html');
+careersHtml = splice(careersHtml, 'job cards',
+  jobs.map(jobCard).join('\n'), 'careers.html');
+careersHtml = splice(careersHtml, 'job schema',
+  jobs.map(jobSchema).join('\n'), 'careers.html');
+write('careers.html', careersHtml);
+
+// --- sitemap.xml ------------------------------------------------------------
+var sitemap = read('sitemap.xml');
+sitemap = splice(sitemap, 'blog articles',
+  posts.filter(function (p) { return p.hasPage; }).map(function (p) {
+    return '  <url>\n' +
+      '    <loc>https://neualto.com/' + p.url + '</loc>\n' +
+      '    <lastmod>' + (p.updated || p.date) + '</lastmod>\n' +
+      '    <changefreq>yearly</changefreq>\n' +
+      '    <priority>0.6</priority>\n' +
+      '  </url>';
+  }).join('\n'), 'sitemap.xml');
+write('sitemap.xml', sitemap);
+
+// --- llms.txt ---------------------------------------------------------------
+var llms = read('llms.txt');
+llms = splice(llms, 'articles',
+  posts.map(function (p) {
+    var where = p.hasPage ? 'https://neualto.com/' + p.url : (p.linkedin || 'blog.html');
+    return '- [' + p.title + '](' + where + '): ' + p.summary;
+  }).join('\n'), 'llms.txt');
+write('llms.txt', llms);
+
+/* ── Report ───────────────────────────────────────────────────────────────── */
+
+if (errors.length) {
+  console.error('\nERRORS (' + errors.length + '):');
+  errors.forEach(function (e) { console.error('  x ' + e); });
+  process.exit(1);
+}
+
+console.log('Blog:    ' + posts.length + ' post(s), ' + written.length + ' article page(s)');
+console.log('Careers: ' + jobs.length + ' role(s)');
+console.log('Wrote blog.html, careers.html, assets/posts-data.js, sitemap.xml, llms.txt' +
+            (written.length ? ', ' + written.join(', ') : ''));

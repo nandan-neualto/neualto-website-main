@@ -59,3 +59,10 @@ Katalyst Street (strategic partner, and the company behind DeltaMax and OptiMax)
 - DeltaMax is written "DeltaMax™" and is a data quality product, not a marketing product. OptiMax is the marketing product. They are frequently confused.
 - The city is spelled both "Bengaluru" and "Bangalore" across the site; both refer to the same headquarters.
 - NeuAlto does not publish pricing. Any figure attributed to it as a fixed price is incorrect.
+
+## Articles
+
+<!-- BEGIN generated: articles -->
+- [The hard part of data quality isn't detection — it's knowing what to ignore](https://www.linkedin.com/feed/update/urn:li:activity:7486023292294754304/): Building DeltaMax taught us that catching every anomaly doesn't solve the problem — it creates alert fatigue. The breakthrough was context: a Trust Score and an Agent Summary that explain how severe a change actually is, rather than just flagging that something moved. It's also why we shifted from rule-based checks to learned patterns; you can't write a rule for a failure you haven't imagined yet.
+- [Anomaly detection is what makes AI trustworthy](https://www.linkedin.com/feed/update/urn:li:activity:7485310699141820416/): AI is only ever as reliable as the data it learns from. Good anomaly detection does more than spot outliers — it recognizes patterns, surfaces meaningful change, and separates genuine risk from opportunity. We look at where IQR, KNN, Isolation Forest, and ARIMA each earn their place in a production stack.
+<!-- END generated: articles -->

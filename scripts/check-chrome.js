@@ -22,8 +22,9 @@
 
 var fs = require('fs');
 
-var PAGES = ['index.html', 'services.html', 'solutions.html', 'deltamax.html',
-             'optimax.html', 'blog.html', 'careers.html', '404.html', 'privacy.html'];
+var sitePages = require('./site-pages.js');
+var PAGES = sitePages.PAGES;
+var HAND_PAGES = sitePages.HAND_PAGES;
 
 // index.html intentionally carries a different, larger footer (the 3-column
 // mega-footer). Compare its header, but exempt its footer from the diff.
@@ -132,7 +133,13 @@ function compare(tag, pages) {
   var normalised = {};
   names.forEach(function (p) { normalised[p] = normalise(blocks[p]); });
 
-  var canonical = majority(names.map(function (p) { return normalised[p]; }));
+  /* The majority is computed from the hand-written pages only. Generated
+     article pages all share one chrome by construction, so once there are ten
+     or so of them they would outvote the real pages and this checker would
+     start reporting index.html and services.html as the deviation. */
+  var voters = names.filter(function (p) { return HAND_PAGES.indexOf(p) !== -1; });
+  var canonical = majority((voters.length ? voters : names)
+    .map(function (p) { return normalised[p]; }));
   var canonicalPage = names.filter(function (p) { return normalised[p] === canonical; })[0];
   var matching = names.filter(function (p) { return normalised[p] === canonical; });
 

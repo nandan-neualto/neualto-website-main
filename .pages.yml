@@ -1,11 +1,178 @@
-media: media
+# Pages CMS (https://pagescms.org) — the editing UI for this site.
+#
+# Sign in at app.pagescms.org with GitHub, grant access to this repository, and
+# these two collections appear as forms. Saving commits the .md file below;
+# the "Regenerate site content" GitHub Action then runs
+# scripts/build-content.js and commits the generated HTML.
+#
+# Nothing here is a database. Every field maps to JSON front matter in a file
+# under content/, so the CMS is optional — editing the .md by hand and running
+# `npm run content` does exactly the same thing.
+
+media:
+  input: pics/blog
+  output: pics/blog
+
 content:
-  - name: pages
-    label: Pages
+  - name: blog
+    label: Blog posts
     type: collection
-    path: docs
+    path: content/blog
+    filename: '{fields.slug}.md'
+    format: json-frontmatter
+    view:
+      fields: [title, date, tags]
+      primary: title
+      sort: [date, title]
     fields:
-      - name: title
+      - name: slug
+        label: URL slug
         type: string
+        pattern: '^[a-z0-9][a-z0-9-]*$'
+        required: true
+        description: >-
+          PERMANENT — this becomes the page address (blog-<slug>.html).
+          Changing it after publishing breaks the live URL and any link to it.
+          Lowercase letters, numbers and hyphens only.
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Publish date
+        type: date
+        options: { format: yyyy-MM-dd }
+        required: true
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+        required: true
+        description: >-
+          These become the filter buttons on the blog page. Reuse an existing
+          tag rather than inventing a near-duplicate — "AI & ML" and "AI/ML"
+          would show up as two separate filters.
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+        description: >-
+          Shown on the blog card and used as the page meta description, which
+          Google truncates around 160 characters. Lead with the point.
+      - name: linkedin
+        label: LinkedIn post URL
+        type: string
+        description: >-
+          Optional. Paste the post URL in whatever shape LinkedIn gave you —
+          the activity id is extracted for you.
+      - name: linkedinOnly
+        label: LinkedIn only (no article page)
+        type: boolean
+        default: false
+        description: >-
+          Tick this for a post that is just a card linking to LinkedIn. Leave
+          it off and write the body below to publish a full article on the site
+          — which is the version search engines can actually read.
+      - name: draft
+        label: Draft
+        type: boolean
+        default: false
+        description: >-
+          Keeps the post out of the site. NOT private: this repository's files
+          are served as-is, so the .md is still publicly fetchable. Anything
+          confidential belongs on a branch, not behind this checkbox.
       - name: body
+        label: Article
         type: rich-text
+        description: >-
+          Supported: ## and ### headings, paragraphs, bullet and numbered
+          lists, quotes, code blocks, bold, italic, links and images. Do not
+          use a level-1 heading — the title above is the page's only H1.
+          Type {{linkedin}} on its own line to embed the LinkedIn post here.
+
+  - name: careers
+    label: Open roles
+    type: collection
+    path: content/careers
+    filename: '{fields.slug}.md'
+    format: json-frontmatter
+    view:
+      fields: [title, location, validThrough]
+      primary: title
+    fields:
+      - name: slug
+        label: URL slug
+        type: string
+        pattern: '^[a-z0-9][a-z0-9-]*$'
+        required: true
+        description: >-
+          PERMANENT — becomes the anchor on the careers page
+          (careers.html#<slug>) and the URL in the Google Jobs listing.
+      - name: title
+        label: Role title
+        type: string
+        required: true
+      - name: location
+        label: Location
+        type: string
+        required: true
+        description: 'Shown after the 📍 pin, e.g. "Bangalore · On-site".'
+      - name: experience
+        label: Experience
+        type: string
+        required: true
+        description: 'Shown after the 🕓 clock, e.g. "4–6 years".'
+      - name: employmentType
+        label: Employment type
+        type: select
+        options:
+          values: [Full-Time, Part-Time, Contract, Temporary, Intern]
+        default: Full-Time
+        required: true
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+      - name: responsibilities
+        label: What you'll do
+        type: string
+        list: true
+        required: true
+      - name: requirements
+        label: What you'll bring
+        type: string
+        list: true
+        required: true
+      - name: datePosted
+        label: Date posted
+        type: date
+        options: { format: yyyy-MM-dd }
+        required: true
+      - name: validThrough
+        label: Closing date
+        type: string
+        required: true
+        description: >-
+          REQUIRED by Google for Jobs, and it matters: once this date passes
+          Google drops the listing. Format 2026-12-31T23:59. Keep it current or
+          the role quietly disappears from job search.
+      - name: monthsOfExperience
+        label: Minimum experience (months)
+        type: number
+        description: 'Used for structured data only. 4 years = 48.'
+      - name: seoDescription
+        label: Search-result description
+        type: text
+        required: true
+        description: >-
+          The plain-prose version Google shows in Jobs results. Write it as a
+          paragraph covering the role, the must-haves and how to apply.
+      - name: applyEmail
+        label: Apply-to email
+        type: string
+        default: hr@neualto.com
+        required: true
+      - name: draft
+        label: Draft
+        type: boolean
+        default: false

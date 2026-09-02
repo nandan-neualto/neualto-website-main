@@ -31,6 +31,15 @@ jobs:
       - name: Chatbot search accuracy
         run: node scripts/assistant-widget.test.js
 
+      - name: blog and careers pages are in sync with content/
+        # Same freshness contract as the kb docs below: content/ is the source,
+        # and everything build-content.js writes is a committed artifact. If
+        # someone edits content/ and forgets to regenerate, the site would go
+        # on serving the old cards with nothing to say so.
+        run: |
+          node scripts/build-content.js
+          git diff --exit-code -- blog.html careers.html assets/posts-data.js sitemap.xml llms.txt
+
       - name: docs/kb.json and docs/kb-review.md are in sync with assets/kb-data.js
         # build-kb-docs.js regenerates these. If someone edits assets/kb-data.js and
         # forgets to regenerate, the committed copies silently go stale - so
