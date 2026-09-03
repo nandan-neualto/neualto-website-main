@@ -44,9 +44,14 @@ function read(file) {
   return fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\r\n/g, '\n');
 }
 
-/** Writes with CRLF, matching what git's autocrlf hands back on this repo. */
+/* Writes LF, always. The generator must produce the same bytes on Windows and
+   in CI. Forcing CRLF here does not: with core.autocrlf=true a Windows commit
+   normalises them back to LF, while Linux CI has autocrlf off and stores the
+   CRLF verbatim - so every Action run rewrote every generated file and every
+   local run rewrote it back, churning ~600 lines and flapping the freshness
+   gate forever. LF everywhere; git hands Windows checkouts CRLF on its own. */
 function write(file, text) {
-  fs.writeFileSync(path.join(ROOT, file), text.replace(/\n/g, '\r\n'));
+  fs.writeFileSync(path.join(ROOT, file), text);
 }
 
 /** For attribute values: quotes must be escaped or they break out of the attr. */

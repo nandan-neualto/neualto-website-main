@@ -46,12 +46,17 @@ POSTS.forEach(function (post, i) {
   var source = post.link || post.urn;
 
   var urn = extractUrn(source);
-  if (!urn) {
-    errors.push(who + ': no LinkedIn post id found in link ' + JSON.stringify(source || '') +
-      '\n      Expected something like https://www.linkedin.com/feed/update/urn:li:activity:1234567890123456789/');
-  } else if (seenUrn[urn]) {
+  /* A LinkedIn link is only required for a post with no article page of its
+     own. Native articles (content/blog/<slug>.md with a body) live at
+     blog-<slug>.html and need no embed - requiring one here would make it
+     impossible to publish anything that did not start life on LinkedIn. */
+  if (!urn && !post.url) {
+    errors.push(who + ': has neither an article page nor a LinkedIn post id.' +
+      '\n      Give it a body in content/blog/, or set "linkedin" to a URL like' +
+      '\n      https://www.linkedin.com/feed/update/urn:li:activity:1234567890123456789/');
+  } else if (urn && seenUrn[urn]) {
     errors.push(who + ': duplicate of ' + seenUrn[urn] + ' — both point at post id ' + urn);
-  } else {
+  } else if (urn) {
     seenUrn[urn] = who;
   }
 

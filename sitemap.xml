@@ -43,6 +43,11 @@
     <priority>0.8</priority>
   </url>
 <!-- BEGIN generated: blog articles -->
-
+  <url>
+    <loc>https://neualto.com/blog-reaching-new-heights.html</loc>
+    <lastmod>2026-09-03</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
 <!-- END generated: blog articles -->
 </urlset>

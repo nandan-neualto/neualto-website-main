@@ -12,6 +12,18 @@
 }(typeof self !== 'undefined' ? self : this, function () {
   return [
     {
+      "slug": "reaching-new-heights",
+      "title": "Reaching New Heights: a conversation with Hemanth K Rajasekhar",
+      "date": "2026-09-03",
+      "tags": [
+        "Leadership",
+        "AI & ML"
+      ],
+      "summary": "NeuAlto co-founder Hemanth K Rajasekhar on two decades at Wipro, why DeltaMax and OptiMax exist, what he looks for when hiring, and what AI actually changes about engineering work.",
+      "link": "",
+      "url": "blog-reaching-new-heights.html"
+    },
+    {
       "slug": "data-quality-what-to-ignore",
       "title": "The hard part of data quality isn't detection — it's knowing what to ignore",
       "date": "2026-07-23",
