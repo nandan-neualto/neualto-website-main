@@ -38,7 +38,7 @@ jobs:
         # on serving the old cards with nothing to say so.
         run: |
           node scripts/build-content.js
-          git diff --exit-code -- blog.html careers.html assets/posts-data.js sitemap.xml llms.txt
+          git diff --exit-code -- blog.html careers.html sitemap.xml llms.txt 'blog-*.html'
 
       - name: docs/kb.json and docs/kb-review.md are in sync with assets/kb-data.js
         # build-kb-docs.js regenerates these. If someone edits assets/kb-data.js and

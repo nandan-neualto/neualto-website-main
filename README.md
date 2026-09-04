@@ -45,7 +45,6 @@ Then open <http://localhost:4173>.
 | `docs/kb.json`, `docs/kb-review.md` | Generated from `assets/kb-data.js` by `scripts/build-kb-docs.js` — **do not hand-edit** |
 | **Blog** | |
 | `content/blog/`, `content/careers/` | **Blog posts and job openings.** The only content you edit (see *Editing content*) |
-| `assets/posts-data.js` | Generated from `content/blog/` — **do not hand-edit** |
 | `.pages.yml` | Pages CMS configuration — turns `content/` into edit forms |
 | **Checks** (see *Checks*) | |
 | `scripts/check-seo.js` | Structured data, meta, canonicals, links, image alts |
@@ -55,6 +54,7 @@ Then open <http://localhost:4173>.
 | `scripts/build-kb-docs.js` | Regenerates `docs/kb.json` and `docs/kb-review.md` |
 | `scripts/build-content.js` | Regenerates the blog and careers pages from `content/` |
 | `scripts/site-pages.js` | The page list the checkers validate (globbed, not hand-kept) |
+| `scripts/content-lib.js` | Shared front-matter loading for the generator and the checker |
 | `tools/png-to-webp.py` | One-time image migration (already run; kept for reference) |
 | `docs/WEBSITE-IMPROVEMENTS.md` | Past improvement audit, kept for reference |
 
@@ -162,7 +162,6 @@ is generated and committed:
 | --- | --- |
 | `blog.html` post cards + filter chips | `content/blog/` |
 | `blog-<slug>.html` article pages | posts that have a body |
-| `assets/posts-data.js` | `content/blog/` |
 | `careers.html` job cards + `JobPosting` JSON-LD | `content/careers/` |
 | `sitemap.xml`, `llms.txt` generated blocks | both |
 
@@ -170,11 +169,10 @@ CI regenerates and fails if the committed output differs, so the pages can
 never drift from `content/`.
 
 **Why static HTML and not client-side rendering.** The cards used to be built
-in the browser from `posts-data.js` into an empty `<div>`, which meant a
-crawler that does not run JavaScript saw *nothing* — no title, no summary. The
-generator writes them into `blog.html` instead. `app.js` now only enhances what
-is already there (filtering, LinkedIn embeds), and falls back to rendering if
-the grid is empty.
+in the browser, which meant a crawler that does not run JavaScript saw
+*nothing* — no title, no summary. The generator writes them into `blog.html`
+instead, and `app.js` only wires up the filter chips. Nothing on the blog is
+rendered in the browser.
 
 ### A post
 
@@ -248,7 +246,7 @@ npm test
 | --- | --- |
 | `node scripts/check-seo.js` | JSON-LD parses; FAQ schema matches visible text; titles/descriptions within display length; canonicals absolute and in the sitemap; in-page anchors resolve; robots.txt and sitemap.xml do not contradict each other; every `<img>` has alt and exists on disk; `assets/kb-data.js` links resolve |
 | `node scripts/check-chrome.js` | The header and footer are identical across all 9 pages |
-| `node scripts/check-posts.js` | Blog entries in `assets/posts-data.js` |
+| `node scripts/check-posts.js` | Blog entries in `content/blog/` |
 | `npm run content` | Regenerates blog + careers from `content/`; CI fails if the committed output differs |
 | `node scripts/assistant-widget.test.js` | Chatbot answers the right entry, refuses off-topic questions, and small talk does not swallow real questions |
 

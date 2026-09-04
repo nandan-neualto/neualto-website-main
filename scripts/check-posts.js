@@ -1,5 +1,5 @@
 /**
- * Validates posts-data.js before it reaches the page.
+ * Validates content/blog/*.md before the generator turns it into pages.
  *
  *   node scripts/check-posts.js
  *
@@ -13,44 +13,37 @@
  */
 'use strict';
 
-var POSTS = require('../assets/posts-data.js');
+var lib = require('./content-lib.js');
 
 var errors = [];
 var warnings = [];
 
-function label(post, index) {
-  var title = (post && post.title) ? String(post.title).trim() : '';
-  var name = title ? '"' + (title.length > 55 ? title.slice(0, 52) + '…' : title) + '"' : '(untitled)';
-  return '#' + (index + 1) + ' ' + name;
+/* The same reader the generator builds from, so this fails on exactly what
+   build-content.js would choke on. Load errors (bad front matter, a bad slug)
+   land in the same list as the content errors below. */
+var POSTS = lib.loadCollection('content/blog', function (where, message) {
+  errors.push(where + ': ' + message);
+});
+
+/* Name the file, not the array index: "#2" tells an editor nothing about
+   which post to open. */
+function label(post) {
+  return post.where;
 }
 
-/** Same extraction the site uses — keep these two in step. */
-function extractUrn(value) {
-  var raw = String(value == null ? '' : value).trim();
-  if (!raw) return null;
-  if (/^\d{6,}$/.test(raw)) return raw;
-  var match = raw.match(/activity[:\-](\d{6,})/i);
-  return match ? match[1] : null;
-}
-
-if (!Array.isArray(POSTS)) {
-  console.error('posts-data.js did not export an array.');
-  process.exit(1);
-}
 
 var seenUrn = {};
 var tagCasing = {};   // lowercased tag -> first spelling seen
 
-POSTS.forEach(function (post, i) {
-  var who = label(post, i);
-  var source = post.link || post.urn;
-
-  var urn = extractUrn(source);
+POSTS.forEach(function (post) {
+  var who = label(post);
+  var urn = lib.extractUrn(post.linkedin);
+  var hasArticle = !post.linkedinOnly && !!post.body;
   /* A LinkedIn link is only required for a post with no article page of its
      own. Native articles (content/blog/<slug>.md with a body) live at
      blog-<slug>.html and need no embed - requiring one here would make it
      impossible to publish anything that did not start life on LinkedIn. */
-  if (!urn && !post.url) {
+  if (!urn && !hasArticle) {
     errors.push(who + ': has neither an article page nor a LinkedIn post id.' +
       '\n      Give it a body in content/blog/, or set "linkedin" to a URL like' +
       '\n      https://www.linkedin.com/feed/update/urn:li:activity:1234567890123456789/');
@@ -101,7 +94,7 @@ POSTS.forEach(function (post, i) {
   }
 });
 
-console.log('Checked ' + POSTS.length + ' post' + (POSTS.length === 1 ? '' : 's') + ' in posts-data.js.');
+console.log('Checked ' + POSTS.length + ' post' + (POSTS.length === 1 ? '' : 's') + ' in content/blog/.');
 
 if (errors.length) {
   console.log('\nERRORS (' + errors.length + ') — these will break the page:');

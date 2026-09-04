@@ -977,16 +977,19 @@
   };
 
   /**
-   * Blog feed — renders cards from `window.NEUALTO_POSTS` (posts-data.js) and
-   * mounts the official LinkedIn embed for each.
+   * Topic filtering for the blog index.
    *
-   * Post data is a plain script rather than a JSON file so the page keeps
-   * working from `file://`, where `fetch` of a local path is blocked.
+   * The cards and the filter chips are static HTML, written into blog.html by
+   * scripts/build-content.js from content/blog/*.md. This module only wires
+   * the chips up; it does not build anything.
    *
-   * Everything an editor could get wrong is absorbed here rather than pushed
-   * onto them: they paste a LinkedIn URL in whatever shape LinkedIn gave it,
-   * in any order, and the ordering, the filter buttons, and the embed URLs are
-   * all derived. See posts-data.js for the authoring contract.
+   * It used to also render the cards client-side from posts-data.js, which is
+   * why that file existed. That path became unreachable once the generator
+   * started writing the cards - and it was never the path that mattered,
+   * because a crawler that does not run JavaScript saw nothing at all. The
+   * ~95 lines that served it, and posts-data.js itself, are gone.
+   *
+   * Filtering reads data-tags off the cards, so it needs no post data.
    */
   var blogFeed = {
     name: 'blogFeed',
@@ -994,132 +997,10 @@
       var grid = document.getElementById('postGrid');
       if (!grid) return;
 
+      var chips = $$('.filter-chip');
+      if (!chips.length) return;   // fewer than two articles: nothing to filter
+
       var emptyMessage = document.getElementById('postEmpty');
-      var filterRow = document.getElementById('filterRow');
-      var PERMALINK_BASE = 'https://www.linkedin.com/feed/update/urn:li:activity:';
-
-      /**
-       * Pulls the numeric activity id out of whatever LinkedIn handed over:
-       * a /posts/ share link ("…-activity-7486023292294754304-uhN5"), a
-       * /feed/update/ permalink ("urn:li:activity:7486023292294754304"), or an
-       * id someone pasted on its own. Returns null when there is no id to find,
-       * which is the signal to drop the post rather than render a dead embed.
-       */
-      var extractUrn = function (value) {
-        var raw = String(value == null ? '' : value).trim();
-        if (!raw) return null;
-        if (/^\d{6,}$/.test(raw)) return raw;
-        var match = raw.match(/activity[:\-](\d{6,})/i);
-        return match ? match[1] : null;
-      };
-
-      /** Renders an ISO date as e.g. "Jul 23, 2026"; passes anything else through. */
-      var formatDate = function (iso) {
-        if (!iso) return '';
-        var date = new Date(iso + 'T00:00:00');
-        return isNaN(date) ? iso
-          : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-      };
-
-      var sortTime = function (iso) {
-        var time = Date.parse(iso + 'T00:00:00');
-        return isNaN(time) ? 0 : time; // undated posts sink to the bottom
-      };
-
-      // `link` is the documented field; `urn` is still accepted so older
-      // entries keep working.
-      var posts = window.NEUALTO_POSTS
-        .map(function (post) {
-          var urn = extractUrn(post.link || post.urn);
-          if (!urn) {
-            if (window.console && console.warn) {
-              console.warn('[NeuAlto] blog post skipped — no LinkedIn id found in "' +
-                (post.link || post.urn) + '" (post: "' + (post.title || 'untitled') + '")');
-            }
-            return null;
-          }
-          return {
-            urn: urn,
-            title: post.title || '',
-            summary: post.summary || '',
-            date: post.date || '',
-            tags: post.tags || []
-          };
-        })
-        .filter(Boolean)
-        .sort(function (a, b) { return sortTime(b.date) - sortTime(a.date); });
-
-      if (!posts.length) {
-        if (emptyMessage) emptyMessage.hidden = false;
-        return;
-      }
-
-      var renderCard = function (post) {
-        var pills = post.tags.map(function (tag) {
-          return '<span class="pill">' + escapeHtml(tag) + '</span>';
-        }).join('');
-
-        return '<article class="post-card" data-tags="' + escapeHtml(post.tags.join('|')) + '">' +
-            '<div class="post-body">' +
-              '<div class="post-meta">' +
-                '<time datetime="' + escapeHtml(post.date) + '">' +
-                  escapeHtml(formatDate(post.date)) +
-                '</time>' +
-                '<span class="post-src">LinkedIn</span>' +
-              '</div>' +
-              '<h2>' + escapeHtml(post.title) + '</h2>' +
-              '<p>' + escapeHtml(post.summary) + '</p>' +
-              '<div class="pill-row">' + pills + '</div>' +
-            '</div>' +
-            '<div class="post-embed" data-urn="' + escapeHtml(post.urn) + '">' +
-              '<div class="embed-skeleton"><span></span><span></span><span></span></div>' +
-            '</div>' +
-            '<a class="svc-link post-link" href="' +
-                escapeHtml(PERMALINK_BASE + post.urn) +
-                '" target="_blank" rel="noopener">' +
-              'Discuss on LinkedIn <svg width="15" height="15"><use href="#i-arrow"/></svg>' +
-            '</a>' +
-          '</article>';
-      };
-
-      /* The cards are static HTML, written into blog.html by
-         scripts/build-content.js, so the page works with JavaScript off and a
-         crawler sees real content. Only render client-side if the grid came
-         back empty - that keeps this module working on a page the generator
-         has not touched, instead of blanking it. */
-      var clientRendered = !grid.querySelector('.post-card') && !!window.NEUALTO_POSTS;
-      if (clientRendered) {
-        grid.innerHTML = posts.map(renderCard).join('');
-      }
-
-      // Filter buttons are built from the tags actually in use, so adding a
-      // post with a new tag needs no second edit — and a tag can never point at
-      // a button that does not exist (or vice versa).
-      if (filterRow) {
-        var seen = {};
-        var tags = [];
-        posts.forEach(function (post) {
-          post.tags.forEach(function (tag) {
-            if (!seen[tag]) { seen[tag] = true; tags.push(tag); }
-          });
-        });
-        tags.sort();
-
-        // aria-pressed, not just a class: without it a screen-reader user has no
-        // way to tell which filter is currently applied.
-        // Only when this module also rendered the cards. If the generator
-        // produced the grid, it owns the chips too - including deciding there
-        // are none, which is what it does below two articles. Rebuilding them
-        // here would put a filter row back above a single card.
-        if (!filterRow.querySelector('.filter-chip') && clientRendered) {
-          filterRow.innerHTML =
-            '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
-            tags.map(function (tag) {
-              return '<button class="filter-chip" data-filter="' + escapeHtml(tag) + '" aria-pressed="false">' +
-                escapeHtml(tag) + '</button>';
-            }).join('');
-        }
-      }
 
       // Filtering changes the result set silently. A polite live region is the
       // only way that reaches a screen reader.
@@ -1129,9 +1010,8 @@
       liveStatus.setAttribute('aria-live', 'polite');
       grid.parentNode.insertBefore(liveStatus, grid);
 
-      // Topic filtering. Tags are matched against a pipe-delimited list so that
-      // a tag is never a substring match of another ("AI" vs "AI & ML").
-      var chips = $$('.filter-chip');
+      // Tags are matched against a pipe-delimited list so that one tag is never
+      // a substring match of another ("AI" vs "AI & ML").
       chips.forEach(function (chip) {
         chip.addEventListener('click', function () {
           var filter = chip.getAttribute('data-filter');

@@ -16,7 +16,6 @@
  * entire point of this script; the CMS is just a nicer way to edit the source.
  *
  * WHAT IT WRITES
- *   assets/posts-data.js  - regenerated; app.js still uses it for filtering
  *   blog.html             - static post cards + filter chips, between markers
  *   blog-<slug>.html      - one article page per post that has a body
  *   careers.html          - job cards + JobPosting JSON-LD, between markers
@@ -34,15 +33,18 @@
 var fs = require('fs');
 var path = require('path');
 
-var ROOT = path.join(__dirname, '..');
+var lib = require('./content-lib.js');
+var ROOT = lib.ROOT;
 var errors = [];
 
 function fail(where, message) { errors.push(where + ': ' + message); }
 
-/** Reads a file with line endings normalised, so CRLF checkouts match CI. */
-function read(file) {
-  return fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\r\n/g, '\n');
-}
+/* Parsing and loading live in content-lib.js so check-posts.js validates the
+   files with exactly the same reader this builds from. */
+var read = lib.read;
+var extractUrn = lib.extractUrn;
+function loadCollection(dir) { return lib.loadCollection(dir, fail); }
+function require_(entry, fields) { lib.requireFields(entry, fields, fail); }
 
 /* Writes LF, always. The generator must produce the same bytes on Windows and
    in CI. Forcing CRLF here does not: with core.autocrlf=true a Windows commit
@@ -68,57 +70,6 @@ function escapeHtml(value) {
 function escapeText(value) {
   return String(value == null ? '' : value).replace(/[&<>]/g, function (ch) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch];
-  });
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   1. FRONT MATTER
-   JSON, not YAML: this repo has no dependencies and adding a YAML parser to
-   read four files would be the largest dependency in the project. JSON.parse
-   is built in and fails loudly on a typo, which is what you want from content
-   an editor just saved. Pages CMS writes this shape natively (json-frontmatter).
-   ══════════════════════════════════════════════════════════════════════════ */
-
-function parseFrontMatter(raw, where) {
-  var match = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  if (!match) { fail(where, 'no JSON front matter block (expected --- ... --- at the top)'); return null; }
-  var data;
-  try {
-    data = JSON.parse(match[1]);
-  } catch (e) {
-    fail(where, 'front matter is not valid JSON - ' + e.message);
-    return null;
-  }
-  data.body = match[2].trim();
-  return data;
-}
-
-function loadCollection(dir) {
-  var abs = path.join(ROOT, dir);
-  if (!fs.existsSync(abs)) return [];
-  return fs.readdirSync(abs).sort()          // sort: readdir order is not guaranteed
-    .filter(function (f) { return /\.md$/.test(f); })
-    .map(function (file) {
-      var slug = file.replace(/\.md$/, '');
-      var where = dir + '/' + file;
-      if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
-        fail(where, 'slug must be lowercase letters, digits and hyphens - it becomes the URL');
-      }
-      var entry = parseFrontMatter(read(dir + '/' + file), where);
-      if (!entry) return null;
-      entry.slug = slug;
-      entry.where = where;
-      return entry;
-    })
-    .filter(Boolean);
-}
-
-function require_(entry, fields) {
-  fields.forEach(function (f) {
-    var v = entry[f];
-    if (v == null || v === '' || (Array.isArray(v) && !v.length)) {
-      fail(entry.where, 'missing required field "' + f + '"');
-    }
   });
 }
 
@@ -257,15 +208,6 @@ function splice(text, name, replacement, where) {
 
 var LINKEDIN_EMBED = 'https://www.linkedin.com/embed/feed/update/urn:li:activity:';
 var LINKEDIN_PERMALINK = 'https://www.linkedin.com/feed/update/urn:li:activity:';
-
-/** Same three URL shapes app.js accepts, so an editor can paste any of them. */
-function extractUrn(value) {
-  var raw = String(value == null ? '' : value).trim();
-  if (!raw) return null;
-  if (/^\d{6,}$/.test(raw)) return raw;
-  var m = raw.match(/activity[:\-](\d{6,})/i);
-  return m ? m[1] : null;
-}
 
 function formatDate(iso) {
   if (!iso) return '';
@@ -568,7 +510,7 @@ var chrome = {
   headAssets: sliceBetween(blogHtml, /<link rel="icon"/, /<script type="application\/ld\+json">/, 'head assets'),
   bodyTop: sliceBetween(blogHtml, /<a class="skip-link"/, /<header/, 'body top'),
   header: sliceBetween(blogHtml, /<header/, /<main/, 'header'),
-  footer: sliceBetween(blogHtml, /<footer/, /<script src="assets\/posts-data\.js"/, 'footer') +
+  footer: sliceBetween(blogHtml, /<footer/, /<script src="assets\/app\.js"/, 'footer') +
           '<script src="assets/app.js" defer></script>\n' +
           '<script src="assets/kb-data.js" defer></script>\n' +
           '<script src="assets/assistant-widget.js" defer></script>\n'
@@ -598,33 +540,6 @@ fs.readdirSync(ROOT).filter(function (f) { return /^blog-.*\.html$/.test(f); })
       fail(f, 'orphan - no matching file in content/blog. Delete it deliberately, or restore the source');
     }
   });
-
-// --- posts-data.js ----------------------------------------------------------
-write('assets/posts-data.js',
-  '/**\n' +
-  ' * GENERATED by scripts/build-content.js from content/blog/*.md - do not edit.\n' +
-  ' *\n' +
-  ' * app.js reads this for tag filtering and for the LinkedIn embeds on\n' +
-  ' * linkedinOnly cards. The cards themselves are static HTML in blog.html, so\n' +
-  ' * the page still shows every post with JavaScript disabled.\n' +
-  ' */\n' +
-  '(function (root, factory) {\n' +
-  '  var data = factory();\n' +
-  "  if (typeof module === 'object' && module.exports) module.exports = data;\n" +
-  '  else root.NEUALTO_POSTS = data;\n' +
-  '}(typeof self !== \'undefined\' ? self : this, function () {\n' +
-  '  return ' + JSON.stringify(posts.map(function (p) {
-    return {
-      slug: p.slug,
-      title: p.title,
-      date: p.date,
-      tags: p.tags,
-      summary: p.summary,
-      link: p.linkedin || '',
-      url: p.url || ''
-    };
-  }), null, 2).split('\n').join('\n  ') + ';\n' +
-  '}));\n');
 
 // --- careers.html -----------------------------------------------------------
 var careersHtml = read('careers.html');
@@ -666,5 +581,5 @@ if (errors.length) {
 
 console.log('Blog:    ' + posts.length + ' post(s), ' + written.length + ' article page(s)');
 console.log('Careers: ' + jobs.length + ' role(s)');
-console.log('Wrote blog.html, careers.html, assets/posts-data.js, sitemap.xml, llms.txt' +
+console.log('Wrote blog.html, careers.html, sitemap.xml, llms.txt' +
             (written.length ? ', ' + written.join(', ') : ''));
