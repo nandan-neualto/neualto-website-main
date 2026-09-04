@@ -200,6 +200,20 @@ Your article.
 The **filename is the URL** (`data-quality.md` → `blog-data-quality.html`) and
 is permanent — renaming it breaks the live link.
 
+The blog page is two bands: **articles** written here, then **From LinkedIn**
+below them. Which band a post lands in is derived from whether it has a body —
+write one for a LinkedIn post and it moves itself up into the articles grid,
+gaining its own page, a sitemap entry and schema. Nothing to configure.
+
+The newest four LinkedIn posts render with a real embed; older ones keep their
+card but drop the iframe. Each embed is a 480px cross-origin frame, so the cap
+stops the section growing into twenty of them — change `EMBED_LIMIT` in
+`scripts/build-content.js` if you want more. They are lazy-loaded and sit below
+the articles, so they cost nothing until someone scrolls that far.
+
+Topic filter chips only appear once there are **two or more articles**: below
+that there is nothing to filter.
+
 Set `"linkedinOnly": true` for a card that just points at LinkedIn, with no
 article page. That is what both current posts use, because the original
 LinkedIn text was never written up as an article. Prefer a real body where you

@@ -302,6 +302,19 @@ posts.sort(function (a, b) {
   return a.slug < b.slug ? -1 : 1;
 });
 
+/* The page is two bands: articles written here, then the shorter notes that
+   were published on LinkedIn. Which band a post lands in is DERIVED from
+   whether it has a body - write one for a LinkedIn post and it moves itself
+   up into the articles grid, gaining a page, a sitemap entry and schema. */
+var articles = posts.filter(function (p) { return p.hasPage; });
+var linkedinPosts = posts.filter(function (p) { return !p.hasPage && p.urn; });
+
+/* How many of the LinkedIn notes render as a real embed. The rest fall back
+   to a compact row. Each embed is a 480px cross-origin iframe, so this caps
+   what the section can grow into; they are lazy and below the articles, so
+   the ones that do render cost nothing until someone scrolls to them. */
+var EMBED_LIMIT = 4;
+
 function postCard(p) {
   var pills = (p.tags || []).map(function (t) {
     return '<span class="pill">' + escapeText(t) + '</span>';
@@ -318,10 +331,10 @@ function postCard(p) {
     '<p>' + escapeText(p.summary) + '</p>' +
     '<div class="pill-row">' + pills + '</div>';
 
-  // The embed placeholder is kept only for LinkedIn-only cards. Posts with a
-  // real article link to the article instead: N 480px cross-origin iframes on
-  // a listing page cost a lot and contribute nothing a crawler can read.
-  var embed = (!p.hasPage && p.urn)
+  // Only LinkedIn cards carry an embed, and only the newest EMBED_LIMIT of
+  // them. An article links to itself instead - a crawler cannot read a word
+  // inside a cross-origin iframe, so an embed adds weight and no content.
+  var embed = (!p.hasPage && p.urn && p.embed !== false)
     ? '<div class="post-embed" data-urn="' + escapeHtml(p.urn) + '">' +
         '<div class="embed-skeleton"><span></span><span></span><span></span></div>' +
       '</div>'
@@ -338,10 +351,14 @@ function postCard(p) {
     '</article>';
 }
 
+/* Chips filter the articles grid only. Below two articles there is nothing to
+   filter, and a row reading "All Posts / Leadership / AI & ML" above a single
+   card is furniture pretending to be a control. */
 function filterChips() {
+  if (articles.length < 2) return '';
   var seen = {};
   var tags = [];
-  posts.forEach(function (p) {
+  articles.forEach(function (p) {
     (p.tags || []).forEach(function (t) { if (!seen[t]) { seen[t] = true; tags.push(t); } });
   });
   tags.sort();
@@ -559,7 +576,10 @@ var chrome = {
 
 // --- blog.html: static cards + chips ---------------------------------------
 blogHtml = splice(blogHtml, 'blog cards',
-  posts.length ? posts.map(postCard).join('\n') : '', 'blog.html');
+  articles.map(postCard).join('\n'), 'blog.html');
+linkedinPosts.forEach(function (p, i) { p.embed = i < EMBED_LIMIT; });
+blogHtml = splice(blogHtml, 'linkedin posts',
+  linkedinPosts.map(postCard).join('\n'), 'blog.html');
 blogHtml = splice(blogHtml, 'blog filters', filterChips(), 'blog.html');
 write('blog.html', blogHtml);
 

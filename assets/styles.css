@@ -1200,6 +1200,17 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 @keyframes shimmerBar { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 .post-link { margin-top: 18px; align-self: flex-start; }
 .post-empty { text-align: center; color: var(--ink-soft); font-size: 15px; padding: 40px 0; }
+
+/* ── "From LinkedIn" band ────────────────────────────────────── */
+/* The shorter notes, below the articles. Same .post-grid and .post-card as
+   above - only the surrounding band differs, so the embeds still look like
+   themselves while clearly sitting a level below the writing. The embeds are
+   lazy (see the postEmbeds module in app.js), so nothing here is fetched
+   until a visitor actually scrolls this far. */
+.li-sec { padding: 56px 0 90px; border-top: 1px solid var(--line); background: var(--bg); }
+.li-sec .sol-sub { margin-top: 0; }
+.li-note { text-align: center; color: var(--ink-faint); font-size: 14.5px; margin-bottom: 34px; }
+.li-cta { display: flex; justify-content: center; margin-top: 38px; }
 @media (max-width: 860px) { .post-grid { grid-template-columns: 1fr; } }
 
 /* ── Careers page ────────────────────────────────────────────────────── */

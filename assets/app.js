@@ -939,6 +939,44 @@
   };
 
   /**
+   * Mounts the official LinkedIn embed into every .post-embed[data-urn] on the
+   * page.
+   *
+   * Deliberately its own module, and deliberately document-wide. This used to
+   * live inside blogFeed, scoped to #postGrid - which meant it never ran on a
+   * generated article page, because those have no #postGrid and do not load
+   * posts-data.js. A {{linkedin}} embed inside an article body therefore
+   * rendered its skeleton and never loaded anything at all.
+   *
+   * It needs no post data: the activity id is already on the element.
+   */
+  var postEmbeds = {
+    name: 'postEmbeds',
+    init: function () {
+      var EMBED_BASE = 'https://www.linkedin.com/embed/feed/update/urn:li:activity:';
+
+      $$('.post-embed[data-urn]').forEach(function (holder) {
+        if (holder.querySelector('iframe')) return;   // never mount twice
+
+        var iframe = document.createElement('iframe');
+        iframe.src = EMBED_BASE + holder.dataset.urn;
+        iframe.title = 'LinkedIn post by NeuAlto';
+        // Native lazy-loading defers the offscreen iframes: more reliable than
+        // an IntersectionObserver, and the browser picks the moment to fetch.
+        iframe.loading = 'lazy';
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.addEventListener('load', function () {
+          var skeleton = $('.embed-skeleton', holder);
+          if (skeleton) skeleton.remove();
+          holder.dataset.loaded = '1';
+        });
+        holder.appendChild(iframe);
+      });
+    }
+  };
+
+  /**
    * Blog feed — renders cards from `window.NEUALTO_POSTS` (posts-data.js) and
    * mounts the official LinkedIn embed for each.
    *
@@ -954,11 +992,10 @@
     name: 'blogFeed',
     init: function () {
       var grid = document.getElementById('postGrid');
-      if (!grid || !window.NEUALTO_POSTS) return;
+      if (!grid) return;
 
       var emptyMessage = document.getElementById('postEmpty');
       var filterRow = document.getElementById('filterRow');
-      var EMBED_BASE = 'https://www.linkedin.com/embed/feed/update/urn:li:activity:';
       var PERMALINK_BASE = 'https://www.linkedin.com/feed/update/urn:li:activity:';
 
       /**
@@ -1050,26 +1087,10 @@
          crawler sees real content. Only render client-side if the grid came
          back empty - that keeps this module working on a page the generator
          has not touched, instead of blanking it. */
-      if (!grid.querySelector('.post-card')) {
+      var clientRendered = !grid.querySelector('.post-card') && !!window.NEUALTO_POSTS;
+      if (clientRendered) {
         grid.innerHTML = posts.map(renderCard).join('');
       }
-
-      // Native lazy-loading defers the offscreen iframes: more reliable than an
-      // IntersectionObserver, and the browser picks the moment to fetch.
-      $$('.post-embed', grid).forEach(function (holder) {
-        var iframe = document.createElement('iframe');
-        iframe.src = EMBED_BASE + holder.dataset.urn;
-        iframe.title = 'LinkedIn post by NeuAlto';
-        iframe.loading = 'lazy';
-        iframe.setAttribute('frameborder', '0');
-        iframe.setAttribute('allowfullscreen', '');
-        iframe.addEventListener('load', function () {
-          var skeleton = $('.embed-skeleton', holder);
-          if (skeleton) skeleton.remove();
-          holder.dataset.loaded = '1';
-        });
-        holder.appendChild(iframe);
-      });
 
       // Filter buttons are built from the tags actually in use, so adding a
       // post with a new tag needs no second edit — and a tag can never point at
@@ -1086,8 +1107,11 @@
 
         // aria-pressed, not just a class: without it a screen-reader user has no
         // way to tell which filter is currently applied.
-        // Same rule as the grid: generated chips win, this is the fallback.
-        if (!filterRow.querySelector('.filter-chip')) {
+        // Only when this module also rendered the cards. If the generator
+        // produced the grid, it owns the chips too - including deciding there
+        // are none, which is what it does below two articles. Rebuilding them
+        // here would put a filter row back above a single card.
+        if (!filterRow.querySelector('.filter-chip') && clientRendered) {
           filterRow.innerHTML =
             '<button class="filter-chip active" data-filter="all" aria-pressed="true">All Posts</button>' +
             tags.map(function (tag) {
@@ -1263,6 +1287,7 @@
     pointerEffects,
     contactForm,
     blogFeed,
+    postEmbeds,
     dunsSeal,
     motionToggle,
     backgrounds
