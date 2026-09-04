@@ -1,0 +1,9 @@
+Image uploads from Pages CMS land here (see the `media:` block in .pages.yml).
+
+Kept in git so the folder exists before the first upload — Pages CMS points at
+this path, and a missing directory makes the media browser fail rather than
+create it.
+
+Article markdown references these as ![alt](pics/blog/name.webp). Article pages
+are flat files at the repo root, so that path resolves as-is, and check-seo.js
+verifies every <img src> exists on disk.
