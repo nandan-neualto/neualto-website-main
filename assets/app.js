@@ -226,95 +226,163 @@
    */
   var SCENES = {
 
-    /** Hero: rotating particle globe that leans toward the pointer. */
-    bg3d: function (ctx) {
-      var COUNT = 240;
-      var LINK_THRESHOLD = 0.972; // Dot product above which two points are linked.
-      var FOV = 2.6;
+    /**
+     * Hero: a drifting starfield that periodically gathers into the NeuAlto
+     * mark, holds, and disperses again.
+     *
+     * DARK ONLY. A starfield on a white ground reads as dust, so in the light
+     * theme this paints nothing and the aurora carries the hero on its own.
+     * The theme is checked every frame because the toggle can flip at any time.
+     *
+     * The mark is not a path anyone typed out: the logo is drawn to an
+     * offscreen canvas once, and every pixel whose alpha clears a threshold
+     * becomes a candidate target. Re-sampled on resize, since the point cloud
+     * is in device pixels.
+     *
+     * Movement is a single eased blend between each star's drifting position
+     * and its target, not a per-star spring. A spring is the wrong tool behind
+     * body copy: it overshoots, and an underdamped one oscillates forever. A
+     * blend cannot go unstable, and it makes the whole gather one number.
+     */
+    bgMark: function (ctx) {
+      var COUNT = 190;
+      var FORM_SHARE = 0.58;   // fraction that joins the mark; the rest drift on
+      var SAMPLE_STEP = 5;     // px between candidate targets in the logo bitmap
 
-      // Unit-sphere positions, and reusable buffers for the projected result.
-      var px = new Float32Array(COUNT), py = new Float32Array(COUNT), pz = new Float32Array(COUNT);
-      var sx = new Float32Array(COUNT), sy = new Float32Array(COUNT), depth = new Float32Array(COUNT);
+      /* One cycle, in frames at ~60fps: settle, gather, hold, let go, rest.
+         The long rest is deliberate - this sits behind the headline, and an
+         effect that re-triggers every few seconds stops being atmosphere and
+         starts being a distraction. */
+      var T_SETTLE = 150, T_FORM = 130, T_HOLD = 280, T_RELEASE = 130, T_REST = 430;
+      var CYCLE = T_FORM + T_HOLD + T_RELEASE + T_REST;
 
-      // Fibonacci sphere: even distribution without clustering at the poles.
+      // Deterministic scatter using irrational multipliers, so the stars never
+      // fall into a visible grid. Same trick as the testimonials starfield.
+      var stars = [];
       for (var i = 0; i < COUNT; i++) {
-        var y = 1 - (i / (COUNT - 1)) * 2;
-        var radius = Math.sqrt(Math.max(0, 1 - y * y));
-        var theta = i * 2.39996323; // golden angle
-        px[i] = Math.cos(theta) * radius;
-        py[i] = y;
-        pz[i] = Math.sin(theta) * radius;
+        stars.push({
+          x: (i * 0.618034) % 1,
+          y: ((i * 0.381966 + 0.17) * 1.61803) % 1,
+          z: 0.25 + ((i * 7919) % 100) / 133,   // depth: size, drift speed, brightness
+          phase: (i * 997) % 63 / 10,           // twinkle offset
+          coral: i % 5 === 0,
+          joins: (i % 100) / 100 < FORM_SHARE,
+          lead: ((i * 5701) % 100) / 250,       // 0-0.4 stagger into the gather
+          tx: 0, ty: 0
+        });
       }
 
-      // Neighbour pairs are fixed on the unit sphere, so resolve them once and
-      // store flat (a, b, a, b, …) to keep the draw loop allocation-free.
-      var links = [];
-      for (var a = 0; a < COUNT; a++) {
-        for (var b = a + 1; b < COUNT; b++) {
-          if (px[a] * px[b] + py[a] * py[b] + pz[a] * pz[b] > LINK_THRESHOLD) links.push(a, b);
+      var img = new Image();
+      var imgReady = false;
+      img.onload = function () { imgReady = true; };
+      img.src = 'pics/logo.png';   // already in cache: the header renders it
+
+      var targets = [];
+      var sampledW = 0, sampledH = 0;
+
+      /** Draws the mark offscreen and keeps the coordinates of its opaque pixels. */
+      function sampleTargets(W, H) {
+        targets = [];
+        if (!imgReady || W < 2 || H < 2) return;
+
+        var off = document.createElement('canvas');
+        off.width = W;
+        off.height = H;
+        var octx = off.getContext('2d');
+
+        var scale = Math.min(W * 0.21, H * 0.50) / img.height;
+        var w = img.width * scale, h = img.height * scale;
+        octx.drawImage(img, (W - w) / 2, (H - h) / 2 - H * 0.13, w, h);
+
+        var data = octx.getImageData(0, 0, W, H).data;
+        for (var y = 0; y < H; y += SAMPLE_STEP) {
+          for (var x = 0; x < W; x += SAMPLE_STEP) {
+            if (data[(y * W + x) * 4 + 3] > 120) targets.push(x, y);
+          }
         }
+
+        // Spread the assignment across the whole cloud rather than taking the
+        // first N, which would only ever light up the top of the mark.
+        var pairs = targets.length / 2;
+        if (!pairs) return;
+        var joiners = 0;
+        for (var s = 0; s < COUNT; s++) if (stars[s].joins) joiners++;
+        var stride = Math.max(1, Math.floor(pairs / Math.max(joiners, 1)));
+        var n = 0;
+        for (var k = 0; k < COUNT; k++) {
+          if (!stars[k].joins) continue;
+          var idx = ((n++ * stride) % pairs) * 2;
+          stars[k].tx = targets[idx];
+          stars[k].ty = targets[idx + 1];
+        }
+        sampledW = W;
+        sampledH = H;
       }
 
-      var spinY = 0;
-      var tiltX = -0.35;
-      var targetTiltX = -0.35;
-      var pointerX = 0;
+      function easeInOut(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
 
-      window.addEventListener('mousemove', function (e) {
-        pointerX = e.clientX / window.innerWidth - 0.5;
-        targetTiltX = -0.35 + (e.clientY / window.innerHeight - 0.5) * 0.5;
-      }, { passive: true });
+      /** 0 while drifting, 1 while fully gathered, eased in between. */
+      function gatherAmount(tick) {
+        if (Env.reducedMotion) return 1;   // the still frame should show the mark
+        if (tick < T_SETTLE) return 0;
+        var t = (tick - T_SETTLE) % CYCLE;
+        if (t < T_FORM) return easeInOut(t / T_FORM);
+        if (t < T_FORM + T_HOLD) return 1;
+        if (t < T_FORM + T_HOLD + T_RELEASE) {
+          return 1 - easeInOut((t - T_FORM - T_HOLD) / T_RELEASE);
+        }
+        return 0;
+      }
 
       return function (tick, W, H) {
         ctx.clearRect(0, 0, W, H);
-        var dark = Env.isDark();
-        var c = palette(dark);
-        var i;
 
-        spinY += 0.0022 + pointerX * 0.003;
-        tiltX += (targetTiltX - tiltX) * 0.05; // ease toward the pointer
+        // Light theme: the aurora already carries the hero, and stars on a
+        // white ground look like dirt on the screen.
+        if (!Env.isDark()) return;
 
-        var cosY = Math.cos(spinY), sinY = Math.sin(spinY);
-        var cosX = Math.cos(tiltX), sinX = Math.sin(tiltX);
-        var R = Math.min(W, H) * 0.55;
-        var cx = W / 2, cy = H * 0.44;
+        if (imgReady && (W !== sampledW || H !== sampledH)) sampleTargets(W, H);
 
-        // Rotate around Y, then X, then apply perspective divide.
-        for (i = 0; i < COUNT; i++) {
-          var x1 = px[i] * cosY + pz[i] * sinY;
-          var z1 = -px[i] * sinY + pz[i] * cosY;
-          var y1 = py[i] * cosX - z1 * sinX;
-          var z2 = py[i] * sinX + z1 * cosX;
-          var scale = FOV / (FOV + z2);
-          sx[i] = cx + x1 * R * scale;
-          sy[i] = cy + y1 * R * scale * 0.92;
-          depth[i] = (1 - z2) / 2; // 0 = far, 1 = near
-        }
+        var gather = targets.length ? gatherAmount(tick) : 0;
 
-        ctx.lineWidth = 1;
-        for (var l = 0; l < links.length; l += 2) {
-          var ia = links[l], ib = links[l + 1];
-          var d = Math.min(depth[ia], depth[ib]);
-          if (d < 0.25) continue; // hide links on the far side
-          ctx.strokeStyle = c.red + ((dark ? 0.05 : 0.07) + d * (dark ? 0.2 : 0.22)).toFixed(3) + ')';
+        for (var i = 0; i < COUNT; i++) {
+          var star = stars[i];
+
+          star.x += 0.00004 * star.z;
+          if (star.x > 1.02) star.x = -0.02;
+
+          var px = star.x * W;
+          var py = star.y * H;
+
+          // Stagger: a star with a later `lead` starts moving later, so the
+          // mark assembles instead of snapping into place in one frame.
+          var mine = 0;
+          if (star.joins && gather > 0) {
+            mine = (gather - star.lead) / (1 - star.lead);
+            mine = mine < 0 ? 0 : (mine > 1 ? 1 : mine);
+          }
+
+          if (mine > 0) {
+            px += (star.tx - px) * mine;
+            py += (star.ty - py) * mine;
+          }
+
+          var twinkle = 0.55 + 0.45 * Math.sin(tick * 0.025 + star.phase);
+          // Gathered stars steady and brighten; that contrast is what makes the
+          // mark legible without turning up the overall opacity.
+          var alpha = (0.18 + 0.38 * star.z) * (twinkle * (1 - mine) + mine * 0.62);
+          var radius = 0.4 + star.z * 1.2 + mine * 0.35;
+
+          ctx.fillStyle = (star.coral ? 'rgba(255,105,80,' : 'rgba(255,155,145,') +
+            (alpha < 0 ? 0 : alpha).toFixed(3) + ')';
           ctx.beginPath();
-          ctx.moveTo(sx[ia], sy[ia]);
-          ctx.lineTo(sx[ib], sy[ib]);
-          ctx.stroke();
-        }
-
-        for (i = 0; i < COUNT; i++) {
-          // Every sixth particle picks up the coral accent.
-          ctx.fillStyle = (i % 6 === 0)
-            ? c.coral + ((dark ? 0.14 : 0.22) + depth[i] * (dark ? 0.6 : 0.62)).toFixed(3) + ')'
-            : c.red + ((dark ? 0.10 : 0.16) + depth[i] * (dark ? 0.5 : 0.55)).toFixed(3) + ')';
-          ctx.beginPath();
-          ctx.arc(sx[i], sy[i], 0.8 + depth[i] * 1.8, 0, TAU);
+          ctx.arc(px, py, radius, 0, TAU);
           ctx.fill();
         }
       };
     },
-
     /** Services: rolling perspective wave grid. */
     bgWave: function (ctx) {
       var COLS = 46;
