@@ -1,6 +1,6 @@
 # NeuAlto Assistant — knowledge base review
 
-Generated from `kb-data.js` — 50 entries, content id `bb7a8172d70f`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
+Generated from `kb-data.js` — 50 entries, content id `bec722d93243`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
 **To regenerate after an edit:** `node scripts/build-kb-docs.js`
 
@@ -532,7 +532,7 @@ Keywords: onboarding, discovery, kickoff, getting started, process, workshop
 
 *ID: `engagement-startups`*
 
-Yes — product engineering for startups is a core offering. We help early teams accelerate time-to-market with build-operate squads, while enterprises typically engage us for managed AI, cloud migration, EDI, and security programs.
+Yes, product engineering for startups is a core offering. We help early teams accelerate time-to-market with build-operate squads, while enterprises typically engage us for managed AI, cloud migration, EDI, and security programs.
 
 **Links to:** `index.html#faq`
 

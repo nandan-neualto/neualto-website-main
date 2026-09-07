@@ -569,6 +569,10 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .check-list { list-style: none; display: grid; gap: 8px; }
 .check-list li { display: flex; gap: 10px; font-size: 14px; color: var(--ink-soft); align-items: flex-start; }
 .check-list svg { flex-shrink: 0; margin-top: 3px; color: var(--red); }
+/* A paragraph that follows a bullet list needs a gap, or the sentence reads as
+   a fourth bullet that lost its tick. The list itself has no bottom margin -
+   its spacing is grid `gap`, which does not apply past the last item. */
+.check-list + p { margin-top: 16px; }
 
 /* ── FAQ accordion ───────────────────────────────────────────────────── */
 .faq { background: var(--bg-soft); border-top: 1px solid var(--line); }
