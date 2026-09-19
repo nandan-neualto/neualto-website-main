@@ -875,7 +875,12 @@
 
       $$('.tick').forEach(function (element) {
         var target = parseInt(element.getAttribute('data-to'), 10);
-        if (isNaN(target)) return;
+        // Small figures are read at a glance, so counting them adds nothing,
+        // and it costs something: for its first moments the hero read
+        // "0 Global Offices" and "1 Core Service Lines", which is also what any
+        // screenshot or link preview captured. Only numbers with some weight
+        // behind them get the ease-up.
+        if (isNaN(target) || target < 10) return;
 
         var startedAt = null;
         // Deliberately NOT blanking to "0" here. The first animation frame

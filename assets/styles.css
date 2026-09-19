@@ -75,6 +75,10 @@
     --ink-soft: #5c4a4e;
     --ink-faint: #7d686c; /* darkened for WCAG AA at small sizes (5.2:1 on white) */
     --red: #dc2626;
+    /* Red used as TEXT, as opposed to a button fill. Identical to --red in
+       the light theme; the dark theme lifts it, because one red cannot do
+       both jobs there - see the dark block. */
+    --red-text: #dc2626;
     --red-deep: #a61b1b;
     --red-bright: #f43f3f;
     --coral: #ff7a59;
@@ -104,6 +108,12 @@
     overflow-x: hidden;
   }
   h1, h2, h3 { font-family: 'Sora', 'Inter', sans-serif; letter-spacing: -0.02em; }
+  /* Headings balance their lines instead of stranding one word on the last
+     line ("Six practices. One accountable / partner."), and running text
+     avoids a lone last word. Measured: seven such orphans on the home page
+     alone at 1280px. Browsers without support simply ignore these. */
+  h1, h2, h3, h4, .stat > span, .kicker { text-wrap: balance; }
+  p, li { text-wrap: pretty; }
   a { text-decoration: none; color: inherit; }
   img { max-width: 100%; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
@@ -125,18 +135,25 @@
      which is the balance point - going darker to favour button text starts
      failing red-on-dark text instead. */
   --red: #d92d2d;
+  /* --red is tuned so WHITE text on a red button clears AA (4.81:1). That
+     same red as red-on-dark TEXT only reaches 4.04:1 on --bg-soft, so every
+     .svc-link and article link was failing. One token cannot satisfy both
+     directions; this is the text half. 5.71:1 on --bg-soft, 5.25:1 on
+     --card, 4.91:1 on --red-tint - the lightest value that still reads red
+     rather than salmon. */
+  --red-text: #f4564f;
   /* Previously absent from this block entirely, so the light-theme #a61b1b
      leaked into dark mode at 2.49:1 on --card (the CTA-band button). The
      ad-hoc #ffb3a3 overrides scattered further down were symptoms of this. */
   --red-deep: #ff9f8c;
   --coral: #ff8f70;
-  --red-tint: #2a1216;
-  --red-tint-2: #46191e;
-  --line: #2f191d;
+  --red-tint: #33171d;
+  --red-tint-2: #52222a;
+  --line: #3d232a;
   --line-strong: #8a656d;
-  --bg: #0f0708;
-  --bg-soft: #150a0c;
-  --card: #1c0e11;
+  --bg: #0c0507;
+  --bg-soft: #170d10;
+  --card: #24151a;
   --shadow-sm: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.35);
   --shadow-md: 0 2px 4px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.5);
   --shadow-lg: 0 4px 8px rgba(0,0,0,.45), 0 24px 60px rgba(0,0,0,.6);
@@ -171,7 +188,7 @@ section { padding: 96px 0; }
 .sec-head { max-width: 680px; margin: 0 auto 60px; text-align: center; }
 .kicker {
   display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--red); margin-bottom: 14px;
+  text-transform: uppercase; color: var(--red-text); margin-bottom: 14px;
 }
 .sec-head h2 { font-size: clamp(28px, 3.6vw, 40px); font-weight: 800; margin-bottom: 16px; }
 .sec-head p { color: var(--ink-soft); font-size: 16.5px; }
@@ -275,7 +292,7 @@ header {
 .btn-primary { background: var(--red); color: #fff; box-shadow: 0 6px 18px rgba(220,38,38,.32); }
 .btn-primary:hover { background: var(--red-deep); box-shadow: 0 10px 26px rgba(220,38,38,.4); }
 .btn-ghost { background: var(--card); color: var(--ink); border: 1.5px solid var(--line); }
-.btn-ghost:hover { border-color: var(--red); color: var(--red); }
+.btn-ghost:hover { border-color: var(--red); color: var(--red-text); }
 .nav .btn { padding: 10px 20px; font-size: 14px; }
 
 /* ── Brand logo (transparent mark + wordmark text) ───────────────────── */
@@ -318,7 +335,7 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6px) rotate
   padding: 13px 12px; font-family: 'Inter'; font-size: 15.5px; font-weight: 600;
   color: var(--ink-soft); border-radius: 10px;
 }
-.mobile-nav a:hover, .mobile-nav a:active { color: var(--red); background: var(--bg-soft); }
+.mobile-nav a:hover, .mobile-nav a:active { color: var(--red-text); background: var(--bg-soft); }
 .mobile-nav .btn { margin-top: 10px; justify-content: center; }
 .mobile-nav .btn:hover { color: #fff; background: var(--red-deep); }
 @media (min-width: 981px) { .mobile-nav { display: none !important; } }
@@ -339,14 +356,14 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .social:hover { color: var(--red); border-color: var(--red); }
 .foot-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-faint); margin-bottom: 20px; }
 .foot-col a { display: block; font-size: 14.5px; color: var(--ink-soft); padding: 6px 0; transition: color .2s; }
-.foot-col a:hover { color: var(--red); }
+.foot-col a:hover { color: var(--red-text); }
 .foot-bottom {
   border-top: 1px solid var(--line);
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   padding: 22px 0; font-size: 13.5px; color: var(--ink-faint);
 }
 .foot-bottom a { color: var(--ink-soft); }
-.foot-bottom a:hover { color: var(--red); }
+.foot-bottom a:hover { color: var(--red-text); }
 
 /* ── Compliance badge (D-U-N-S seal) ─────────────────────────────────── */
 /* The seal is injected by D&B's own script, so this container has to cope with
@@ -590,7 +607,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .faq-q .chev {
   flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
-  background: var(--red-tint); color: var(--red);
+  background: var(--red-tint); color: var(--red-text);
   display: grid; place-items: center;
   transition: transform .35s ease, background .25s, color .25s;
 }
@@ -646,8 +663,21 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .logo-chip:hover { border-color: #f3cdcd; box-shadow: var(--shadow-md); }
 .logo-chip:hover img { filter: none; opacity: 1; transform: scale(1.06); }
-[data-theme="dark"] .logo-chip { border-color: #33202a; }
+/* Dark theme: most of these logo files have a white or half-transparent
+   white background baked into the image (12 of 17), so the light-theme
+   white chip became a row of glaring white rectangles on a near-black
+   page. Plain silhouetting (brightness 0, invert 1) would turn those same
+   files into solid white boxes.
+   Greyscale -> invert -> screen does the right thing for both kinds: the
+   baked-in white inverts to black, and screen makes black transparent, so
+   only the mark survives, as light on the dark card. Logos are already
+   greyscale in the light theme, so no brand colour is lost. The attribute
+   selector also outranks the reduced-motion rule that sets filter:none,
+   which would otherwise reveal the white backgrounds. */
+[data-theme="dark"] .logo-chip { background: var(--card); border-color: var(--line); isolation: isolate; }
 [data-theme="dark"] .logo-chip:hover { border-color: #55272e; }
+[data-theme="dark"] .logo-chip img { filter: grayscale(1) invert(1); mix-blend-mode: screen; opacity: .8; }
+[data-theme="dark"] .logo-chip:hover img { filter: grayscale(1) invert(1); opacity: 1; }
 @media (max-width: 620px) {
   .logo-chip { width: 150px; height: 88px; padding: 18px 22px; }
   .logo-chip img { height: 34px; max-width: 118px; }
@@ -790,7 +820,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .spot-card:hover .svc-icon { background: var(--red); color: #fff; box-shadow: 0 8px 20px rgba(220,38,38,.35); transform: rotate(-6deg) scale(1.06); }
 .spot-card h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; line-height: 1.35; position: relative; }
 .spot-card p { font-size: 14.5px; color: var(--ink-soft); flex: 1; margin-bottom: 20px; position: relative; }
-.svc-link { font-size: 14px; font-weight: 600; color: var(--red); display: inline-flex; align-items: center; gap: 6px; position: relative; }
+.svc-link { font-size: 14px; font-weight: 600; color: var(--red-text); display: inline-flex; align-items: center; gap: 6px; position: relative; }
 .svc-link svg { transition: transform .2s; }
 .spot-card:hover .svc-link svg { transform: translateX(4px); }
 .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; position: relative; }
@@ -810,7 +840,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .why-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
 .why-num {
-  font-family: 'Sora'; font-size: 15px; font-weight: 800; color: var(--red);
+  font-family: 'Sora'; font-size: 15px; font-weight: 800; color: var(--red-text);
   background: var(--red-tint); width: 40px; height: 40px; border-radius: 50%;
   display: grid; place-items: center; margin-bottom: 20px;
   transition: all .25s ease;
@@ -838,7 +868,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .teaser-card:hover .teaser-art img { transform: scale(1.04); }
 .teaser-body { padding: 26px 28px 28px; display: flex; flex-direction: column; flex: 1; }
 .teaser-body h3 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-.teaser-tag { font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+.teaser-tag { font-size: 13px; font-weight: 700; color: var(--red-text); margin-bottom: 12px; }
 .teaser-body p:not(.teaser-tag) { font-size: 14.5px; color: var(--ink-soft); flex: 1; margin-bottom: 18px; }
 @media (max-width: 780px) { .teaser-grid { grid-template-columns: 1fr; } }
 .about-narrative { max-width: 820px; margin: -18px auto 40px; }
@@ -883,7 +913,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: var(--bg-soft);
 }
 .founder-card h3 { position: relative; font-size: 21px; font-weight: 800; margin-bottom: 6px; transform: translateZ(28px); }
-.founder-role { position: relative; font-size: 14px; font-weight: 600; color: var(--red); margin-bottom: 4px; transform: translateZ(22px); }
+.founder-role { position: relative; font-size: 14px; font-weight: 600; color: var(--red-text); margin-bottom: 4px; transform: translateZ(22px); }
 .founder-loc {
   position: relative; display: inline-flex; align-items: center; gap: 7px;
   font-size: 13px; font-weight: 600; color: var(--ink-faint);
@@ -916,7 +946,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
               radial-gradient(700px 400px at 90% 100%, rgba(255,122,89,.15), transparent 60%);
 }
 .testimonials .wrap { position: relative; }
-.testimonials .kicker { color: var(--red); }
+.testimonials .kicker { color: var(--red-text); }
 .testimonials .sec-head h2 { color: var(--ink); }
 .testimonials .sec-head p { color: var(--ink-soft); }
 .quote-marquee { position: relative; z-index: 1; margin-top: -20px; }
@@ -933,7 +963,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .quote-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); border-color: #f3cdcd; }
 [data-theme="dark"] .quote-card:hover { border-color: rgba(255,122,89,.45); }
-.quote-mark { font-family: 'Sora'; font-size: 46px; line-height: 1; color: var(--red); margin-bottom: 14px; }
+.quote-mark { font-family: 'Sora'; font-size: 46px; line-height: 1; color: var(--red-text); margin-bottom: 14px; }
 .quote-card blockquote { font-size: 15px; color: var(--ink-soft); flex: 1; margin-bottom: 24px; }
 .quote-who { display: flex; align-items: center; gap: 13px; }
 .quote-who::before {
@@ -957,6 +987,13 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px;
 }
 .partner-logo img { max-height: 64px; max-width: 200px; object-fit: contain; }
+/* Partner logos stay in full colour on a light plate: they are named brand
+   relationships, and recolouring a mark like Google's is not ours to do. The
+   plate is softened from pure white so it stops glaring against the dark
+   card, and multiply absorbs the white backgrounds baked into two of the
+   four files, so they do not show as a whiter box inside the plate. */
+[data-theme="dark"] .partner-logo { background: #efe7e9; border-color: transparent; }
+[data-theme="dark"] .partner-logo img { mix-blend-mode: multiply; }
 .partner-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
 .partner-card p { font-size: 14.5px; color: var(--ink-soft); }
 @media (max-width: 680px) { .partner-grid { grid-template-columns: 1fr; } }
@@ -1006,7 +1043,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .contact-form button { justify-content: center; }
 .contact-form .opt { font-weight: 500; color: var(--ink-faint); }
 .form-note { font-size: 12.5px; color: var(--ink-faint); }
-.form-note a { color: var(--red); font-weight: 600; }
+.form-note a { color: var(--red-text); font-weight: 600; }
 .contact-side { display: grid; gap: 22px; }
 .loc-card {
   background: var(--card); border: 1px solid var(--line); border-radius: 22px;
@@ -1014,7 +1051,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 .loc-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
 .loc-card p { font-size: 14px; color: var(--ink-soft); margin-bottom: 6px; }
-.loc-card .loc-meta a { color: var(--red); font-weight: 600; }
+.loc-card .loc-meta a { color: var(--red-text); font-weight: 600; }
 .map-embed { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); margin-top: 14px; }
 .map-embed iframe { display: block; width: 100%; height: 220px; border: 0; }
 @media (max-width: 880px) { .contact-grid { grid-template-columns: 1fr; } }
@@ -1086,7 +1123,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .prod-section h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 800; margin-bottom: 18px; }
 .prod-section h3 { font-size: 18px; font-weight: 700; margin: 24px 0 12px; }
 .prod-section > .wrap > p { font-size: 15px; color: var(--ink-soft); max-width: 860px; margin-bottom: 14px; }
-.prod-kicker { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+.prod-kicker { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--red-text); margin-bottom: 10px; }
 .cloud-badge {
   display: inline-flex; align-items: center; gap: 8px;
   font-family: 'Sora'; font-size: 13px; font-weight: 700;
@@ -1124,7 +1161,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   cursor: pointer; font-family: 'Sora'; font-size: 15px; font-weight: 700;
   color: var(--ink); padding: 18px 0; list-style: none;
 }
-.faq-details summary::before { content: "+"; color: var(--red); font-weight: 800; margin-right: 10px; }
+.faq-details summary::before { content: "+"; color: var(--red-text); font-weight: 800; margin-right: 10px; }
 .faq-details details[open] summary::before { content: "–"; }
 .faq-details details > div { padding: 0 0 18px; font-size: 14.5px; color: var(--ink-soft); }
 .faq-details details > div ul { margin: 8px 0 0 18px; display: grid; gap: 6px; }
@@ -1158,7 +1195,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   border: 1.5px solid var(--line); border-radius: 100px; padding: 9px 18px;
   transition: all .2s ease;
 }
-.filter-chip:hover { color: var(--red); border-color: var(--red); }
+.filter-chip:hover { color: var(--red-text); border-color: var(--red); }
 .filter-chip.active { color: #fff; background: var(--red); border-color: var(--red); box-shadow: 0 6px 16px rgba(220,38,38,.3); }
 
 .post-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; align-items: start; }
@@ -1263,7 +1300,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .page-careers footer { background: var(--card); padding: 34px 0; }
 .foot-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-size: 13.5px; color: var(--ink-faint); }
 .foot-row a { color: var(--ink-soft); font-weight: 500; }
-.foot-row a:hover { color: var(--red); }
+.foot-row a:hover { color: var(--red-text); }
 .foot-links { display: flex; gap: 22px; }
 @media (max-width: 720px) {
   .job-cols { grid-template-columns: 1fr; }
@@ -1290,14 +1327,14 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   padding-top: 28px; border-top: 1px solid var(--line);
 }
 .legal h2 .sec-num {
-  font-size: 13px; color: var(--red); background: var(--red-tint);
+  font-size: 13px; color: var(--red-text); background: var(--red-tint);
   border: 1px solid var(--red-tint-2); border-radius: 8px; padding: 3px 9px;
   font-family: 'Sora';
 }
 .legal h3 { font-size: 16.5px; font-weight: 700; margin: 22px 0 10px; }
 .legal ul { margin: 0 0 18px 20px; display: grid; gap: 8px; }
 .legal li { font-size: 14.5px; color: var(--ink-soft); line-height: 1.7; }
-.legal a { color: var(--red); font-weight: 600; }
+.legal a { color: var(--red-text); font-weight: 600; }
 .legal a:hover { text-decoration: underline; }
 .legal-table-wrap { overflow-x: auto; margin: 6px 0 18px; }
 .legal table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
@@ -1326,7 +1363,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .article-inner { max-width: 760px; }
 .article-crumbs { font-size: 13px; margin-bottom: 18px; }
 .article-crumbs a { color: var(--ink-soft); font-weight: 600; }
-.article-crumbs a:hover { color: var(--red); text-decoration: underline; }
+.article-crumbs a:hover { color: var(--red-text); text-decoration: underline; }
 .article-wrap h1 { font-size: 38px; line-height: 1.18; letter-spacing: -0.03em; margin-bottom: 14px; }
 .article-meta {
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
@@ -1336,7 +1373,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .article-body p { font-size: 16px; color: var(--ink-soft); margin-bottom: 18px; line-height: 1.8; }
 .article-body h2 { font-size: 24px; margin: 38px 0 14px; letter-spacing: -0.02em; }
 .article-body h3 { font-size: 18px; font-weight: 700; margin: 28px 0 10px; }
-.article-body a { color: var(--red); font-weight: 600; }
+.article-body a { color: var(--red-text); font-weight: 600; }
 .article-body a:hover { text-decoration: underline; }
 .article-body .article-list { margin: 0 0 20px 20px; display: grid; gap: 9px; }
 .article-body li { font-size: 15.5px; color: var(--ink-soft); line-height: 1.75; }
