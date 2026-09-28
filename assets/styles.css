@@ -656,6 +656,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: #fff; border: 1px solid var(--line); border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
+.logo-chip strong { font-size: 25px; letter-spacing: -.035em; color: var(--ink); }
 .logo-chip img {
   height: 42px; width: auto; max-width: 150px; object-fit: contain;
   filter: grayscale(1); opacity: .72;
@@ -1428,4 +1429,3 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   /* Logos are greyscale-until-hover; show them in colour immediately instead. */
   .logo-chip img { filter: none; opacity: 1; }
 }
-

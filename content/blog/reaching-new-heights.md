@@ -8,7 +8,7 @@
 }
 ---
 
-A conversation with Hemanth K Rajasekhar on engineering, entrepreneurship, and AI — Founder & Managing Director, India, NeuAlto.
+A conversation with Hemanth K Rajasekhar on engineering, entrepreneurship, and AI — Co-founder & CEO, Middle East and India, NeuAlto.
 
 After more than two decades across telecommunications, embedded systems, semiconductors, and global customer delivery, Hemanth K Rajasekhar co-founded NeuAlto to bring enterprise experience to focused product engineering. In this edited conversation, he reflects on building teams, learning from technology cycles, and leading through the rise of AI.
 

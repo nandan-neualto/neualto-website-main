@@ -130,11 +130,11 @@
           "leadership",
           "hemanth",
           "mohan",
-          "managing director",
+          "ceo",
           "ceo",
           "management"
         ],
-        "a": "NeuAlto is led by two co-founders:\n\n- **Hemanth K Rajasekhar** — Founder & Managing Director, Bangalore, leading the India delivery organization\n- **Mohan Bethur** — Founder & Managing Director, United States, driving client engagement, strategy, and partnerships",
+        "a": "NeuAlto is led by two co-founders:\n\n- **Hemanth K Rajasekhar** — Co-founder & CEO, Middle East and India, leading the India delivery organization\n- **Mohan Bethur** — Co-founder & CEO, North America and Europe, driving client engagement, strategy, and partnerships",
         "href": "index.html#founders",
         "rel": [
           "company-overview",
@@ -185,7 +185,7 @@
           "case study",
           "portfolio"
         ],
-        "a": "We've worked with 12+ enterprise and startup clients — including Cleo, Mytonomy, CrashPlan, Nirmata, Lodestar, ZeeSense, SafEnces, NetSequre, Stockholm, and funtoot. Engineering and security leaders including Srihari Hosahalli (Asato Technology), Damien Toledo (Nirmata), and Mangesh Bhamre (Cybird) have shared feedback on working with our teams.",
+        "a": "We've worked with 12+ enterprise and startup clients — including Cleo, Mytonomy, CrashPlan, Nirmata, Lodestar, ZeeSense, SafEnces, NetSequre, Stockholm, funtoot, and Cybird. Engineering and security leaders including Srihari Hosahalli (Asato Technology), Damien Toledo (Nirmata), and Mangesh Bhamre (Cybird) have shared feedback on working with our teams.",
         "href": "index.html#clients",
         "rel": [
           "company-industries",
@@ -340,7 +340,7 @@
           "machine learning",
           "data science"
         ],
-        "a": "Our Managed AI team — DevOps, AI/ML, Data Science, Security, and Data Engineering specialists — offloads the complexity of generative AI/ML workflows end to end: developing, deploying, supporting, and monitoring models so you deliver faster and at scale.\n\nWe cover discovery and onboarding, implementation and deployment, and continuous monitoring, with a focus on high availability, scalability, risk management, and security.",
+        "a": "Our Managed AI team — DevOps, AI/ML, Data Science, Security, and Data Engineering specialists — offloads the complexity of AI/ML workflows end to end: developing, deploying, supporting, and monitoring models so you deliver faster and at scale.\n\nWe cover discovery and onboarding, implementation and deployment, and continuous monitoring, with a focus on high availability, scalability, risk management, and security.",
         "href": "services.html#managed-ai",
         "rel": [
           "services-overview",
@@ -1032,7 +1032,7 @@
           "chocky",
           "install"
         ],
-        "a": "Find OptiMax on the **Google Cloud Marketplace** and subscribe through your existing billing account, then deploy it as a VM inside your own project.\n\nFrom there the **\"Chocky — The Chocolate Shop\"** synthetic-data walkthrough teaches the framework end to end: generating data, descriptive statistics, propensity models, CLTV models, OptiMax segmentation, media-mix modeling, and Gen AI experiments.",
+        "a": "Find OptiMax on the **Google Cloud Marketplace** and subscribe through your existing billing account, then deploy it as a VM inside your own project.\n\nFrom there the **\"Chocky — The Chocolate Shop\"** synthetic-data walkthrough teaches the framework end to end: generating data, descriptive statistics, propensity models, CLTV models, OptiMax segmentation, media-mix modeling, and AI experiments.",
         "href": "optimax.html#started",
         "rel": [
           "optimax-what",

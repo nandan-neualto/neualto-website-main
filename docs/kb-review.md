@@ -1,6 +1,6 @@
 # NeuAlto Assistant — knowledge base review
 
-Generated from `kb-data.js` — 50 entries, content id `bec722d93243`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
+Generated from `kb-data.js` — 50 entries, content id `a27db0347248`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
 **To regenerate after an edit:** `node scripts/build-kb-docs.js`
 
@@ -63,8 +63,8 @@ Keywords: location, office, bangalore, bengaluru, usa, india, address, headquart
 
 NeuAlto is led by two co-founders:
 
-- **Hemanth K Rajasekhar** — Founder & Managing Director, Bangalore, leading the India delivery organization
-- **Mohan Bethur** — Founder & Managing Director, United States, driving client engagement, strategy, and partnerships
+- **Hemanth K Rajasekhar** — Co-founder & CEO, Middle East and India, leading the India delivery organization
+- **Mohan Bethur** — Co-founder & CEO, North America and Europe, driving client engagement, strategy, and partnerships
 
 **Links to:** `index.html#founders`
 
@@ -75,7 +75,7 @@ NeuAlto is led by two co-founders:
 
 Also recognizes: who runs neualto, who are the founders, who is the ceo, tell me about the leadership, who leads neualto, who founde neualto
 
-Keywords: founder, leadership, hemanth, mohan, managing director, ceo, management
+Keywords: founder, leadership, hemanth, mohan, ceo, ceo, management
 
 </details>
 
@@ -115,7 +115,7 @@ Keywords: differentiator, why us, value proposition, unique, better
 
 *ID: `company-clients`*
 
-We've worked with 12+ enterprise and startup clients — including Cleo, Mytonomy, CrashPlan, Nirmata, Lodestar, ZeeSense, SafEnces, NetSequre, Stockholm, and funtoot. Engineering and security leaders including Srihari Hosahalli (Asato Technology), Damien Toledo (Nirmata), and Mangesh Bhamre (Cybird) have shared feedback on working with our teams.
+We've worked with 12+ enterprise and startup clients — including Cleo, Mytonomy, CrashPlan, Nirmata, Lodestar, ZeeSense, SafEnces, NetSequre, Stockholm, funtoot, and Cybird. Engineering and security leaders including Srihari Hosahalli (Asato Technology), Damien Toledo (Nirmata), and Mangesh Bhamre (Cybird) have shared feedback on working with our teams.
 
 **Links to:** `index.html#clients`
 
@@ -267,7 +267,7 @@ Keywords: services, practices, offerings, capabilities
 
 *ID: `service-managed-ai`*
 
-Our Managed AI team — DevOps, AI/ML, Data Science, Security, and Data Engineering specialists — offloads the complexity of generative AI/ML workflows end to end: developing, deploying, supporting, and monitoring models so you deliver faster and at scale.
+Our Managed AI team — DevOps, AI/ML, Data Science, Security, and Data Engineering specialists — offloads the complexity of AI/ML workflows end to end: developing, deploying, supporting, and monitoring models so you deliver faster and at scale.
 
 We cover discovery and onboarding, implementation and deployment, and continuous monitoring, with a focus on high availability, scalability, risk management, and security.
 
@@ -950,7 +950,7 @@ Keywords: who is it for, target user, marketing teams, retail, banking, telecom,
 
 Find OptiMax on the **Google Cloud Marketplace** and subscribe through your existing billing account, then deploy it as a VM inside your own project.
 
-From there the **"Chocky — The Chocolate Shop"** synthetic-data walkthrough teaches the framework end to end: generating data, descriptive statistics, propensity models, CLTV models, OptiMax segmentation, media-mix modeling, and Gen AI experiments.
+From there the **"Chocky — The Chocolate Shop"** synthetic-data walkthrough teaches the framework end to end: generating data, descriptive statistics, propensity models, CLTV models, OptiMax segmentation, media-mix modeling, and AI experiments.
 
 **Links to:** `optimax.html#started`
 
