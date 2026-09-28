@@ -20,8 +20,7 @@
  */
 'use strict';
 
-var fs = require('fs');
-
+var lib = require('./content-lib.js');
 var sitePages = require('./site-pages.js');
 var PAGES = sitePages.PAGES;
 var HAND_PAGES = sitePages.HAND_PAGES;
@@ -62,9 +61,6 @@ function normalise(block) {
     .replace(/(<a class="btn btn-primary[^"]*"[^>]*>)[^<]*(<\/a>)/g, '$1CTA$2')
     .replace(/href="mailto:[^"]*"/g, 'href="mailto:CTA"')
     .replace(/href="index\.html#/g, 'href="#')      // in-page vs cross-page anchors
-    .replace(/href="(\w+)\.html"/g, function (_m, p) {
-      return 'href="' + p + '.html"';
-    })
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -119,8 +115,7 @@ function majority(values) {
 function compare(tag, pages) {
   var blocks = {};
   pages.forEach(function (p) {
-    if (!fs.existsSync(p)) { errors.push(p + ': file missing'); return; }
-    var block = extract(fs.readFileSync(p, 'utf8'), tag);
+    var block = extract(lib.readCached(p), tag);
     if (!block) { errors.push(p + ': no <' + tag + '>'); return; }
     blocks[p] = block;
   });
@@ -140,8 +135,9 @@ function compare(tag, pages) {
   var voters = names.filter(function (p) { return HAND_PAGES.indexOf(p) !== -1; });
   var canonical = majority((voters.length ? voters : names)
     .map(function (p) { return normalised[p]; }));
-  var canonicalPage = names.filter(function (p) { return normalised[p] === canonical; })[0];
   var matching = names.filter(function (p) { return normalised[p] === canonical; });
+  var canonicalPage = matching[0];
+  var theirs = links(canonical);
 
   console.log('  <' + tag + '>: ' + matching.length + '/' + names.length +
               ' pages match the majority variant (' + canonicalPage + ')');
@@ -155,8 +151,7 @@ function compare(tag, pages) {
     // page uses a full href) are reported as warnings: they are usually
     // legitimate per-page variation, and treating them as failures would make
     // the checker something people switch off.
-    var mine = links(normalise(blocks[p]));
-    var theirs = links(normalise(blocks[canonicalPage]));
+    var mine = links(normalised[p]);
     var missing = theirs.filter(function (l) { return mine.indexOf(l) === -1; });
     var extra = mine.filter(function (l) { return theirs.indexOf(l) === -1; });
 
@@ -181,8 +176,7 @@ compare('footer', PAGES.filter(function (p) { return FOOTER_EXEMPT.indexOf(p) ==
    but a deferred script means the control is a nameless-state toggle until
    then, and reports nothing at all if JS fails. */
 PAGES.forEach(function (p) {
-  if (!fs.existsSync(p)) return;
-  var html = fs.readFileSync(p, 'utf8');
+  var html = lib.readCached(p);
   if (html.indexOf('id="themeToggle"') !== -1 && html.indexOf('aria-pressed') === -1) {
     warnings.push(p + ': theme toggle has no static aria-pressed (added by app.js at runtime only)');
   }

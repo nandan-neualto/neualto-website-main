@@ -14,9 +14,8 @@
 'use strict';
 
 var fs = require('fs');
-var path = require('path');
 
-var ROOT = path.join(__dirname, '..');
+var ROOT = require('./content-lib.js').ROOT;
 
 /** Every served page, sorted so output order never depends on the filesystem. */
 var PAGES = fs.readdirSync(ROOT)

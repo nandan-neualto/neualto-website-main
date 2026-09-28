@@ -6,9 +6,6 @@
 <title>Data Quality, AI &amp; Cloud Engineering Blog | NeuAlto Technologies</title>
 <meta name="description" content="Field notes from NeuAlto engineers on data quality, anomaly detection, AI reliability, DevSecOps, EDI integration and cloud migration.">
 <link rel="canonical" href="https://neualto.com/blog.html">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f0708" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NeuAlto Technologies">
 <meta name="twitter:title" content="Data Quality, AI &amp; Cloud Engineering Blog | NeuAlto Technologies">
@@ -22,6 +19,11 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NeuAlto Technologies — engineering the future of enterprise technology">
 <meta name="twitter:image" content="https://neualto.com/pics/og-card.png">
+<!-- From here to the stylesheet is shared with every generated article page:
+     scripts/build-content.js copies it, so keep page-specific tags above. -->
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0708" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/png" href="pics/logo.png">
 <script>
 (function () {
@@ -142,7 +144,7 @@
   <div class="wrap">
     <!-- Chips and cards below are written by scripts/build-content.js from
          content/blog/*.md. Do not hand-edit between the markers. -->
-    <div class="filter-row" id="filterRow" role="group" aria-label="Filter posts by topic">
+    <div class="filter-row" role="group" aria-label="Filter posts by topic">
 <!-- BEGIN generated: blog filters -->
 
 <!-- END generated: blog filters -->
@@ -178,6 +180,8 @@
   </div>
 </section>
 
+<!-- Posts live in content/blog/*.md; scripts/build-content.js writes the
+     cards above. Nothing on this page is rendered in the browser. -->
 </main>
 
 <footer>
@@ -199,8 +203,6 @@
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
 </button>
 
-<!-- Posts live in content/blog/*.md; scripts/build-content.js writes the
-     cards above. Nothing on this page is rendered in the browser. -->
 <script src="assets/app.js" defer></script>
 <script src="assets/kb-data.js" defer></script>
 <script src="assets/assistant-widget.js" defer></script>

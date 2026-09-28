@@ -15,15 +15,15 @@
  *   - canonical present, absolute, and self-consistent with the sitemap
  *   - Open Graph + Twitter card tags present
  *   - exactly one <h1> per page
- *   - every <img> has an alt attribute, and local image files exist
+ *   - every <img> has an alt attribute, and local images, stylesheets and
+ *     scripts exist
  *   - internal .html links point at files that exist
  *
  * Exits 1 on errors so it can gate a deploy; warnings alone exit 0.
  */
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
+var lib = require('./content-lib.js');
 
 // Discovered from the filesystem, so generated article pages are validated
 // too - see scripts/site-pages.js for why this is not a hardcoded list.
@@ -74,23 +74,41 @@ function meta(html, key, kind) {
   return m ? attr(m[0], 'content') : null;
 }
 
+/**
+ * The repo file a src/href points at, or null when it is not a local file:
+ * another site, a data: URI, mailto:/tel:, or a bare #fragment.
+ */
+function localFile(ref) {
+  if (!ref || /^(https?:|data:|mailto:|tel:|\/\/|#)/i.test(ref)) return null;
+  return decodeURIComponent(ref.split('#')[0].split('?')[0]);
+}
+
+/** Whether a page has the element a #fragment link points at. */
+function hasId(file, id) {
+  return lib.readCached(file).indexOf('id="' + id + '"') !== -1;
+}
+
+/** The public URL a page is served at, as the sitemap lists it. */
+function pageUrl(page) {
+  return 'https://neualto.com/' + (page === 'index.html' ? '' : page);
+}
+
 var sitemapUrls = [];
-if (fs.existsSync('sitemap.xml')) {
-  var sm = fs.readFileSync('sitemap.xml', 'utf8');
-  sitemapUrls = (sm.match(/<loc>([^<]+)<\/loc>/g) || [])
+if (lib.exists('sitemap.xml')) {
+  sitemapUrls = (lib.read('sitemap.xml').match(/<loc>([^<]+)<\/loc>/g) || [])
     .map(function (l) { return l.replace(/<\/?loc>/g, ''); });
 } else {
   errors.push('sitemap.xml is missing');
 }
 
 PAGES.forEach(function (page) {
-  if (!fs.existsSync(page)) { err(page, 'file missing'); return; }
-  var html = fs.readFileSync(page, 'utf8');
+  var html = lib.readCached(page);
   var text = visibleText(html);
   var indexable = NOINDEX.indexOf(page) === -1;
 
   /* ── JSON-LD ─────────────────────────────────────────────────────── */
   var ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi) || [];
+  var plainText = null;   // punctuation-free page text, built once if a FAQ needs it
   ld.forEach(function (block, i) {
     var body = block.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '');
     var parsed;
@@ -105,11 +123,12 @@ PAGES.forEach(function (page) {
 
     // FAQ answers must be visible on the page, per Google's rich-result rules.
     if (parsed['@type'] === 'FAQPage' && Array.isArray(parsed.mainEntity)) {
+      if (plainText === null) plainText = text.replace(/[^a-z0-9 ]/g, '');
       parsed.mainEntity.forEach(function (q) {
         var name = (q && q.name) || '';
         // compare on a distinctive slice, ignoring punctuation differences
         var probe = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).slice(0, 6).join(' ');
-        if (probe && text.replace(/[^a-z0-9 ]/g, '').indexOf(probe) === -1) {
+        if (probe && plainText.indexOf(probe) === -1) {
           err(page, 'FAQ schema question is not visible on the page: "' + name + '"');
         }
       });
@@ -164,55 +183,37 @@ PAGES.forEach(function (page) {
   if (h1s.length === 0) err(page, 'no <h1>');
   else if (h1s.length > 1) warn(page, h1s.length + ' <h1> elements — should be exactly one');
 
-  /* ── Images ──────────────────────────────────────────────────────── */
+  /* ── Images, stylesheets and scripts ─────────────────────────────── */
   (html.match(/<img\s[^>]*>/gi) || []).forEach(function (tag) {
-    var src = attr(tag, 'src');
-    if (attr(tag, 'alt') === null) err(page, 'img without alt attribute: ' + (src || tag).slice(0, 70));
-    if (src && !/^https?:|^data:/.test(src)) {
-      var f = decodeURIComponent(src.split('?')[0]);
-      if (!fs.existsSync(f)) err(page, 'img src not found on disk: ' + f);
-    }
+    if (attr(tag, 'alt') === null) err(page, 'img without alt attribute: ' + (attr(tag, 'src') || tag).slice(0, 70));
   });
-
-  /* ── Stylesheets and scripts ──────────────────────────── */
   /* A page that links a stylesheet or script that is not on disk renders
-     unstyled or dead, and nothing else here would notice: the img check only
-     covers <img>, and the internal-link check only matches .html hrefs. This
-     gap let a mistyped asset path pass CI silently. */
-  (html.match(/<link\s[^>]*rel="stylesheet"[^>]*>/gi) || []).forEach(function (tag) {
-    var href = attr(tag, 'href');
-    if (href && !/^https?:|^data:|^\/\//.test(href)) {
-      var f = decodeURIComponent(href.split('?')[0]);
-      if (!fs.existsSync(f)) err(page, 'stylesheet not found on disk: ' + f);
-    }
-  });
-  (html.match(/<script\s[^>]*src="[^"]*"[^>]*>/gi) || []).forEach(function (tag) {
-    var src = attr(tag, 'src');
-    if (src && !/^https?:|^data:|^\/\//.test(src)) {
-      var f = decodeURIComponent(src.split('?')[0]);
-      if (!fs.existsSync(f)) err(page, 'script src not found on disk: ' + f);
-    }
+     unstyled or dead. The internal-link check below only matches .html
+     hrefs, so assets need their own existence check. */
+  [[/<img\s[^>]*>/gi, 'src', 'img src'],
+   [/<link\s[^>]*rel="stylesheet"[^>]*>/gi, 'href', 'stylesheet'],
+   [/<script\s[^>]*src="[^"]*"[^>]*>/gi, 'src', 'script src']].forEach(function (kind) {
+    (html.match(kind[0]) || []).forEach(function (tag) {
+      var file = localFile(attr(tag, kind[1]));
+      if (file && !lib.exists(file)) err(page, kind[2] + ' not found on disk: ' + file);
+    });
   });
 
   /* ── Internal links ──────────────────────────────────────────────── */
   (html.match(/href="([^"]+\.html[^"]*)"/gi) || []).forEach(function (h) {
-    var href = h.replace(/^href="/i, '').replace(/"$/, '');
-    if (/^https?:/.test(href)) return;
-    var parts = href.split('#');
-    var file = parts[0];
-    var frag = parts[1];
-    if (file && !fs.existsSync(file)) {
+    var href = h.slice(6, -1);
+    var file = localFile(href);
+    if (!file) return;
+    if (!lib.exists(file)) {
       err(page, 'internal link to missing file: ' + href);
       return;
     }
     // The fragment used to be split off and thrown away, so a renamed section
     // id broke every deep link in silence. The unified footer alone points at
     // five services.html anchors from nine pages.
-    if (frag) {
-      var target = fs.readFileSync(file || page, 'utf8');
-      if (target.indexOf('id="' + frag + '"') === -1) {
-        err(page, 'link to a fragment that does not exist: ' + href);
-      }
+    var frag = href.split('#')[1];
+    if (frag && !hasId(file, frag)) {
+      err(page, 'link to a fragment that does not exist: ' + href);
     }
   });
 
@@ -224,16 +225,14 @@ PAGES.forEach(function (page) {
       err(page, 'same-page link to a missing id: #' + frag);
     }
   });
-});
 
-/* ── sitemap coverage ──────────────────────────────────────────────── */
-PAGES.forEach(function (page) {
-  if (NOINDEX.indexOf(page) !== -1) return;
-  var expect = page === 'index.html'
-    ? 'https://neualto.com/'
-    : 'https://neualto.com/' + page;
-  if (sitemapUrls.length && sitemapUrls.indexOf(expect) === -1) {
-    warn('sitemap.xml', 'does not list ' + expect);
+  /* ── Sitemap coverage ────────────────────────────────────────────── */
+  var listed = sitemapUrls.indexOf(pageUrl(page)) !== -1;
+  if (indexable && sitemapUrls.length && !listed) {
+    warn('sitemap.xml', 'does not list ' + pageUrl(page));
+  }
+  if (!indexable && listed) {
+    errors.push('sitemap.xml lists ' + pageUrl(page) + ' but the page is noindex');
   }
 });
 
@@ -241,22 +240,19 @@ PAGES.forEach(function (page) {
    These three signals (robots, sitemap, meta robots) contradicted each other
    on privacy.html: it was Disallowed, listed in the sitemap, AND marked
    noindex - and the Disallow meant Google could never fetch the page to read
-   the noindex. Nothing caught it because the NOINDEX skip below returns before
-   either check. Assert the combination stays coherent. */
-if (fs.existsSync('robots.txt')) {
-  var robots = fs.readFileSync('robots.txt', 'utf8');
-  var disallowed = (robots.match(/^Disallow:\s*(\S+)/gm) || [])
+   the noindex. Assert the combination stays coherent. */
+if (lib.exists('robots.txt')) {
+  var disallowed = (lib.read('robots.txt').match(/^Disallow:\s*(\S+)/gm) || [])
     .map(function (l) { return l.replace(/^Disallow:\s*/, '').trim(); })
     .filter(function (v) { return v && v !== '/'; });
 
-  disallowed.forEach(function (path) {
-    var asUrl = 'https://neualto.com' + path;
-    if (sitemapUrls.indexOf(asUrl) !== -1) {
-      errors.push('robots.txt Disallows ' + path + ' but sitemap.xml lists it');
+  disallowed.forEach(function (rule) {
+    if (sitemapUrls.indexOf('https://neualto.com' + rule) !== -1) {
+      errors.push('robots.txt Disallows ' + rule + ' but sitemap.xml lists it');
     }
-    var file = path.replace(/^\//, '');
-    if (fs.existsSync(file) && /noindex/i.test(fs.readFileSync(file, 'utf8'))) {
-      errors.push('robots.txt Disallows ' + path + ' which also has meta noindex - ' +
+    var file = rule.replace(/^\//, '');
+    if (lib.exists(file) && /noindex/i.test(lib.readCached(file))) {
+      errors.push('robots.txt Disallows ' + rule + ' which also has meta noindex - ' +
                   'the Disallow stops crawlers ever reading the noindex');
     }
   });
@@ -264,21 +260,12 @@ if (fs.existsSync('robots.txt')) {
   warnings.push('robots.txt is missing');
 }
 
-PAGES.forEach(function (page) {
-  if (NOINDEX.indexOf(page) === -1) return;
-  var expect = page === 'index.html' ? 'https://neualto.com/' : 'https://neualto.com/' + page;
-  if (sitemapUrls.indexOf(expect) !== -1) {
-    errors.push('sitemap.xml lists ' + expect + ' but the page is noindex');
-  }
-});
-
 /* ── kb-data.js link targets ───────────────────────────────────────────
    ~50 chatbot answers carry markdown links, none of which were validated.
    A dead link inside an answer is worse than one on a page: the visitor was
    explicitly told to go there. */
-if (fs.existsSync('assets/kb-data.js')) {
-  var kb = require('../assets/kb-data.js');
-  kb.forEach(function (entry) {
+if (lib.exists('assets/kb-data.js')) {
+  require('../assets/kb-data.js').forEach(function (entry) {
     var targets = [];
     var re = /\]\(([^)]+)\)/g;
     var m;
@@ -286,18 +273,15 @@ if (fs.existsSync('assets/kb-data.js')) {
     if (entry.href) targets.push(entry.href);
 
     targets.forEach(function (t) {
-      if (/^(https?:|mailto:|tel:)/i.test(t)) return;
-      var parts = t.split('#');
-      var file = parts[0];
-      var frag = parts[1];
-      if (file && !fs.existsSync(file)) {
+      var file = localFile(t);
+      if (!file) return;
+      if (!lib.exists(file)) {
         errors.push('kb-data.js [' + entry.id + '] links to a missing file: ' + t);
         return;
       }
-      if (frag && file) {
-        if (fs.readFileSync(file, 'utf8').indexOf('id="' + frag + '"') === -1) {
-          errors.push('kb-data.js [' + entry.id + '] links to a missing fragment: ' + t);
-        }
+      var frag = t.split('#')[1];
+      if (frag && !hasId(file, frag)) {
+        errors.push('kb-data.js [' + entry.id + '] links to a missing fragment: ' + t);
       }
     });
   });

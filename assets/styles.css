@@ -31,7 +31,7 @@
  *      - Trusted-by logo wall
  *      - LinkedIn button
  *      - CTA band with border beam
- *      - Background canvases (hero globe + sections)
+ *      - Background canvases (hero starfield + sections)
  *      - Gif-style animated stickers
  *      - Mini terminal "gif" (featured AI card)
  *   HOME PAGE
@@ -67,7 +67,8 @@
  *   override next to the component it belongs to.
  * - Media queries that concern a single component live with that component.
  *   Only cross-cutting breakpoint changes belong in RESPONSIVE.
- * - Anything animated needs a counterpart in MOTION PREFERENCES.
+ * - Animations stop automatically under reduced motion. MOTION PREFERENCES
+ *   holds only the static fallbacks some components need instead.
  */
 
 :root {
@@ -89,6 +90,8 @@
        3:1 non-text minimum when it is the ONLY thing identifying a form
        control. --line-strong is for those borders. */
     --line-strong: #9c8388;
+    /* Border of a card that is hovered or open. */
+    --line-accent: #f3cdcd;
     --bg: #ffffff;
     --bg-soft: #fcf8f8;
     --card: #ffffff;
@@ -98,6 +101,10 @@
     --shadow-lg: 0 4px 8px rgba(28,10,13,.06), 0 24px 60px rgba(28,10,13,.13);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* The UA's [hidden] { display: none } loses to any author rule that sets
+     display, so every component toggled with the hidden attribute needed
+     its own patch. One rule, for all of them. */
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -115,6 +122,8 @@
   h1, h2, h3, h4, .stat > span, .kicker { text-wrap: balance; }
   p, li { text-wrap: pretty; }
   a { text-decoration: none; color: inherit; }
+  /* A link inside running copy, where it has to look like one. */
+  .text-link { color: var(--red-text); font-weight: 600; }
   img { max-width: 100%; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 
@@ -151,6 +160,7 @@
   --red-tint-2: #52222a;
   --line: #3d232a;
   --line-strong: #8a656d;
+  --line-accent: #55272e;
   --bg: #0c0507;
   --bg-soft: #170d10;
   --card: #24151a;
@@ -170,12 +180,7 @@
                     linear-gradient(90deg, rgba(255,220,220,.05) 1px, transparent 1px);
 }
 [data-theme="dark"] .aurora span { opacity: .38; }
-[data-theme="dark"] .pill,
-[data-theme="dark"] .ftag,
-[data-theme="dark"] .meta-pill,
 [data-theme="dark"] .sticker { background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.5); }
-[data-theme="dark"] .spot-card:hover,
-[data-theme="dark"] .faq-item.open { border-color: #55272e; }
 [data-theme="dark"] .gif-terminal { border: 1px solid #3a1c21; }
 
 /* ==========================================================================
@@ -205,7 +210,6 @@ section { padding: 96px 0; }
   border-radius: 100px; padding: 9px 18px; transition: all .2s ease;
 }
 .jump-chips a:hover { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 6px 16px rgba(220,38,38,.3); }
-[data-theme="dark"] .jump-chips a:hover { color: #fff; }
 
 /* ==========================================================================
    CHROME
@@ -393,7 +397,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
    attributes (114x97). Do NOT set width/height here — forcing width:100% and
    height:auto stretches the seal out of proportion. Only stop it overflowing. */
 .compliance iframe { display: block; max-width: 100%; border: 0; }
-.compliance [hidden] { display: none; }
 
 /* ── Motion pause control (WCAG 2.2.2) ───────────────────────────────── */
 /* Injected by the motionToggle module in app.js. The attribute lives on <html>
@@ -469,11 +472,12 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   line-height: 1.12; font-weight: 800;
   max-width: 860px; margin: 0 auto 22px;
 }
-.rotator {
-  display: inline-block; position: relative; text-align: left;
-  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
-     gradient-filled headings, so the tail of every word fell below the 3:1
-     large-text minimum. --red is 4.83:1. */
+.rotator { display: inline-block; position: relative; text-align: left; }
+/* Brand gradient text, used by every page's headline accent. Ends on --red,
+   not --coral: coral is 2.57:1 on white and these are gradient-filled
+   headings, so the tail of every word fell below the 3:1 large-text minimum.
+   --red is 4.83:1. */
+.rotator, .hero h1 .accent, .sec-head h2.prod-name, .err-code {
   background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
@@ -512,7 +516,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
    "24/7" (bare text in the <b>) stayed 34px dark. Hence "6", "12" and "2"
    looking tiny next to a full-size "+". */
 .stat > span { font-size: 13px; color: var(--ink-soft); font-weight: 600; line-height: 1.4; max-width: 16ch; }
-.stat b .tick { font: inherit; color: inherit; letter-spacing: inherit; }
 
 /* On laptop-height viewports the hero's generous rhythm pushes the stat strip
    below the fold, so the numbers are only found by scrolling. Tighten the
@@ -545,7 +548,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .hero .reveal:nth-child(3) { animation-delay: .08s; }
 .hero .reveal:nth-child(4) { animation-delay: .16s; }
 .hero .reveal:nth-child(5) { animation-delay: .24s; }
-.hero .reveal:nth-child(6) { animation-delay: .32s; }
 
 /* Reduced-motion overrides live together in MOTION PREFERENCES at the end of
    this file, so there is one place to check when adding a new animation. */
@@ -598,7 +600,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;
   overflow: hidden; transition: border-color .25s, box-shadow .25s;
 }
-.faq-item.open { border-color: #f3cdcd; box-shadow: var(--shadow-sm); }
+.faq-item.open { border-color: var(--line-accent); box-shadow: var(--shadow-sm); }
 .faq-q {
   width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   background: none; border: none; cursor: pointer; text-align: left;
@@ -634,9 +636,9 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
-.marquee + .marquee { margin-top: 14px; }
+.marquee + .marquee { margin-top: 20px; }
 .marquee-track {
-  display: flex; gap: 16px; width: max-content;
+  display: flex; gap: 20px; width: max-content;
   animation: scrollX 36s linear infinite;
   padding: 4px 0;
 }
@@ -648,8 +650,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 /* ── Trusted-by logo wall ────────────────────────────────────────────── */
 .clients { padding: 100px 0 96px; overflow: hidden; }
 .clients .sec-head { margin-bottom: 40px; }
-.clients .marquee + .marquee { margin-top: 20px; }
-.clients .marquee-track { gap: 20px; }
 .logo-chip {
   flex-shrink: 0; display: grid; place-items: center;
   width: 196px; height: 108px; padding: 24px 30px;
@@ -661,7 +661,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   filter: grayscale(1); opacity: .72;
   transition: filter .3s ease, opacity .3s ease, transform .3s ease;
 }
-.logo-chip:hover { border-color: #f3cdcd; box-shadow: var(--shadow-md); }
+.logo-chip:hover { border-color: var(--line-accent); box-shadow: var(--shadow-md); }
 .logo-chip:hover img { filter: none; opacity: 1; transform: scale(1.06); }
 /* Dark theme: most of these logo files have a white or half-transparent
    white background baked into the image (12 of 17), so the light-theme
@@ -674,8 +674,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
    greyscale in the light theme, so no brand colour is lost. The attribute
    selector also outranks the reduced-motion rule that sets filter:none,
    which would otherwise reveal the white backgrounds. */
-[data-theme="dark"] .logo-chip { background: var(--card); border-color: var(--line); isolation: isolate; }
-[data-theme="dark"] .logo-chip:hover { border-color: #55272e; }
+[data-theme="dark"] .logo-chip { background: var(--card); isolation: isolate; }
 [data-theme="dark"] .logo-chip img { filter: grayscale(1) invert(1); mix-blend-mode: screen; opacity: .8; }
 [data-theme="dark"] .logo-chip:hover img { filter: grayscale(1) invert(1); opacity: 1; }
 @media (max-width: 620px) {
@@ -700,24 +699,41 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   animation: spin 5s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.cta-inner {
+/* The red CTA band. .cta-inner is the home page's full-size one; .mail-inner
+   is the compact variant that closes services, solutions and careers. */
+.cta-inner, .mail-inner {
   position: relative; overflow: hidden;
   background: linear-gradient(115deg, #63100f, #dc2626 70%, #f2603c);
-  border-radius: 26px; padding: 72px 60px;
-  display: flex; align-items: center; justify-content: space-between; gap: 40px;
+  border-radius: 26px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.cta-inner::after {
-  content: ""; position: absolute; right: -80px; top: -80px;
-  width: 340px; height: 340px; border-radius: 50%;
+.cta-inner::after, .mail-inner::after {
+  content: ""; position: absolute; border-radius: 50%;
   background: rgba(255,255,255,.08);
 }
-.cta-inner h2 { color: #fff; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; margin-bottom: 12px; }
+.cta-inner h2, .mail-inner h2 { color: #fff; font-weight: 800; }
 /* #ffd6cb was 2.42:1 against the coral end of the band gradient. */
-.cta-inner p { color: #fff; font-size: 16.5px; max-width: 520px; }
-.cta-inner .btn { background: var(--card); color: var(--red-deep); position: relative; z-index: 1; white-space: nowrap; }
+.cta-inner p, .mail-inner p { color: #fff; }
+/* --card rather than #fff: in the dark theme --red-deep is a light salmon,
+   which would be about 2:1 on a white button. */
+.cta-inner .btn, .mail-inner .btn { background: var(--card); color: var(--red-deep); position: relative; z-index: 1; white-space: nowrap; }
+
+.cta-inner { padding: 72px 60px; gap: 40px; }
+.cta-inner::after { right: -80px; top: -80px; width: 340px; height: 340px; }
+.cta-inner h2 { font-size: clamp(26px, 3.4vw, 38px); margin-bottom: 12px; }
+.cta-inner p { font-size: 16.5px; max-width: 520px; }
 .cta-inner .btn:hover { box-shadow: 0 12px 28px rgba(0,0,0,.25); }
 
-/* ── Background canvases (hero globe + sections) ─────────────────────── */
+.mail-band { padding: 60px 0 100px; background: var(--bg-soft); }
+.mail-inner { max-width: 900px; margin: 0 auto; padding: 54px 50px; gap: 32px; flex-wrap: wrap; box-shadow: var(--shadow-md); }
+.mail-inner::after { right: -70px; top: -70px; width: 280px; height: 280px; }
+.mail-inner h2 { font-size: clamp(22px, 3vw, 30px); margin-bottom: 10px; }
+.mail-inner p { font-size: 15.5px; max-width: 480px; }
+@media (max-width: 720px) {
+  .mail-inner { padding: 42px 30px; text-align: center; justify-content: center; }
+}
+
+/* ── Background canvases (hero starfield + sections) ─────────────────── */
 .bg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .services, #founders { position: relative; overflow: hidden; }
 .services .wrap, #founders .wrap, .testimonials .wrap { position: relative; z-index: 1; }
@@ -805,7 +821,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   opacity: 0; transition: opacity .3s ease;
 }
 .spot-card:hover::before { opacity: 1; }
-.spot-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: #f3cdcd; }
+.spot-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--line-accent); }
 .spot-card.featured { grid-column: span 2; background: linear-gradient(120deg, var(--card) 55%, var(--red-tint)); }
 .spot-card.wide { grid-column: span 3; flex-direction: row; align-items: center; gap: 30px; }
 .spot-card.wide .svc-body { flex: 1; }
@@ -861,8 +877,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   box-shadow: var(--shadow-sm);
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.teaser-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: #f3cdcd; }
-[data-theme="dark"] .teaser-card:hover { border-color: #55272e; }
+.teaser-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--line-accent); }
 .teaser-art { aspect-ratio: 21 / 9; overflow: hidden; border-bottom: 1px solid var(--line); }
 .teaser-art img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
 .teaser-card:hover .teaser-art img { transform: scale(1.04); }
@@ -935,7 +950,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 }
 
 /* ── Testimonials (theme-aware) ──────────────────────────────────────── */
-.testimonials { background: var(--bg-soft); color: var(--ink); position: relative; overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.testimonials { background: var(--bg-soft); position: relative; overflow: hidden; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .testimonials::before {
   content: ""; position: absolute; inset: 0;
   background: radial-gradient(800px 400px at 20% 0%, rgba(220,38,38,.08), transparent 60%),
@@ -945,13 +960,8 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   background: radial-gradient(800px 400px at 20% 0%, rgba(220,38,38,.28), transparent 60%),
               radial-gradient(700px 400px at 90% 100%, rgba(255,122,89,.15), transparent 60%);
 }
-.testimonials .wrap { position: relative; }
-.testimonials .kicker { color: var(--red-text); }
-.testimonials .sec-head h2 { color: var(--ink); }
-.testimonials .sec-head p { color: var(--ink-soft); }
 .quote-marquee { position: relative; z-index: 1; margin-top: -20px; }
 .quote-marquee .marquee-track { gap: 24px; animation-duration: 46s; align-items: stretch; }
-.quote-marquee:hover .marquee-track { animation-play-state: paused; }
 .quote-marquee .quote-card { width: 400px; flex-shrink: 0; }
 @media (max-width: 620px) { .quote-marquee .quote-card { width: 300px; } }
 .quote-card {
@@ -961,7 +971,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
   transition: box-shadow .25s, transform .25s, border-color .25s;
 }
-.quote-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); border-color: #f3cdcd; }
+.quote-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); border-color: var(--line-accent); }
 [data-theme="dark"] .quote-card:hover { border-color: rgba(255,122,89,.45); }
 .quote-mark { font-family: 'Sora'; font-size: 46px; line-height: 1; color: var(--red-text); margin-bottom: 14px; }
 .quote-card blockquote { font-size: 15px; color: var(--ink-soft); flex: 1; margin-bottom: 24px; }
@@ -980,8 +990,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   padding: 38px 34px; text-align: center;
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.partner-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: #f3cdcd; }
-[data-theme="dark"] .partner-card:hover { border-color: #55272e; }
+.partner-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--line-accent); }
 .partner-logo {
   height: 96px; display: grid; place-items: center; margin-bottom: 22px;
   background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px;
@@ -1083,15 +1092,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .sol-detail { padding: 80px 0; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
 .sol-detail.alt { background: var(--bg-soft); }
 .prod-head { margin-bottom: 38px; }
-.sec-head h2.prod-name {
-  font-size: clamp(38px, 5.4vw, 56px);
-  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
-     gradient-filled headings, so the tail of every word fell below the 3:1
-     large-text minimum. --red is 4.83:1. */
-  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  margin-bottom: 10px;
-}
+.sec-head h2.prod-name { font-size: clamp(38px, 5.4vw, 56px); margin-bottom: 10px; }
 .prod-head p { font-size: 17px; font-weight: 500; }
 .sol-banner {
   border-radius: 22px; overflow: hidden; margin-bottom: 44px;
@@ -1205,9 +1206,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   padding: 30px 30px 26px; box-shadow: var(--shadow-sm);
   transition: box-shadow .25s ease, border-color .25s ease;
 }
-.post-card:hover { box-shadow: var(--shadow-md); border-color: #f3cdcd; }
-[data-theme="dark"] .post-card:hover { border-color: #55272e; }
-.post-card[hidden] { display: none; }
+.post-card:hover { box-shadow: var(--shadow-md); border-color: var(--line-accent); }
 .post-meta {
   display: flex; align-items: center; gap: 10px;
   font-size: 12.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 12px;
@@ -1255,9 +1254,9 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 @media (max-width: 860px) { .post-grid { grid-template-columns: 1fr; } }
 
 /* ── Careers page ────────────────────────────────────────────────────── */
-.page-careers .wrap { max-width: 1080px; }
+/* careers.html is a .page-sub page; these are its only departures. */
 .page-careers .hero { padding: 90px 0 70px; }
-.page-careers .hero h1 { font-size: clamp(34px, 4.8vw, 54px); max-width: 760px; }
+.page-careers .hero h1 { max-width: 760px; }
 .page-careers .hero-ctas { margin-bottom: 0; }
 .announce b { color: #fff; }
 .openings { padding: 80px 0 40px; background: var(--bg-soft); border-top: 1px solid var(--line); }
@@ -1267,8 +1266,7 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   box-shadow: var(--shadow-sm);
   transition: box-shadow .25s ease, border-color .25s ease;
 }
-.job-card:hover { box-shadow: var(--shadow-md); border-color: #f3cdcd; }
-[data-theme="dark"] .job-card:hover { border-color: #55272e; }
+.job-card:hover { box-shadow: var(--shadow-md); border-color: var(--line-accent); }
 .job-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 18px; }
 .job-top h3 { font-size: 24px; font-weight: 800; }
 .job-card .job-meta { margin: 0 0 20px; }
@@ -1280,24 +1278,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   margin-bottom: 14px;
 }
 .job-apply { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 24px; }
-.job-apply span { font-size: 13.5px; color: var(--ink-faint); }
-.mail-band { padding: 60px 0 100px; background: var(--bg-soft); }
-.mail-inner {
-  position: relative; overflow: hidden; max-width: 900px; margin: 0 auto;
-  background: linear-gradient(115deg, #63100f, #dc2626 70%, #f2603c);
-  border-radius: 26px; padding: 54px 50px;
-  display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
-  box-shadow: var(--shadow-md);
-}
-.mail-inner::after {
-  content: ""; position: absolute; right: -70px; top: -70px;
-  width: 280px; height: 280px; border-radius: 50%;
-  background: rgba(255,255,255,.08);
-}
-.mail-inner h2 { color: #fff; font-size: clamp(22px, 3vw, 30px); font-weight: 800; margin-bottom: 10px; }
-.mail-inner p { color: #ffd6cb; font-size: 15.5px; max-width: 480px; }
-.mail-inner .btn { background: #fff; color: var(--red-deep); position: relative; z-index: 1; white-space: nowrap; }
-.page-careers footer { background: var(--card); padding: 34px 0; }
 .foot-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-size: 13.5px; color: var(--ink-faint); }
 .foot-row a { color: var(--ink-soft); font-weight: 500; }
 .foot-row a:hover { color: var(--red-text); }
@@ -1305,15 +1285,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 @media (max-width: 720px) {
   .job-cols { grid-template-columns: 1fr; }
   .job-card { padding: 30px 26px; }
-  .mail-inner { padding: 42px 30px; text-align: center; justify-content: center; }
-}
-
-.hero h1 .accent {
-  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
-     gradient-filled headings, so the tail of every word fell below the 3:1
-     large-text minimum. --red is 4.83:1. */
-  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
 /* ── Legal / privacy page ────────────────────────────────────────────── */
@@ -1347,11 +1318,6 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .err-hero { padding: 110px 0 120px; }
 .err-code {
   font-family: 'Sora'; font-size: clamp(90px, 17vw, 190px); font-weight: 800; line-height: 1;
-  /* Ends on --red, not --coral: coral is 2.57:1 on white and these are
-     gradient-filled headings, so the tail of every word fell below the 3:1
-     large-text minimum. --red is 4.83:1. */
-  background: linear-gradient(100deg, var(--red-deep), var(--red-bright) 45%, var(--red));
-  -webkit-background-clip: text; background-clip: text; color: transparent;
   margin-bottom: 6px; letter-spacing: -0.04em;
 }
 
@@ -1360,7 +1326,9 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
    Deliberately mirrors the .legal type scale: both are long-form reading
    columns, and having one measure for prose beats inventing a second. */
 .article-wrap { padding: 40px 0 90px; border-top: 1px solid var(--line); background: var(--bg-soft); }
-.article-inner { max-width: 760px; }
+/* Two classes so it outranks .page-sub .wrap: articles use the sub-page
+   chrome, but the reading column stays narrow. */
+.article-wrap .article-inner { max-width: 760px; }
 .article-crumbs { font-size: 13px; margin-bottom: 18px; }
 .article-crumbs a { color: var(--ink-soft); font-weight: 600; }
 .article-crumbs a:hover { color: var(--red-text); text-decoration: underline; }
@@ -1436,36 +1404,26 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
    ========================================================================== */
 
 /*
- * Single source of truth for reduced-motion. When you add an animation
- * anywhere above, add its counterpart here.
+ * Single source of truth for reduced-motion. Every CSS animation stops through
+ * the one universal rule below, including any added later. Add a rule here
+ * only when a component needs a static fallback or a transition turned off.
  *
  * Note the canvas backgrounds are NOT listed: they are handled in app.js, which
  * paints one static frame and then stops rather than hiding them outright.
  */
 @media (prefers-reduced-motion: reduce) {
 
-  /* Entrance and ambient animation — stop outright. */
-  .hero .reveal,
-  .aurora span,
-  .beam-wrap::before,
-  .announce a,
-  .rotator .word,
-  .sticker, .spinSlow, .orbit, .beat, .twinkle, .flame, .rocketBob,
-  .tl, .term-ok, .caret,
-  .mobile-nav.open,
-  .embed-skeleton span { animation: none !important; }
+  /* Entrance and ambient animation — stop outright, everywhere. */
+  *, *::before, *::after { animation: none !important; }
 
   /* Marquees: fall back to a static wrapped row so all logos stay reachable. */
-  .marquee-track { animation: none; flex-wrap: wrap; width: auto; justify-content: center; }
+  .marquee-track { flex-wrap: wrap; width: auto; justify-content: center; }
   .marquee { mask-image: none; -webkit-mask-image: none; }
 
   /* Hover/steady-state transitions that would otherwise slide. */
   .tab-ind, .founder-card { transition: none; }
 
-  /* Previously missing from this block despite the note above. */
   html { scroll-behavior: auto; }
-  .eyebrow .dot { animation: none; }
-  .tab-panel.active { animation: none; }
 
   /* Logos are greyscale-until-hover; show them in colour immediately instead. */
   .logo-chip img { filter: none; opacity: 1; }

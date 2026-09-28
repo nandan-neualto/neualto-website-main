@@ -35,14 +35,16 @@ var path = require('path');
 
 var lib = require('./content-lib.js');
 var ROOT = lib.ROOT;
+// Globbed at require time, before anything below is written: exactly the
+// pre-existing set the orphan check compares against.
+var EXISTING_ARTICLES = require('./site-pages.js').ARTICLE_PAGES;
 var errors = [];
 
 function fail(where, message) { errors.push(where + ': ' + message); }
 
-/* Parsing and loading live in content-lib.js so check-posts.js validates the
-   files with exactly the same reader this builds from. */
+/* Parsing, loading and the post rules live in content-lib.js so check-posts.js
+   validates the files with exactly the same reader this builds from. */
 var read = lib.read;
-var extractUrn = lib.extractUrn;
 function loadCollection(dir) { return lib.loadCollection(dir, fail); }
 function require_(entry, fields) { lib.requireFields(entry, fields, fail); }
 
@@ -220,21 +222,8 @@ function formatDate(iso) {
   return months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
 }
 
-var posts = loadCollection('content/blog').filter(function (p) {
-  require_(p, ['title', 'date', 'tags', 'summary']);
-  if (p.draft) return false;           // draft: keep in git, keep off the site
-  return true;
-});
-
+var posts = lib.loadPosts(fail);
 posts.forEach(function (p) {
-  p.urn = extractUrn(p.linkedin);
-  if (p.linkedinOnly && !p.urn) {
-    fail(p.where, 'linkedinOnly is set but no LinkedIn activity id could be found in "linkedin"');
-  }
-  if (!p.linkedinOnly && !p.body) {
-    fail(p.where, 'no body. Either write the article, or set "linkedinOnly": true to publish it as a card only');
-  }
-  p.hasPage = !p.linkedinOnly && !!p.body;
   p.url = p.hasPage ? 'blog-' + p.slug + '.html' : null;
 });
 
@@ -257,36 +246,47 @@ var linkedinPosts = posts.filter(function (p) { return !p.hasPage && p.urn; });
    the ones that do render cost nothing until someone scrolls to them. */
 var EMBED_LIMIT = 4;
 
-function postCard(p) {
-  var pills = (p.tags || []).map(function (t) {
+var ARROW = '<svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg>';
+
+function pills(tags) {
+  return (tags || []).map(function (t) {
     return '<span class="pill">' + escapeText(t) + '</span>';
   }).join('');
+}
 
+function timeTag(date) {
+  return '<time datetime="' + escapeHtml(date) + '">' + escapeText(formatDate(date)) + '</time>';
+}
+
+/* A placeholder app.js (postEmbeds) mounts the LinkedIn iframe into; the
+   skeleton holds the space until it loads. */
+function embedSlot(urn, extraClass) {
+  return '<div class="post-embed' + (extraClass ? ' ' + extraClass : '') +
+    '" data-urn="' + escapeHtml(urn) + '">' +
+    '<div class="embed-skeleton"><span></span><span></span><span></span></div></div>';
+}
+
+function postCard(p, withEmbed) {
   var head =
     '<div class="post-meta">' +
-      '<time datetime="' + escapeHtml(p.date) + '">' + escapeText(formatDate(p.date)) + '</time>' +
+      timeTag(p.date) +
       (p.urn ? '<span class="post-src">LinkedIn</span>' : '') +
     '</div>' +
     '<h2>' + (p.hasPage
       ? '<a href="' + escapeHtml(p.url) + '">' + escapeText(p.title) + '</a>'
       : escapeText(p.title)) + '</h2>' +
     '<p>' + escapeText(p.summary) + '</p>' +
-    '<div class="pill-row">' + pills + '</div>';
+    '<div class="pill-row">' + pills(p.tags) + '</div>';
 
   // Only LinkedIn cards carry an embed, and only the newest EMBED_LIMIT of
   // them. An article links to itself instead - a crawler cannot read a word
   // inside a cross-origin iframe, so an embed adds weight and no content.
-  var embed = (!p.hasPage && p.urn && p.embed !== false)
-    ? '<div class="post-embed" data-urn="' + escapeHtml(p.urn) + '">' +
-        '<div class="embed-skeleton"><span></span><span></span><span></span></div>' +
-      '</div>'
-    : '';
+  var embed = withEmbed ? embedSlot(p.urn) : '';
 
   var cta = p.hasPage
-    ? '<a class="svc-link post-link" href="' + escapeHtml(p.url) + '">' +
-        'Read the article <svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>'
-    : '<a class="svc-link post-link" href="' + escapeHtml(LINKEDIN_PERMALINK + p.urn) + '" target="_blank" rel="noopener">' +
-        'Discuss on LinkedIn <svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg></a>';
+    ? '<a class="svc-link post-link" href="' + escapeHtml(p.url) + '">Read the article ' + ARROW + '</a>'
+    : '<a class="svc-link post-link" href="' + escapeHtml(LINKEDIN_PERMALINK + p.urn) +
+        '" target="_blank" rel="noopener">Discuss on LinkedIn ' + ARROW + '</a>';
 
   return '<article class="post-card" data-tags="' + escapeHtml((p.tags || []).join('|')) + '">' +
       '<div class="post-body">' + head + '</div>' + embed + cta +
@@ -337,9 +337,7 @@ function jobCard(j) {
   return '<article class="job-card" id="' + escapeHtml(j.slug) + '">' +
       '<div class="job-top">' +
         '<h3>' + escapeText(j.title) + '</h3>' +
-        '<a class="btn btn-primary" href="' + escapeHtml(mail) + '">Apply Now' +
-          '<svg width="15" height="15" aria-hidden="true" focusable="false"><use href="#i-arrow"/></svg>' +
-        '</a>' +
+        '<a class="btn btn-primary" href="' + escapeHtml(mail) + '">Apply Now' + ARROW + '</a>' +
       '</div>' +
       '<div class="job-meta">' +
         '<span class="meta-pill">📍 ' + escapeText(j.location) + '</span>' +
@@ -453,16 +451,13 @@ function buildArticle(p, chrome) {
   };
 
   var body = renderMarkdown(p.body, p.where);
-  var embed = p.urn
-    ? '<div class="post-embed article-embed" data-urn="' + escapeHtml(p.urn) + '">' +
-        '<div class="embed-skeleton"><span></span><span></span><span></span></div></div>'
-    : '';
-  body = body.replace(LINKEDIN_MARK, embed);
+  var hasEmbed = !!p.urn && body.indexOf(LINKEDIN_MARK) !== -1;
+  body = body.replace(LINKEDIN_MARK, hasEmbed ? embedSlot(p.urn, 'article-embed') : '');
   body = body.split(LINKEDIN_MARK).join('');   // only the first is honoured
 
-  var pills = (p.tags || []).map(function (t) {
-    return '<span class="pill">' + escapeText(t) + '</span>';
-  }).join('');
+  // blog.html preconnects to LinkedIn for its embeds; an article without one
+  // would open that third-party connection on every view for nothing.
+  var headAssets = hasEmbed ? chrome.headAssets : chrome.headAssets.replace(LINKEDIN_PRECONNECT, '');
 
   return '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
     '<meta charset="UTF-8">\n' +
@@ -479,19 +474,18 @@ function buildArticle(p, chrome) {
     '<meta name="twitter:title" content="' + escapeHtml(p.title) + '">\n' +
     '<meta name="twitter:description" content="' + escapeHtml(desc) + '">\n' +
     '<meta name="twitter:image" content="https://neualto.com/pics/og-card.png">\n' +
-    chrome.headAssets +
+    headAssets +
     '<script type="application/ld+json">\n' + JSON.stringify(schema, null, 2) + '\n</script>\n' +
     '<script type="application/ld+json">\n' + JSON.stringify(crumbs, null, 2) + '\n</script>\n' +
-    '</head>\n<body>\n' +
+    '</head>\n' + chrome.bodyOpen + '\n' +
     chrome.bodyTop +
     chrome.header +
     '<main id="main">\n' +
     '<article class="article-wrap">\n  <div class="wrap article-inner">\n' +
     '    <nav class="article-crumbs" aria-label="Breadcrumb"><a href="blog.html">Blog</a></nav>\n' +
     '    <h1>' + escapeText(p.title) + '</h1>\n' +
-    '    <div class="article-meta">' +
-      '<time datetime="' + escapeHtml(p.date) + '">' + escapeText(formatDate(p.date)) + '</time>' +
-      '<span class="pill-row">' + pills + '</span></div>\n' +
+    '    <div class="article-meta">' + timeTag(p.date) +
+      '<span class="pill-row">' + pills(p.tags) + '</span></div>\n' +
     '    <div class="article-body">\n' + body + '\n    </div>\n' +
     '    <a class="svc-link" href="blog.html">← All articles</a>\n' +
     '  </div>\n</article>\n' +
@@ -506,40 +500,39 @@ function buildArticle(p, chrome) {
 
 var blogHtml = read('blog.html');
 
+var LINKEDIN_PRECONNECT = '<link rel="preconnect" href="https://www.linkedin.com">\n';
+
+/* Everything an article shares with blog.html, lifted from it. The head slice
+   starts at the theme metas, so blog.html keeps those grouped just above the
+   icon link; the footer slice runs to </body>, so the page scripts come along
+   with it rather than being retyped here. */
 var chrome = {
-  headAssets: sliceBetween(blogHtml, /<link rel="icon"/, /<script type="application\/ld\+json">/, 'head assets'),
+  headAssets: sliceBetween(blogHtml, /<meta name="color-scheme"/, /<script type="application\/ld\+json">/, 'head assets'),
+  bodyOpen: (blogHtml.match(/<body[^>]*>/) || ['<body>'])[0],
   bodyTop: sliceBetween(blogHtml, /<a class="skip-link"/, /<header/, 'body top'),
   header: sliceBetween(blogHtml, /<header/, /<main/, 'header'),
-  footer: sliceBetween(blogHtml, /<footer/, /<script src="assets\/app\.js"/, 'footer') +
-          '<script src="assets/app.js" defer></script>\n' +
-          '<script src="assets/kb-data.js" defer></script>\n' +
-          '<script src="assets/assistant-widget.js" defer></script>\n'
+  footer: sliceBetween(blogHtml, /<footer/, /<\/body>/, 'footer')
 };
 
 // --- blog.html: static cards + chips ---------------------------------------
 blogHtml = splice(blogHtml, 'blog cards',
-  articles.map(postCard).join('\n'), 'blog.html');
-linkedinPosts.forEach(function (p, i) { p.embed = i < EMBED_LIMIT; });
+  articles.map(function (p) { return postCard(p, false); }).join('\n'), 'blog.html');
 blogHtml = splice(blogHtml, 'linkedin posts',
-  linkedinPosts.map(postCard).join('\n'), 'blog.html');
+  linkedinPosts.map(function (p, i) { return postCard(p, i < EMBED_LIMIT); }).join('\n'), 'blog.html');
 blogHtml = splice(blogHtml, 'blog filters', filterChips(), 'blog.html');
 write('blog.html', blogHtml);
 
 // --- article pages ----------------------------------------------------------
-var written = [];
-posts.filter(function (p) { return p.hasPage; }).forEach(function (p) {
-  write(p.url, buildArticle(p, chrome));
-  written.push(p.url);
-});
+articles.forEach(function (p) { write(p.url, buildArticle(p, chrome)); });
+var written = articles.map(function (p) { return p.url; });
 
 // Orphans are reported, never deleted: silently removing a page that search
 // engines have already indexed turns a rename into a 404 nobody notices.
-fs.readdirSync(ROOT).filter(function (f) { return /^blog-.*\.html$/.test(f); })
-  .forEach(function (f) {
-    if (written.indexOf(f) === -1) {
-      fail(f, 'orphan - no matching file in content/blog. Delete it deliberately, or restore the source');
-    }
-  });
+EXISTING_ARTICLES.forEach(function (f) {
+  if (written.indexOf(f) === -1) {
+    fail(f, 'orphan - no matching file in content/blog. Delete it deliberately, or restore the source');
+  }
+});
 
 // --- careers.html -----------------------------------------------------------
 var careersHtml = read('careers.html');
@@ -552,7 +545,7 @@ write('careers.html', careersHtml);
 // --- sitemap.xml ------------------------------------------------------------
 var sitemap = read('sitemap.xml');
 sitemap = splice(sitemap, 'blog articles',
-  posts.filter(function (p) { return p.hasPage; }).map(function (p) {
+  articles.map(function (p) {
     return '  <url>\n' +
       '    <loc>https://neualto.com/' + p.url + '</loc>\n' +
       '    <lastmod>' + (p.updated || p.date) + '</lastmod>\n' +

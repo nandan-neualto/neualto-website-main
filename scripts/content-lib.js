@@ -1,12 +1,13 @@
 /**
- * Shared loading and parsing for content/.
+ * Shared loading and parsing for content/, plus the repo-relative file access
+ * every script uses.
  *
  * Both the generator (build-content.js) and the validator (check-posts.js) read
  * the same markdown files, and used to carry their own copy of the front-matter
- * parser and the LinkedIn id extractor. Two copies of a parser drift: the point
- * of check-posts.js is to fail on exactly what build-content.js would choke on,
- * which only holds if they parse identically. Now they do, because it is the
- * same function.
+ * parser, the LinkedIn id extractor and the post rules. Two copies drift: the
+ * point of check-posts.js is to fail on exactly what build-content.js would
+ * choke on, which only holds if they parse and classify identically. Now they
+ * do, because it is the same function (loadPosts).
  *
  * Errors are reported through an `onError(where, message)` callback rather than
  * thrown, so each caller collects them its own way and can report every problem
@@ -22,6 +23,23 @@ var ROOT = path.join(__dirname, '..');
 /** Reads a file with line endings normalised, so CRLF checkouts match CI. */
 function read(file) {
   return fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\r\n/g, '\n');
+}
+
+/** Whether a repo-relative path exists, independent of the working directory. */
+function exists(file) {
+  return fs.existsSync(path.join(ROOT, file));
+}
+
+var readCache = {};
+
+/**
+ * read(), memoised. For the checkers, which look at the same few pages many
+ * times over (every #fragment link re-opens its target). Never use it for a
+ * file the running script also writes.
+ */
+function readCached(file) {
+  if (!Object.prototype.hasOwnProperty.call(readCache, file)) readCache[file] = read(file);
+  return readCache[file];
 }
 
 /**
@@ -93,11 +111,42 @@ function requireFields(entry, fields, onError) {
   });
 }
 
+/**
+ * The published blog posts, validated and classified the one way both the
+ * generator and the checker see them - so a clean `check-posts` run means the
+ * build will accept the same files.
+ *
+ * Required fields are checked on every file, drafts included; drafts are then
+ * dropped. Each remaining post gains `urn` (its LinkedIn activity id, or null)
+ * and `hasPage` (whether it gets an article page of its own, which is also
+ * what puts it in the articles band rather than the LinkedIn one).
+ */
+function loadPosts(onError) {
+  return loadCollection('content/blog', onError).filter(function (p) {
+    requireFields(p, ['title', 'date', 'tags', 'summary'], onError);
+    if (p.draft) return false;           // draft: keep in git, keep off the site
+
+    p.urn = extractUrn(p.linkedin);
+    if (p.linkedinOnly && !p.urn) {
+      onError(p.where, 'linkedinOnly is set but no LinkedIn activity id could be found in "linkedin".' +
+        ' Use a URL like https://www.linkedin.com/feed/update/urn:li:activity:1234567890123456789/');
+    }
+    if (!p.linkedinOnly && !p.body) {
+      onError(p.where, 'no body. Either write the article, or set "linkedinOnly": true to publish it as a card only');
+    }
+    p.hasPage = !p.linkedinOnly && !!p.body;
+    return true;
+  });
+}
+
 module.exports = {
   ROOT: ROOT,
   read: read,
+  exists: exists,
+  readCached: readCached,
   parseFrontMatter: parseFrontMatter,
   loadCollection: loadCollection,
+  loadPosts: loadPosts,
   extractUrn: extractUrn,
   requireFields: requireFields
 };
