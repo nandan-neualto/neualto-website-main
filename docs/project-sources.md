@@ -27,3 +27,8 @@ The six images below are unchanged source files, selected because they do not di
 
 - Showcase order: custom workflow management, social media, taxi hailing. Taxi replaces the earlier commerce selection; unused commerce assets are retained but not referenced by the page.
 - Taxi features describe the documented implementation, not current service availability or independently verified operating results. Map attribution within original screenshots is retained.
+
+## User-supplied additions (2026-10-28)
+
+- The user states the workflow app was used to administer tests at some of India's top universities. No university names or endorsements are implied.
+- The user states the social app has 4 million users in the USA; the page uses registered users, consistent with the earlier supplied biography. This is separate from the source case study's architecture claim and was not independently verified.

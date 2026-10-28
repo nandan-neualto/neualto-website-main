@@ -1147,10 +1147,12 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .project-card--2 { --project-stage: #102e37; --project-glow: #24606a; }
 .project-card--3 { --project-stage: #392719; --project-glow: #7b5636; }
 .project-body { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 42px; }
-.project-category { display: flex; align-items: center; gap: 10px; color: var(--red-text); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 22px; }
-.project-number { display: grid; place-items: center; width: 29px; height: 29px; border: 1px solid var(--line-accent); border-radius: 50%; font-family: 'Sora', sans-serif; font-size: 10px; letter-spacing: 0; }
-.project-card h3 { font-size: clamp(27px, 2.9vw, 36px); line-height: 1.2; letter-spacing: -.03em; margin-bottom: 18px; }
+.project-category { display: flex; align-items: flex-start; gap: 12px; color: var(--red-text); font-size: clamp(24px, 2.3vw, 29px); font-weight: 700; line-height: 1.3; letter-spacing: -.025em; margin-bottom: 16px; }
+.project-category > span:last-child { min-width: 0; }
+.project-number { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border: 1px solid var(--line-accent); border-radius: 50%; font-family: 'Sora', sans-serif; font-size: 15px; letter-spacing: 0; }
+.project-tagline { font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 600; line-height: 1.5; color: var(--ink); margin-bottom: 18px; }
 .project-summary { color: var(--ink-soft); font-size: 15px; line-height: 1.75; }
+.project-summary strong { display: block; color: var(--ink); margin-bottom: 8px; }
 .project-stack { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 22px 0; }
 .project-stack li { font-size: 11px; font-weight: 600; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; }
 .project-highlight { padding: 2px 0 2px 16px; border-left: 3px solid var(--red-text); margin: 4px 0 26px; }
@@ -1212,7 +1214,8 @@ html:has(.project-image-dialog[open]) { overflow: hidden; }
   .project-index a { padding: 10px 12px; font-size: 12px; }
   .project-index a svg { display: none; }
   .project-body { padding: 28px 24px; }
-  .project-card h3 { font-size: 27px; }
+  .project-category { font-size: 24px; }
+  .project-tagline { font-size: 18px; }
   .project-gallery { padding: 26px 20px; gap: 22px 16px; }
   .project-shot a { border-width: 3px; border-radius: 13px; }
   .project-shot:nth-of-type(2) { margin-top: 20px; }
