@@ -1215,6 +1215,75 @@
     }
   };
 
+  /** Enlarges project screenshots, with direct image links as a no-JS fallback. */
+  var projectImages = {
+    name: 'projectImages',
+    init: function () {
+      var dialog = $('#projectImageDialog');
+      if (!dialog || typeof dialog.showModal !== 'function') return;
+      var image = $('.project-image-full', dialog);
+      var title = $('#projectImageTitle', dialog);
+      var original = $('.project-image-original', dialog);
+      var counter = $('.project-image-counter', dialog);
+      var previous = $('[data-image-prev]', dialog);
+      var next = $('[data-image-next]', dialog);
+      var opener;
+      var galleryLinks = [];
+      var currentIndex = 0;
+
+      function showImage() {
+        var link = galleryLinks[currentIndex];
+        var thumbnail = $('img', link);
+        var caption = $('figcaption', link.parentElement);
+        image.src = link.href;
+        image.alt = thumbnail.alt;
+        title.textContent = caption ? caption.textContent : 'App screen';
+        original.href = link.href;
+        counter.textContent = (currentIndex + 1) + ' / ' + galleryLinks.length;
+        counter.setAttribute('aria-label', 'Screenshot ' + (currentIndex + 1) + ' of ' + galleryLinks.length);
+        previous.disabled = next.disabled = galleryLinks.length < 2;
+        dialog.scrollTop = 0;
+      }
+
+      function moveImage(direction) {
+        if (galleryLinks.length < 2) return;
+        currentIndex = (currentIndex + direction + galleryLinks.length) % galleryLinks.length;
+        showImage();
+      }
+
+      $$('[data-project-image]').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          var thumbnail = $('img', link);
+          if (!thumbnail) return;
+          event.preventDefault();
+          opener = link;
+          galleryLinks = $$('[data-project-image]', link.closest('.project-gallery'));
+          currentIndex = galleryLinks.indexOf(link);
+          showImage();
+          dialog.showModal();
+          dialog.scrollTop = 0;
+        });
+      });
+      previous.addEventListener('click', function () { moveImage(-1); });
+      next.addEventListener('click', function () { moveImage(1); });
+      dialog.addEventListener('keydown', function (event) {
+        if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          event.preventDefault();
+          moveImage(event.key === 'ArrowLeft' ? -1 : 1);
+        }
+      });
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) dialog.close();
+      });
+      dialog.addEventListener('close', function () {
+        image.removeAttribute('src');
+        if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+      });
+    }
+  };
+
   /** Mounts every decorative background canvas present on the page. */
   var backgrounds = {
     name: 'backgrounds',
@@ -1243,6 +1312,7 @@
     postEmbeds,
     dunsSeal,
     motionToggle,
+    projectImages,
     backgrounds
   ];
 
