@@ -34,6 +34,7 @@
  *      - Background canvases (hero starfield + sections)
  *      - Gif-style animated stickers
  *      - Mini terminal "gif" (featured AI card)
+ *      - Virtual office tour (poster + dialog)
  *   HOME PAGE
  *      - Services: spotlight bento grid
  *      - Why NeuAlto
@@ -43,6 +44,7 @@
  *      - Founder photos
  *      - Testimonials (theme-aware)
  *      - Partners section
+ *      - Office tour section
  *      - Careers section
  *      - Contact section (form + maps)
  *   SUB PAGES
@@ -99,6 +101,10 @@
     --shadow-sm: 0 1px 2px rgba(28,10,13,.05), 0 4px 14px rgba(28,10,13,.05);
     --shadow-md: 0 2px 4px rgba(28,10,13,.05), 0 12px 32px rgba(28,10,13,.09);
     --shadow-lg: 0 4px 8px rgba(28,10,13,.06), 0 24px 60px rgba(28,10,13,.13);
+    /* Behind the virtual office tour while it loads: the tour app's own
+       background, so the hand-off to its first frame has no flash. Not
+       themed - the tour is dark in both themes. */
+    --tour-stage: #0b0f17;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   /* The UA's [hidden] { display: none } loses to any author rule that sets
@@ -801,6 +807,110 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
   .spot-card.featured { padding-right: 30px; }
 }
 
+/* ── Virtual office tour (poster + dialog) ───────────────────────────── */
+/* The tour is a separate WebGL app that the virtualTour module in app.js
+   embeds on demand. Every way into it is a real link marked
+   data-tour-open, so without JavaScript it simply opens in a new tab.
+   Used on the home page and on careers.html, hence a component. */
+.tour-poster {
+  position: relative; display: block; overflow: hidden; isolation: isolate;
+  aspect-ratio: 21 / 9; border-radius: 22px; border: 1px solid var(--line);
+  background: var(--tour-stage); box-shadow: var(--shadow-md);
+}
+.tour-poster img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; transition: transform .6s ease;
+}
+/* Scrim: keeps the labels legible wherever they land on the photo. */
+.tour-poster::after {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(180deg, rgba(12,5,7,.12) 0%, rgba(12,5,7,.28) 55%, rgba(12,5,7,.6) 100%);
+}
+.tour-poster:hover img, .tour-poster:focus-visible img { transform: scale(1.035); }
+.tour-badge {
+  position: absolute; z-index: 2; left: 18px; top: 18px;
+  font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: #fff; background: rgba(12,5,7,.5); border: 1px solid rgba(255,255,255,.3);
+  border-radius: 100px; padding: 6px 13px;
+}
+.tour-play {
+  position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: inline-flex; align-items: center; gap: 12px; white-space: nowrap;
+  padding: 8px 24px 8px 8px; border-radius: 100px;
+  font-size: 16px; font-weight: 700; color: var(--ink); background: var(--card);
+  box-shadow: 0 14px 40px rgba(0,0,0,.35);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.tour-poster:hover .tour-play, .tour-poster:focus-visible .tour-play {
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 18px 48px rgba(0,0,0,.45);
+}
+.tour-play-icon {
+  display: grid; place-items: center; flex: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  color: #fff; background: var(--red); box-shadow: 0 6px 16px rgba(220,38,38,.4);
+}
+.tour-play-icon svg { margin-left: 3px; } /* optical centring of the triangle */
+@media (max-width: 720px) {
+  .tour-poster { aspect-ratio: 16 / 9; border-radius: 18px; }
+  .tour-badge { left: 12px; top: 12px; }
+  .tour-play { gap: 10px; padding: 6px 18px 6px 6px; font-size: 14.5px; }
+  .tour-play-icon { width: 36px; height: 36px; }
+}
+
+/* The dialog fills the window - inset on desktop, so it still reads as a
+   layer over the site - and the tour fills everything below its bar.
+   display is set only while [open]: set unconditionally, it would override
+   the UA's display:none on a closed <dialog>. 100dvh keeps the tour's own
+   bottom controls above mobile browser toolbars. */
+.tour-dialog {
+  position: fixed; inset: 0; width: auto; height: 100vh; height: 100dvh;
+  max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden;
+  color: var(--ink); background: var(--tour-stage);
+}
+.tour-dialog[open] { display: flex; flex-direction: column; }
+.tour-dialog::backdrop { background: rgba(12, 5, 7, .85); }
+@media (min-width: 900px) {
+  .tour-dialog { inset: 24px; height: auto; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-lg); }
+}
+html:has(.tour-dialog[open]) { overflow: hidden; }
+.tour-dialog-bar {
+  flex: none; display: flex; align-items: center; gap: 10px 20px;
+  padding: 10px 12px 10px 20px; background: var(--card); border-bottom: 1px solid var(--line);
+}
+.tour-dialog-bar h2 {
+  flex: 1; min-width: 0; font-size: 15px; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tour-dialog-bar .text-link { font-size: 14px; white-space: nowrap; }
+.tour-dialog-bar .btn { padding: 8px 16px; font-size: 14px; white-space: nowrap; }
+.tour-label-short { display: none; }
+@media (max-width: 520px) {
+  .tour-dialog-bar { gap: 8px 14px; padding: 8px 8px 8px 14px; }
+  .tour-label-long { display: none; }
+  .tour-label-short { display: inline; }
+}
+.tour-frame { position: relative; flex: 1; min-height: 0; }
+.tour-frame iframe { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border: 0; }
+/* Loading state, over the frame until it fires load. A sleeping Render
+   service can take most of a minute to boot, so app.js changes the wording
+   when loading runs long rather than leaving a blank frame. */
+.tour-status {
+  position: absolute; inset: 0; z-index: 1;
+  display: grid; place-content: center; justify-items: center; gap: 16px;
+  padding: 24px; text-align: center; color: #fff;
+  background:
+    linear-gradient(rgba(11,15,23,.8), rgba(11,15,23,.8)),
+    url("../pics/tour/office-floor-960.webp") center / cover,
+    var(--tour-stage);
+}
+.tour-status p { max-width: 400px; font-size: 15px; }
+.tour-spinner {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.25); border-top-color: #fff;
+  animation: spin .9s linear infinite;
+}
+
 /* ==========================================================================
    HOME PAGE
    Blocks used only by index.html.
@@ -1014,6 +1124,20 @@ footer { background: var(--bg-soft); border-top: 1px solid var(--line); padding:
 .partner-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
 .partner-card p { font-size: 14.5px; color: var(--ink-soft); }
 @media (max-width: 680px) { .partner-grid { grid-template-columns: 1fr; } }
+
+/* ── Office tour section ─────────────────────────────────────────────── */
+.tour { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.tour .sec-head { margin-bottom: 44px; }
+.tour-rooms { align-items: center; margin-top: 28px; }
+.tour-rooms-label {
+  flex-basis: 100%; text-align: center; font-size: 12px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint);
+}
+.tour-note { margin-top: 26px; text-align: center; font-size: 14px; color: var(--ink-soft); }
+.loc-card .loc-tour { margin: 10px 0 0; }
+.loc-tour .text-link { display: inline-flex; align-items: center; gap: 6px; }
+.loc-tour .text-link svg { transition: transform .2s; }
+.loc-tour .text-link:hover svg { transform: translateX(4px); }
 
 /* ── Careers section ─────────────────────────────────────────────────── */
 .careers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 920px; margin: 0 auto 44px; }
@@ -1396,6 +1520,31 @@ html:has(.project-image-dialog[open]) { overflow: hidden; }
   .job-card { padding: 30px 26px; }
 }
 
+/* Office tour invitation under the openings - a smaller cousin of the
+   home page's .tour-poster, sharing its play icon. */
+.tour-card {
+  display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); align-items: center; gap: 30px;
+  max-width: 900px; margin: 0 auto 28px; padding: 18px 34px 18px 18px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+.tour-card:hover { box-shadow: var(--shadow-md); border-color: var(--line-accent); }
+.tour-card-art {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  border-radius: 14px; background: var(--tour-stage);
+}
+.tour-card-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tour-card-art .tour-play-icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.tour-card .kicker { margin-bottom: 8px; font-size: 11.5px; }
+.tour-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.tour-card p { font-size: 15px; color: var(--ink-soft); margin-bottom: 12px; }
+.tour-card:hover .svc-link svg { transform: translateX(4px); }
+@media (max-width: 720px) {
+  .tour-card { grid-template-columns: 1fr; gap: 18px; padding: 16px 16px 26px; }
+  .tour-card-body { padding: 0 10px; }
+}
+
 /* ── Legal / privacy page ────────────────────────────────────────────── */
 .legal-hero { padding-bottom: 48px; }
 .legal { padding: 64px 0 90px; border-top: 1px solid var(--line); background: var(--bg-soft); }
@@ -1531,6 +1680,11 @@ html:has(.project-image-dialog[open]) { overflow: hidden; }
 
   /* Hover/steady-state transitions that would otherwise slide. */
   .tab-ind, .founder-card { transition: none; }
+
+  /* Virtual tour poster: no zoom on hover. */
+  .tour-poster img, .tour-play { transition: none; }
+  .tour-poster:hover img, .tour-poster:focus-visible img { transform: none; }
+  .tour-poster:hover .tour-play, .tour-poster:focus-visible .tour-play { transform: translate(-50%, -50%); }
 
   html { scroll-behavior: auto; }
 

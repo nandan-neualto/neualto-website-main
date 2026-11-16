@@ -36,6 +36,7 @@ Then open <http://localhost:4173>.
 | `assets/app.js` | All site behaviour (see *JavaScript*) |
 | `assets/styles.css` | All styling (see *CSS*) |
 | `pics/` | Images: logos, founders, client marks, product screenshots (WebP) |
+| `pics/tour/` | Poster for the virtual office tour (see *Virtual office tour*) |
 | `sitemap.xml`, `robots.txt` | Crawler directives — **update the sitemap when adding a page** |
 | `llms.txt` | Plain-language facts for AI crawlers — update when contacts or products change |
 | `_headers` | Netlify/Cloudflare caching + security headers |
@@ -278,6 +279,40 @@ Things that will break it, all learned the hard way:
 - The injected iframe uses `http://`, which is mixed content on an https site.
   The `upgrade-insecure-requests` meta tag in `index.html` fixes that — remove
   it and the seal disappears in production.
+
+---
+
+## Virtual office tour
+
+The 360° office tour is a separate app: a WebGL panorama viewer hosted on
+Render at <https://streetviewcontrol.onrender.com/>. This site links to it and
+embeds it on demand; nothing of the tour lives in this repository except the
+poster images in `pics/tour/`.
+
+- **Every way in is an ordinary link** marked `data-tour-open`: the home page's
+  *Virtual Office Tour* section (`#tour`) and its Bengaluru contact card, and a
+  card on `careers.html`. Without JavaScript, or on a ctrl/middle-click, the
+  link opens the tour in a new tab.
+- **With JavaScript**, the `virtualTour` module in `assets/app.js` opens it in
+  a full-window `<dialog>` instead, loading the viewer with `?embed=1` - its own
+  embed mode, which hides the tour's "Login as admin" button. The iframe is
+  created on click and removed on close (the first panorama alone is ~15 MB),
+  and it is sandboxed so it cannot navigate this page.
+- **A link's fragment picks the starting room**: `#/p23` is the rooftop pool.
+  These are the tour's own panorama ids; an id the tour no longer has falls back
+  to the entrance, so a re-shot room degrades gracefully.
+- **Cold starts.** Render puts idle services to sleep. When a tour link scrolls
+  near the viewport, the page sends one request to the tour's `/api/health` so
+  it starts waking before anyone clicks, and the dialog explains a slow start
+  instead of showing a blank frame.
+
+To move the tour to another address (a `tour.neualto.com` subdomain, say),
+replace `https://streetviewcontrol.onrender.com` in `index.html` and
+`careers.html`: the script reads the address off the links.
+
+The posters are flat perspective renders of the tour's *Office Floor* panorama
+(1920, 1440 and 960 px wide). A screenshot from the tour works just as well if
+they ever need replacing.
 
 ---
 

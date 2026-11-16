@@ -1284,6 +1284,141 @@
     }
   };
 
+  /**
+   * Virtual office tour.
+   *
+   * The tour is its own app - a WebGL panorama viewer hosted on Render, at the
+   * address every `a[data-tour-open]` link points to. Those links are the whole
+   * no-JS story: they open the tour in a new tab. With JS, a plain click opens
+   * it full-window in a <dialog> instead, so the visitor stays on the site; a
+   * modified or middle click still gets the new tab.
+   *
+   * - Weight. The first panorama alone is ~15 MB and the viewer keeps
+   *   preloading while it runs, so nothing is requested until someone asks.
+   *   The iframe is created on open and removed on close, which also releases
+   *   its WebGL context.
+   * - Cold starts. Render puts idle services to sleep, and the next request
+   *   waits while one boots - up to a minute. When a tour link comes near the
+   *   viewport, one request to the tour's health endpoint starts that boot
+   *   early, and the dialog says what is happening rather than showing a
+   *   blank frame.
+   * - Containment. `?embed=1` is the viewer's own embed mode, which hides its
+   *   admin link. The frame is sandboxed without top-navigation rights, so the
+   *   embedded app can never redirect this page.
+   *
+   * A link's fragment (`#/p23`) is the viewer's own room deep link. An id the
+   * tour no longer has falls back to its start, so a renamed room degrades to
+   * "starts at the entrance" rather than an error.
+   */
+  var virtualTour = {
+    name: 'virtualTour',
+    init: function () {
+      var links = $$('a[data-tour-open]');
+      if (!links.length) return;
+      var origin = new URL(links[0].href).origin;
+
+      var warmed = false;
+      var warmUp = function () {
+        if (warmed) return;
+        warmed = true;
+        var hint = document.createElement('link');
+        hint.rel = 'preconnect';
+        hint.href = origin;
+        document.head.appendChild(hint);
+        if (window.fetch) {
+          fetch(origin + '/api/health', { mode: 'no-cors', cache: 'no-store', credentials: 'omit' })
+            .catch(function () { /* best effort - a click still works */ });
+        }
+      };
+      if ('IntersectionObserver' in window) {
+        var watcher = new IntersectionObserver(function (entries) {
+          if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+          watcher.disconnect();
+          warmUp();
+        }, { rootMargin: '600px 0px' });
+        links.forEach(function (link) { watcher.observe(link); });
+      }
+
+      var dialog = document.createElement('dialog');
+      if (typeof dialog.showModal !== 'function') return; // links keep their new-tab behaviour
+      dialog.className = 'tour-dialog';
+      dialog.setAttribute('aria-labelledby', 'tourDialogTitle');
+      dialog.innerHTML =
+        '<div class="tour-dialog-bar">' +
+          '<h2 id="tourDialogTitle">NeuAlto office tour</h2>' +
+          '<a class="text-link" target="_blank" rel="noopener" data-tour-newtab>' +
+            '<span class="tour-label-long">Open in a new tab</span>' +
+            '<span class="tour-label-short">New tab</span> <span aria-hidden="true">&nearr;</span></a>' +
+          '<form method="dialog"><button class="btn btn-ghost" type="submit" autofocus>' +
+            'Close <span aria-hidden="true">&times;</span></button></form>' +
+        '</div>' +
+        '<div class="tour-frame">' +
+          '<div class="tour-status" role="status">' +
+            '<span class="tour-spinner" aria-hidden="true"></span>' +
+            '<p data-tour-message></p>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(dialog);
+
+      var frame = $('.tour-frame', dialog);
+      var status = $('.tour-status', dialog);
+      var message = $('[data-tour-message]', dialog);
+      var newTab = $('[data-tour-newtab]', dialog);
+      var iframe = null;
+      var opener = null;
+      var slowTimer = 0;
+
+      var open = function (link) {
+        var src = new URL(link.href);
+        src.searchParams.set('embed', '1');
+
+        opener = link;
+        newTab.href = link.href;
+        message.textContent = 'Loading the tour…';
+        status.hidden = false;
+
+        iframe = document.createElement('iframe');
+        iframe.title = 'NeuAlto office virtual tour';
+        iframe.setAttribute('allow', 'fullscreen; clipboard-write');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+        iframe.addEventListener('load', function () {
+          clearTimeout(slowTimer);
+          status.hidden = true;
+        });
+        iframe.src = src.href;
+        frame.insertBefore(iframe, status);
+
+        slowTimer = setTimeout(function () {
+          message.textContent = 'Waking up the tour server. After a quiet spell this can take up to a minute.';
+        }, 8000);
+        dialog.showModal();
+      };
+
+      links.forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          open(link);
+        });
+      });
+
+      // Choosing the separate window replaces this one, rather than running two tours.
+      newTab.addEventListener('click', function () { dialog.close(); });
+      dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) dialog.close(); // a click on the backdrop
+      });
+      dialog.addEventListener('close', function () {
+        clearTimeout(slowTimer);
+        if (iframe) {
+          iframe.remove();
+          iframe = null;
+        }
+        if (opener && opener.isConnected) opener.focus({ preventScroll: true });
+      });
+    }
+  };
+
   /** Mounts every decorative background canvas present on the page. */
   var backgrounds = {
     name: 'backgrounds',
@@ -1313,6 +1448,7 @@
     dunsSeal,
     motionToggle,
     projectImages,
+    virtualTour,
     backgrounds
   ];
 
