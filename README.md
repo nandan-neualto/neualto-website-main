@@ -21,6 +21,42 @@ Then open <http://localhost:4173>.
 
 ---
 
+## Deploying
+
+neualto.com is the Vercel project **neualto-website-main** (team
+*neualtotechinject's projects*). It is **not connected to GitHub**, so pushing
+to `main` does not deploy - every release is a manual production deploy from
+a local copy of this repository:
+
+```bash
+git pull                 # be on the latest main
+# ...make and commit your changes, then:
+git push
+npm run deploy
+```
+
+`npm run deploy` (`scripts/deploy.js`) refuses to deploy uncommitted changes
+(so what is live is always a commit on GitHub), runs `npm test`, checks the
+folder is linked to the right Vercel project, deploys, and then confirms
+www.neualto.com is serving the new CSS/JS. It takes about a minute.
+
+Note that the Vercel CLI uploads the whole folder, including files git ignores
+or does not track - keep stray files out of the repo folder.
+
+**First time on a machine**, sign in and link the folder (one-off):
+
+```bash
+npx vercel login
+npx vercel link --project neualto-website-main --scope neualtotechinjects-projects
+```
+
+Why not automatic? The Vercel account's single GitHub login belongs to a
+different GitHub user than the one that owns this repository, so Vercel cannot
+see the repo. Linking it would mean changing that login connection, or adding
+a GitHub Action that deploys with a Vercel token.
+
+---
+
 ## Layout of the repository
 
 | Path | Purpose |
@@ -57,6 +93,7 @@ Then open <http://localhost:4173>.
 | `scripts/build-content.js` | Regenerates the blog and careers pages from `content/` |
 | `scripts/site-pages.js` | The page list the checkers validate (globbed, not hand-kept) |
 | `scripts/content-lib.js` | Shared front-matter loading for the generator and the checker |
+| `scripts/deploy.js` | `npm run deploy`: checked production deploy to Vercel (see *Deploying*) |
 | `tools/png-to-webp.py` | One-time image migration (already run; kept for reference) |
 | `docs/WEBSITE-IMPROVEMENTS.md` | Past improvement audit, kept for reference |
 
