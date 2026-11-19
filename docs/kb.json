@@ -635,7 +635,7 @@
       "monitoring"
     ],
     "a": "**DeltaMax™** is an AI-driven data quality monitoring platform — **Never Fly Blind Again**. Unlike rule-based systems, it proactively identifies, analyzes, and helps resolve hidden data quality issues, even ones you didn't anticipate, giving continuous visibility into data health. It's built by Katalyst Street, our strategic partner.",
-    "href": "solutions.html#deltamax",
+    "href": "products.html#deltamax",
     "rel": [
       "deltamax-problem",
       "deltamax-features",
@@ -659,7 +659,7 @@
       "alert fatigue"
     ],
     "a": "Modern data pipelines are hard to track — data arrives from many sources with different formats, volumes, and timings. Common problems DeltaMax addresses:\n\n- Sudden data changes that pass validation checks\n- Inconsistencies during system migrations\n- Excessive time spent investigating alerts\n\nIt focuses on **Anomaly Detection** and **Reliability of Data**, helping identify root causes instead of just flagging issues.",
-    "href": "solutions.html#deltamax",
+    "href": "products.html#deltamax",
     "rel": [
       "deltamax-what",
       "deltamax-features"
@@ -683,7 +683,7 @@
       "mdm"
     ],
     "a": "Key features:\n\n- **Anomaly Detection** — learns normal patterns per source and flags meaningful deviations, no hand-written rules\n- **Trust Score & Agent Summary** — a real-time reliability score plus plain-language context on what changed\n- **Data cleaning workflows** — isolate or remove problematic records once anomalies are understood\n- **Cloud-to-cloud migration validation** — continuous checks before, during, and after migration\n- **Master Data Management** — links and standardizes duplicate or inconsistent entity records",
-    "href": "solutions.html#deltamax",
+    "href": "products.html#deltamax",
     "rel": [
       "deltamax-trust-score",
       "deltamax-migration"
@@ -705,7 +705,7 @@
       "scoring"
     ],
     "a": "The **Trust Score** is a real-time indicator of data reliability — it evaluates anomalies, inconsistencies, and deviations from expected behavior and converts them into a single, easy-to-understand score. Alongside it, the **Agent Summary** explains what changed in the data, where, and whether it's expected, minor, or critical.",
-    "href": "solutions.html#deltamax",
+    "href": "products.html#deltamax",
     "rel": [
       "deltamax-features",
       "deltamax-what"
@@ -901,7 +901,7 @@
       "marketing"
     ],
     "a": "**OptiMax** is a data/AI-driven marketing framework that turns marketing from a cost center into a measurable, revenue-generating function. It integrates advanced analytics and machine learning to move organizations from intuition-based marketing to a scientific, outcome-focused approach. Also built by Katalyst Street.",
-    "href": "solutions.html#optimax",
+    "href": "products.html#optimax",
     "rel": [
       "optimax-two-stage",
       "optimax-who",
@@ -926,7 +926,7 @@
       "segmentation"
     ],
     "a": "OptiMax works in two stages:\n\n1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels\n2. **Revenue Optimization** — evaluates customer lifetime value (CLTV), identifies high-value segments, and optimizes spend for long-term financial outcomes",
-    "href": "solutions.html#optimax",
+    "href": "products.html#optimax",
     "rel": [
       "optimax-what",
       "optimax-getting-started"
@@ -951,7 +951,7 @@
       "ecommerce"
     ],
     "a": "OptiMax is built for marketing teams improving performance and efficiency, business leaders aligning marketing with revenue goals, and data/analytics teams implementing AI-driven solutions — particularly in **retail, banking, telecom, and e-commerce**.",
-    "href": "solutions.html#optimax",
+    "href": "products.html#optimax",
     "rel": [
       "optimax-what",
       "optimax-two-stage"

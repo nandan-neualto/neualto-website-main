@@ -1,6 +1,6 @@
 # NeuAlto Assistant — knowledge base review
 
-Generated from `kb-data.js` — 50 entries, content id `a27db0347248`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
+Generated from `kb-data.js` — 50 entries, content id `f5b572e2eb25`. This is a direct export of what the chatbot actually answers with — nothing here is paraphrased or summarized, so approving an answer below is the same as approving what visitors will see.
 
 **To regenerate after an edit:** `node scripts/build-kb-docs.js`
 
@@ -605,7 +605,7 @@ Keywords: security, compliance, secure development, vciso, sdlc, regulatory
 
 **DeltaMax™** is an AI-driven data quality monitoring platform — **Never Fly Blind Again**. Unlike rule-based systems, it proactively identifies, analyzes, and helps resolve hidden data quality issues, even ones you didn't anticipate, giving continuous visibility into data health. It's built by Katalyst Street, our strategic partner.
 
-**Links to:** `solutions.html#deltamax`
+**Links to:** `products.html#deltamax`
 
 **Related questions offered:** What problem does DeltaMax solve? · What are DeltaMax's key features? · How do I buy DeltaMax? What does it cost?
 
@@ -634,7 +634,7 @@ Modern data pipelines are hard to track — data arrives from many sources with 
 
 It focuses on **Anomaly Detection** and **Reliability of Data**, helping identify root causes instead of just flagging issues.
 
-**Links to:** `solutions.html#deltamax`
+**Links to:** `products.html#deltamax`
 
 **Related questions offered:** What is DeltaMax? · What are DeltaMax's key features?
 
@@ -663,7 +663,7 @@ Key features:
 - **Cloud-to-cloud migration validation** — continuous checks before, during, and after migration
 - **Master Data Management** — links and standardizes duplicate or inconsistent entity records
 
-**Links to:** `solutions.html#deltamax`
+**Links to:** `products.html#deltamax`
 
 **Related questions offered:** What is the DeltaMax Trust Score? · Does DeltaMax help with data migration?
 
@@ -686,7 +686,7 @@ Keywords: features, anomaly detection, trust score, master data management, mdm
 
 The **Trust Score** is a real-time indicator of data reliability — it evaluates anomalies, inconsistencies, and deviations from expected behavior and converts them into a single, easy-to-understand score. Alongside it, the **Agent Summary** explains what changed in the data, where, and whether it's expected, minor, or critical.
 
-**Links to:** `solutions.html#deltamax`
+**Links to:** `products.html#deltamax`
 
 **Related questions offered:** What are DeltaMax's key features? · What is DeltaMax?
 
@@ -878,7 +878,7 @@ Keywords: documentation, docs, eula, support, manual
 
 **OptiMax** is a data/AI-driven marketing framework that turns marketing from a cost center into a measurable, revenue-generating function. It integrates advanced analytics and machine learning to move organizations from intuition-based marketing to a scientific, outcome-focused approach. Also built by Katalyst Street.
 
-**Links to:** `solutions.html#optimax`
+**Links to:** `products.html#optimax`
 
 **Related questions offered:** How does OptiMax work? · Who is OptiMax for? · How do I buy OptiMax? What does it cost?
 
@@ -904,7 +904,7 @@ OptiMax works in two stages:
 1. **Response Optimization** — analyzes customer data to predict response likelihood, segments audiences by engagement potential, and identifies the most effective channels
 2. **Revenue Optimization** — evaluates customer lifetime value (CLTV), identifies high-value segments, and optimizes spend for long-term financial outcomes
 
-**Links to:** `solutions.html#optimax`
+**Links to:** `products.html#optimax`
 
 **Related questions offered:** What is OptiMax? · How do I get started with OptiMax?
 
@@ -927,7 +927,7 @@ Keywords: response optimization, revenue optimization, two-stage, ltv, cltv, seg
 
 OptiMax is built for marketing teams improving performance and efficiency, business leaders aligning marketing with revenue goals, and data/analytics teams implementing AI-driven solutions — particularly in **retail, banking, telecom, and e-commerce**.
 
-**Links to:** `solutions.html#optimax`
+**Links to:** `products.html#optimax`
 
 **Related questions offered:** What is OptiMax? · How does OptiMax work?
 

@@ -281,17 +281,17 @@ header {
   border-bottom: 1px solid var(--line);
 }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 74px; }
-.logo { display: flex; align-items: center; gap: 10px; font-family: 'Sora'; font-weight: 800; font-size: 22px; }
+.logo { display: flex; flex: none; align-items: center; gap: 10px; font-family: 'Sora'; font-weight: 800; font-size: 22px; }
 /* Wordmark: "Neu" red, "Alto" in the foreground ink. --ink is near-black in
    light mode and near-white in dark, so the second half stays readable in both;
    a literal black would disappear against the dark background. */
 .logo > span { color: var(--red); }
 .logo .alto { color: var(--ink); }
 .nav-links {
-  display: flex; gap: 6px; font-size: 14px; font-weight: 500; color: var(--ink-soft);
+  display: flex; gap: 2px; font-size: 14px; font-weight: 500; color: var(--ink-soft);
   background: var(--bg-soft); border: 1px solid var(--line); border-radius: 100px; padding: 5px;
 }
-.nav-links a { padding: 7px 16px; border-radius: 100px; transition: all .25s ease; }
+.nav-links a { padding: 7px 13px; border-radius: 100px; white-space: nowrap; transition: all .25s ease; }
 .nav-links a:hover { color: var(--ink); background: var(--card); }
 .nav-links a.active { color: #fff; background: var(--red); box-shadow: 0 4px 12px rgba(220,38,38,.35); }
 .btn {
@@ -303,7 +303,7 @@ header {
 .btn-primary:hover { background: var(--red-deep); box-shadow: 0 10px 26px rgba(220,38,38,.4); }
 .btn-ghost { background: var(--card); color: var(--ink); border: 1.5px solid var(--line); }
 .btn-ghost:hover { border-color: var(--red); color: var(--red-text); }
-.nav .btn { padding: 10px 20px; font-size: 14px; }
+.nav .btn { padding: 10px 20px; font-size: 14px; white-space: nowrap; }
 
 /* ── Brand logo (transparent mark + wordmark text) ───────────────────── */
 .logo-mark-img { height: 34px; width: auto; display: block; }
@@ -348,8 +348,10 @@ body.nav-open .nav-toggle span:nth-child(3) { transform: translateY(-6px) rotate
 .mobile-nav a:hover, .mobile-nav a:active { color: var(--red-text); background: var(--bg-soft); }
 .mobile-nav .btn { margin-top: 10px; justify-content: center; }
 .mobile-nav .btn:hover { color: #fff; background: var(--red-deep); }
-@media (min-width: 981px) { .mobile-nav { display: none !important; } }
-@media (max-width: 980px) {
+/* The full nav (8 links) needs about 1120px; below that the hamburger takes over. */
+@media (min-width: 1121px) { .mobile-nav { display: none !important; } }
+@media (max-width: 1120px) {
+  .nav-links { display: none; }
   .nav-toggle { display: block; }
   .nav-cta { display: none; }
 }
@@ -1635,7 +1637,6 @@ html:has(.project-image-dialog[open]) { overflow: hidden; }
 
 /* ── Responsive ──────────────────────────────────────────────────────── */
 @media (max-width: 980px) {
-  .nav-links { display: none; }
   .bento { grid-template-columns: 1fr 1fr; }
   .spot-card.featured { grid-column: span 2; }
   .spot-card.wide { grid-column: span 2; flex-direction: column; align-items: flex-start; }

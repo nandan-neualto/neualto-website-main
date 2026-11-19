@@ -48,7 +48,8 @@ Katalyst Street (strategic partner, and the company behind DeltaMax and OptiMax)
 
 - [Home](https://neualto.com/)
 - [Services](https://neualto.com/services.html)
-- [Solutions](https://neualto.com/solutions.html)
+- [Products](https://neualto.com/products.html): DeltaMax™ and OptiMax
+- [Solutions](https://neualto.com/solutions.html): custom applications (test administration, social media, taxi hailing)
 - [DeltaMax](https://neualto.com/deltamax.html)
 - [OptiMax](https://neualto.com/optimax.html)
 - [Blog](https://neualto.com/blog.html)

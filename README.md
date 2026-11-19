@@ -27,7 +27,8 @@ Then open <http://localhost:4173>.
 | --- | --- |
 | `index.html` | Home page — the only page with the full section set |
 | `services.html` | All six service lines in detail |
-| `solutions.html` | Product overview: DeltaMax™ and OptiMax |
+| `products.html` | Product overview: DeltaMax™ and OptiMax |
+| `solutions.html` | Custom application work: test administration, social media, taxi hailing |
 | `deltamax.html` / `optimax.html` | Per-product deep dives |
 | `blog.html` | LinkedIn post feed (see *Adding a blog post*) |
 | `careers.html` | Open roles, with `JobPosting` structured data |
