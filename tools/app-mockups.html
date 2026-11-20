@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>App screen mockups</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 390px; height: 844px; overflow: hidden; }
+  body { font-family: "Segoe UI", "Inter", system-ui, -apple-system, sans-serif; color: #111827; -webkit-font-smoothing: antialiased; }
+  .screen { display: none; position: relative; width: 390px; height: 844px; overflow: hidden; background: #f6f7fb; }
+  .screen.on { display: flex; flex-direction: column; }
+  svg { display: block; }
+
+  /* status bar */
+  .status { height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 26px 0 30px; font-size: 15px; font-weight: 600; }
+  .status .icons { display: flex; gap: 6px; align-items: center; }
+  .bars { display: flex; gap: 2px; align-items: flex-end; }
+  .bars i { display: block; width: 3px; background: currentColor; border-radius: 1px; }
+  .batt { width: 25px; height: 12px; border: 1.5px solid currentColor; border-radius: 3.5px; padding: 1.5px; opacity: .9; }
+  .batt i { display: block; height: 100%; width: 75%; background: currentColor; border-radius: 1.5px; }
+  .home-ind { position: absolute; left: 50%; bottom: 8px; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: #111; opacity: .85; z-index: 20; }
+
+  /* shared bits */
+  .pad { padding: 0 20px; }
+  .h1 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .muted { color: #6b7280; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+  .card { background: #fff; border-radius: 18px; box-shadow: 0 1px 2px rgba(17,24,39,.05), 0 6px 20px rgba(17,24,39,.06); }
+  .tabbar { margin-top: auto; flex: none; height: 84px; background: #fff; border-top: 1px solid #eceef3; display: flex; justify-content: space-around; padding-top: 10px; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #9ca3af; }
+  .tab.on { color: var(--accent); }
+  .tab .ico { width: 24px; height: 24px; border-radius: 7px; border: 2.2px solid currentColor; }
+  .tab .ico.round { border-radius: 50%; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border-radius: 15px; font-size: 16px; font-weight: 700; color: #fff; background: var(--accent); box-shadow: 0 8px 20px var(--accent-shadow); }
+  .avatar { flex: none; display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 700; }
+
+  /* ── Test administration ─────────────────────────────── */
+  .exam { --accent: #4f46e5; --accent-shadow: rgba(79,70,229,.28); }
+  .exam .topbar { display: flex; align-items: center; gap: 12px; padding: 6px 20px 14px; }
+  .back { width: 36px; height: 36px; border-radius: 12px; background: #fff; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .ring { position: relative; width: 74px; height: 74px; flex: none; }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 18px; }
+  .check { display: flex; align-items: center; gap: 13px; padding: 13px 16px; border-bottom: 1px solid #f0f1f5; }
+  .check:last-child { border-bottom: 0; }
+  .check .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none; }
+  .check .t { flex: 1; }
+  .check .t b { display: block; font-size: 15px; }
+  .check .t span { font-size: 12.5px; color: #6b7280; }
+  .ok { background: #ecfdf5; color: #059669; }
+  .warn { background: #fffbeb; color: #b45309; }
+  .info { background: #eef2ff; color: #4f46e5; }
+  .offline { display: flex; align-items: center; gap: 10px; margin: 0 20px 14px; padding: 11px 14px; border-radius: 14px; background: #fef3c7; color: #92400e; font-size: 13px; font-weight: 600; }
+  .stat { flex: 1; padding: 12px 14px; }
+  .stat b { display: block; font-size: 24px; letter-spacing: -.02em; }
+  .stat span { font-size: 12px; font-weight: 600; color: #6b7280; }
+  .search { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; border-radius: 14px; background: #fff; color: #9ca3af; font-size: 15px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .cand { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f0f1f5; }
+  .cand:last-child { border-bottom: 0; }
+  .cand .t { flex: 1; }
+  .cand .t b { display: block; font-size: 15px; }
+  .cand .t span { font-size: 12.5px; color: #6b7280; }
+
+  /* ── Social ──────────────────────────────────────────── */
+  .social { --accent: #db2777; --accent-shadow: rgba(219,39,119,.25); background: #fff; }
+  .logo-word { font-size: 27px; font-weight: 800; letter-spacing: -.04em; background: linear-gradient(90deg,#7c3aed,#db2777 55%,#f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stories { display: flex; gap: 14px; padding: 14px 18px 16px; border-bottom: 1px solid #f1f1f4; }
+  .story { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11.5px; color: #4b5563; }
+  .story .rim { padding: 2.5px; border-radius: 50%; background: linear-gradient(45deg,#f59e0b,#db2777,#7c3aed); }
+  .story .rim.seen { background: #e5e7eb; }
+  .story .avatar { width: 58px; height: 58px; border: 2.5px solid #fff; font-size: 18px; }
+  .post-h { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+  .post-h b { font-size: 14.5px; }
+  .post-h span { font-size: 12px; color: #6b7280; }
+  .media { position: relative; height: 300px; overflow: hidden; }
+  .actions { display: flex; align-items: center; gap: 18px; padding: 12px 16px 6px; font-size: 13.5px; font-weight: 600; color: #374151; }
+  .actions span { display: flex; align-items: center; gap: 6px; }
+  .caption { padding: 2px 16px; font-size: 14px; line-height: 1.4; color: #1f2937; }
+  .seg { display: flex; gap: 6px; padding: 4px; margin: 6px 18px 14px; border-radius: 14px; background: #f3f4f6; }
+  .seg span { flex: 1; text-align: center; padding: 9px 0; border-radius: 10px; font-size: 14px; font-weight: 600; color: #6b7280; }
+  .seg span.on { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 18px; }
+  .vid { position: relative; height: 214px; border-radius: 16px; overflow: hidden; color: #fff; }
+  .vid .play { position: absolute; left: 12px; top: 12px; width: 30px; height: 30px; border-radius: 50%; background: rgba(0,0,0,.35); display: grid; place-items: center; }
+  .vid .meta { position: absolute; left: 12px; right: 12px; bottom: 11px; }
+  .vid .meta b { display: block; font-size: 13.5px; line-height: 1.25; text-shadow: 0 1px 4px rgba(0,0,0,.35); }
+  .vid .meta span { font-size: 11.5px; opacity: .9; }
+  .vid .dur { position: absolute; right: 10px; top: 12px; font-size: 11px; font-weight: 700; padding: 3px 7px; border-radius: 8px; background: rgba(0,0,0,.45); }
+
+  /* ── Taxi ────────────────────────────────────────────── */
+  .taxi { --accent: #111827; --accent-shadow: rgba(17,24,39,.25); background: #e9eef3; }
+  .map { position: absolute; inset: 0; }
+  .float-top { position: absolute; left: 16px; right: 16px; top: 54px; z-index: 5; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; background: #fff; border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px rgba(17,24,39,.12); padding: 10px 20px 34px; }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: #d1d5db; margin: 0 auto 14px; }
+  .route { position: relative; padding-left: 26px; }
+  .route .ln { position: absolute; left: 7px; top: 18px; bottom: 18px; width: 2px; background: repeating-linear-gradient(#cbd5e1 0 4px, transparent 4px 8px); }
+  .route .pt { position: relative; height: 46px; display: flex; align-items: center; font-size: 15px; font-weight: 600; border-radius: 12px; background: #f3f4f6; padding: 0 12px; margin-bottom: 8px; }
+  .route .pt::before { content: ""; position: absolute; left: -26px; width: 14px; height: 14px; border-radius: 50%; }
+  .route .pt.a::before { background: #10b981; box-shadow: 0 0 0 4px #d1fae5; }
+  .route .pt.b::before { background: #111827; border-radius: 3px; box-shadow: 0 0 0 4px #e5e7eb; }
+  .ride { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; border: 1.5px solid transparent; }
+  .ride.on { border-color: #111827; background: #f9fafb; }
+  .ride .car { width: 52px; height: 34px; border-radius: 9px; display: grid; place-items: center; flex: none; }
+  .ride .t { flex: 1; }
+  .ride .t b { font-size: 15px; }
+  .ride .t span { display: block; font-size: 12.5px; color: #6b7280; }
+  .ride .p { font-size: 16px; font-weight: 700; }
+  .est { display: flex; justify-content: space-between; padding: 12px 4px; font-size: 13px; color: #6b7280; }
+  .est b { color: #111827; }
+  .mini-btn { flex: 1; height: 48px; border-radius: 14px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 14px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- Inline icon strokes are drawn per use to keep each screen self-contained. -->
+
+<!-- ═════════════ 1. TEST ADMIN — venue readiness ═════════════ -->
+<section class="screen exam" id="exam-venue">
+  <div class="status"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div class="topbar">
+    <div class="back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.4" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></div>
+    <div style="flex:1"><div style="font-size:12px;font-weight:700;color:#4f46e5;letter-spacing:.06em">EXAM CENTRE · DAY 1</div><div style="font-size:19px;font-weight:700">Venue readiness</div></div>
+    <span class="chip" style="background:#eef2ff;color:#4f46e5">Hall B</span>
+  </div>
+  <div class="card pad" style="margin:0 20px 14px;padding:16px;display:flex;align-items:center;gap:16px">
+    <div class="ring"><svg width="74" height="74" viewBox="0 0 74 74"><circle cx="37" cy="37" r="31" fill="none" stroke="#eef2ff" stroke-width="8"/><circle cx="37" cy="37" r="31" fill="none" stroke="#4f46e5" stroke-width="8" stroke-linecap="round" stroke-dasharray="194.8" stroke-dashoffset="48.7" transform="rotate(-90 37 37)"/></svg><b>75%</b></div>
+    <div><div style="font-size:17px;font-weight:700">6 of 8 checks done</div><div class="muted" style="font-size:13px;margin-top:3px">Reporting time 08:30 · 120 seats</div><div style="display:flex;gap:6px;margin-top:9px"><span class="chip ok">✓ 6 passed</span><span class="chip warn">2 open</span></div></div>
+  </div>
+  <div class="offline"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 20 0M5 12.6a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0"/><path d="M3 3l18 18"/></svg>Offline · 3 photos will sync when connected</div>
+  <div class="card" style="margin:0 20px">
+    <div class="check"><div class="ic ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div><div class="t"><b>Location verified</b><span>GPS matched to the registered venue</span></div><span class="chip ok">Done</span></div>
+    <div class="check"><div class="ic ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><div class="t"><b>Power &amp; backup</b><span>Generator tested · 4 h backup</span></div><span class="chip ok">Done</span></div>
+    <div class="check"><div class="ic ok"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><div class="t"><b>Systems &amp; seating</b><span>120 desks numbered and ready</span></div><span class="chip ok">Done</span></div>
+    <div class="check"><div class="ic warn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 7l5-3 13 8-5 3z"/><path d="M8 4v12M6 20h6"/></svg></div><div class="t"><b>CCTV coverage</b><span>2 cameras still to check</span></div><span class="chip warn">Open</span></div>
+    <div class="check"><div class="ic info"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></div><div class="t"><b>Photo evidence</b><span>Entrance, hall and control room</span></div><span class="chip info">3 / 5</span></div>
+  </div>
+  <div class="pad" style="margin-top:16px"><div class="btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg>Capture evidence</div></div>
+  <div class="tabbar"><div class="tab"><div class="ico"></div>Check-in</div><div class="tab on"><div class="ico round"></div>Venue</div><div class="tab"><div class="ico"></div>Reports</div><div class="tab"><div class="ico round"></div>Profile</div></div>
+  <div class="home-ind"></div>
+</section>
+
+<!-- ═════════════ 2. TEST ADMIN — candidate check-in ═════════════ -->
+<section class="screen exam" id="exam-checkin">
+  <div class="status"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div class="pad" style="padding-top:6px;padding-bottom:14px">
+    <div style="font-size:12px;font-weight:700;color:#4f46e5;letter-spacing:.06em">SESSION 2 · 10:00 – 13:00</div>
+    <div class="h1" style="margin-top:2px">Candidate check-in</div>
+  </div>
+  <div style="display:flex;gap:10px;padding:0 20px 14px">
+    <div class="card stat"><b style="color:#059669">112</b><span>Present</span></div>
+    <div class="card stat"><b style="color:#dc2626">6</b><span>Absent</span></div>
+    <div class="card stat"><b style="color:#b45309">2</b><span>Pending</span></div>
+  </div>
+  <div class="pad" style="margin-bottom:14px"><div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Search name or roll number</div></div>
+  <div class="card" style="margin:0 20px">
+    <div class="cand"><div class="avatar" style="width:42px;height:42px;background:#6366f1">AS</div><div class="t"><b>Aarav Sharma</b><span>Roll 2104118 · Desk 14</span></div><span class="chip ok">✓ Verified</span></div>
+    <div class="cand"><div class="avatar" style="width:42px;height:42px;background:#0ea5e9">DK</div><div class="t"><b>Diya Kulkarni</b><span>Roll 2104119 · Desk 15</span></div><span class="chip ok">✓ Verified</span></div>
+    <div class="cand"><div class="avatar" style="width:42px;height:42px;background:#f59e0b">RN</div><div class="t"><b>Rohan Nair</b><span>Roll 2104120 · Desk 16</span></div><span class="chip warn">Photo check</span></div>
+    <div class="cand"><div class="avatar" style="width:42px;height:42px;background:#10b981">MI</div><div class="t"><b>Meera Iyer</b><span>Roll 2104121 · Desk 17</span></div><span class="chip ok">✓ Verified</span></div>
+    <div class="cand"><div class="avatar" style="width:42px;height:42px;background:#a855f7">KR</div><div class="t"><b>Kabir Rao</b><span>Roll 2104122 · Desk 18</span></div><span class="chip" style="background:#f3f4f6;color:#6b7280">Not arrived</span></div>
+  </div>
+  <div class="pad" style="margin-top:16px"><div class="btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>Scan admit card</div></div>
+  <div class="tabbar"><div class="tab on"><div class="ico"></div>Check-in</div><div class="tab"><div class="ico round"></div>Venue</div><div class="tab"><div class="ico"></div>Reports</div><div class="tab"><div class="ico round"></div>Profile</div></div>
+  <div class="home-ind"></div>
+</section>
+
+<!-- ═════════════ 3. SOCIAL — home feed ═════════════ -->
+<section class="screen social" id="social-feed">
+  <div class="status"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 18px 4px">
+    <span class="logo-word">circle</span>
+    <span style="display:flex;gap:16px"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z"/></svg><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linejoin="round"><path d="M21 4L3 11l7 3 3 7z"/><path d="M10 14l5-5"/></svg></span>
+  </div>
+  <div class="stories">
+    <div class="story"><div class="rim"><div class="avatar" style="background:#f472b6">You</div></div>Your story</div>
+    <div class="story"><div class="rim"><div class="avatar" style="background:#8b5cf6">JL</div></div>jordan.l</div>
+    <div class="story"><div class="rim"><div class="avatar" style="background:#0ea5e9">PR</div></div>priya.r</div>
+    <div class="story"><div class="rim seen"><div class="avatar" style="background:#f59e0b">MC</div></div>maya.c</div>
+    <div class="story"><div class="rim seen"><div class="avatar" style="background:#10b981">TB</div></div>theo.b</div>
+  </div>
+  <div class="post-h"><div class="avatar" style="width:38px;height:38px;background:#8b5cf6;font-size:14px">JL</div><div style="flex:1"><b>Jordan Lee</b><br><span>Lakeside trail · 2h</span></div><svg width="22" height="22" viewBox="0 0 24 24" fill="#6b7280"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></div>
+  <div class="media">
+    <svg width="390" height="300" viewBox="0 0 390 300" preserveAspectRatio="xMidYMid slice">
+      <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbcfe8"/><stop offset=".55" stop-color="#fde68a"/><stop offset="1" stop-color="#fed7aa"/></linearGradient><linearGradient id="lake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#0369a1"/></linearGradient></defs>
+      <rect width="390" height="300" fill="url(#sky)"/>
+      <circle cx="268" cy="118" r="34" fill="#fff7ed" opacity=".95"/>
+      <path d="M0 175 L70 105 L120 150 L185 80 L260 160 L310 120 L390 170 V300 H0Z" fill="#a78bfa" opacity=".75"/>
+      <path d="M0 195 L90 140 L150 180 L230 128 L300 185 L390 150 V300 H0Z" fill="#7c3aed" opacity=".8"/>
+      <rect y="205" width="390" height="95" fill="url(#lake)"/>
+      <path d="M40 232h70M160 250h110M60 272h90M250 280h80" stroke="#e0f2fe" stroke-width="3" stroke-linecap="round" opacity=".7"/>
+    </svg>
+    <span class="chip" style="position:absolute;right:12px;top:12px;background:rgba(17,24,39,.55);color:#fff">1 / 4</span>
+  </div>
+  <div class="actions">
+    <span style="color:#db2777"><svg width="23" height="23" viewBox="0 0 24 24" fill="#db2777"><path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z"/></svg>2,481</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>148</span>
+    <span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"><path d="M21 4L3 11l7 3 3 7z"/></svg>Share</span>
+    <span style="margin-left:auto"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+  </div>
+  <div class="caption"><b>jordan.l</b> Golden hour never misses. Who's in for the sunrise hike next weekend? 🌄</div>
+  <div class="caption muted" style="font-size:13px;margin-top:4px">View all 148 comments</div>
+  <div class="tabbar" style="--accent:#111827"><div class="tab on"><div class="ico"></div>Home</div><div class="tab"><div class="ico round"></div>Explore</div><div class="tab"><div class="ico"></div>Create</div><div class="tab"><div class="ico round"></div>Inbox</div><div class="tab"><div class="ico round"></div>Profile</div></div>
+  <div class="home-ind"></div>
+</section>
+
+<!-- ═════════════ 4. SOCIAL — video discovery ═════════════ -->
+<section class="screen social" id="social-videos">
+  <div class="status"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div class="pad" style="padding-top:4px;display:flex;align-items:center;justify-content:space-between"><div class="h1">Videos</div><div class="avatar" style="width:36px;height:36px;background:#f472b6;font-size:13px">You</div></div>
+  <div class="seg"><span>Latest</span><span class="on">Popular</span><span>My videos</span></div>
+  <div class="grid">
+    <div class="vid" style="background:linear-gradient(160deg,#f472b6,#7c3aed)"><div class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"/></svg></div><span class="dur">0:42</span><svg style="position:absolute;left:0;bottom:46px" width="176" height="90" viewBox="0 0 176 90"><circle cx="120" cy="30" r="20" fill="#fde68a" opacity=".9"/><path d="M0 90 L50 40 L90 75 L130 35 L176 80 V90Z" fill="#fff" opacity=".22"/></svg><div class="meta"><b>Street food tour, part 3</b><span>212K views</span></div></div>
+    <div class="vid" style="background:linear-gradient(160deg,#38bdf8,#1e3a8a)"><div class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"/></svg></div><span class="dur">1:08</span><svg style="position:absolute;left:0;bottom:46px" width="176" height="90" viewBox="0 0 176 90"><path d="M0 70 Q44 40 88 70 T176 70 V90 H0Z" fill="#fff" opacity=".28"/><path d="M0 80 Q44 55 88 80 T176 80 V90 H0Z" fill="#fff" opacity=".35"/></svg><div class="meta"><b>Morning surf check</b><span>98K views</span></div></div>
+    <div class="vid" style="background:linear-gradient(160deg,#fb923c,#be123c)"><div class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"/></svg></div><span class="dur">0:27</span><svg style="position:absolute;left:44px;top:62px" width="90" height="90" viewBox="0 0 90 90"><rect x="15" y="20" width="60" height="44" rx="8" fill="#fff" opacity=".3"/><circle cx="45" cy="42" r="13" fill="#fff" opacity=".5"/></svg><div class="meta"><b>60-second pasta</b><span>1.4M views</span></div></div>
+    <div class="vid" style="background:linear-gradient(160deg,#34d399,#0f766e)"><div class="play"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M7 4.5v15l12-7.5z"/></svg></div><span class="dur">2:15</span><svg style="position:absolute;left:0;bottom:46px" width="176" height="100" viewBox="0 0 176 100"><path d="M30 100 L60 30 L90 100Z M80 100 L118 20 L156 100Z" fill="#fff" opacity=".25"/></svg><div class="meta"><b>Weekend trail run</b><span>67K views</span></div></div>
+    <div class="vid" style="background:linear-gradient(160deg,#a78bfa,#312e81);height:110px"><span class="dur">0:51</span></div>
+    <div class="vid" style="background:linear-gradient(160deg,#facc15,#ea580c);height:110px"><span class="dur">1:32</span></div>
+  </div>
+  <div class="tabbar" style="--accent:#111827"><div class="tab"><div class="ico"></div>Home</div><div class="tab on"><div class="ico round"></div>Explore</div><div class="tab"><div class="ico"></div>Create</div><div class="tab"><div class="ico round"></div>Inbox</div><div class="tab"><div class="ico round"></div>Profile</div></div>
+  <div class="home-ind"></div>
+</section>
+
+<!-- ═════════════ shared map art for the taxi screens ═════════════ -->
+<template id="map-art">
+  <svg class="map" width="390" height="844" viewBox="0 0 390 844">
+    <rect width="390" height="844" fill="#e8edf2"/>
+    <rect x="22" y="70" width="120" height="150" rx="10" fill="#dbe6d3"/>
+    <rect x="250" y="250" width="120" height="110" rx="10" fill="#dbe6d3"/>
+    <path d="M0 600 Q120 560 200 610 T390 590 V844 H0Z" fill="#cfe3f2"/>
+    <g stroke="#fff" stroke-linecap="round">
+      <path d="M-10 240 H400 M-10 410 H400 M-10 520 H400" stroke-width="16"/>
+      <path d="M90 -10 V860 M210 -10 V860 M320 -10 V860" stroke-width="16"/>
+      <path d="M-10 120 L400 330" stroke-width="11"/>
+      <path d="M150 -10 V230 M260 410 V860 M30 410 V860" stroke-width="8"/>
+      <path d="M-10 320 H210 M210 160 H400 M90 470 H320" stroke-width="8"/>
+    </g>
+  </svg>
+</template>
+
+<!-- ═════════════ 5. TAXI — booking & fare estimate ═════════════ -->
+<section class="screen taxi" id="taxi-book">
+  <div data-map></div>
+  <svg class="map" style="z-index:2" width="390" height="844" viewBox="0 0 390 844">
+    <path d="M90 320 H210 V240 H320 V170" fill="none" stroke="#111827" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="320" r="11" fill="#10b981" stroke="#fff" stroke-width="4"/>
+    <rect x="309" y="158" width="22" height="22" rx="5" fill="#111827" stroke="#fff" stroke-width="4"/>
+    <g transform="translate(224 266)"><rect width="74" height="26" rx="13" fill="#111827"/><text x="37" y="17.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="Segoe UI, sans-serif">22 min</text></g>
+  </svg>
+  <div class="status" style="position:relative;z-index:3"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div style="font-size:19px;font-weight:700;margin-bottom:12px">Choose a ride</div>
+    <div class="route"><span class="ln"></span><div class="pt a">MG Road Metro Station</div><div class="pt b">Tech Park, Gate 2</div></div>
+    <div class="ride on" style="margin-top:6px"><div class="car" style="background:#fef3c7"><svg width="34" height="20" viewBox="0 0 34 20"><path d="M4 13 L7 6 Q8 4 10 4 H24 Q26 4 27 6 L30 13 V16 H4Z" fill="#f59e0b"/><circle cx="10" cy="16" r="3" fill="#111827"/><circle cx="24" cy="16" r="3" fill="#111827"/></svg></div><div class="t"><b>Mini</b><span>4 seats · 3 min away</span></div><div class="p">₹186</div></div>
+    <div class="ride"><div class="car" style="background:#e0e7ff"><svg width="34" height="20" viewBox="0 0 34 20"><path d="M2 13 L6 6 Q7 4 9 4 H25 Q27 4 28 6 L32 13 V16 H2Z" fill="#6366f1"/><circle cx="9" cy="16" r="3" fill="#111827"/><circle cx="25" cy="16" r="3" fill="#111827"/></svg></div><div class="t"><b>Sedan</b><span>4 seats · 5 min away</span></div><div class="p">₹242</div></div>
+    <div class="ride"><div class="car" style="background:#dcfce7"><svg width="34" height="20" viewBox="0 0 34 20"><path d="M3 13 L5 5 Q6 3 8 3 H26 Q28 3 29 5 L31 13 V16 H3Z" fill="#10b981"/><circle cx="9" cy="16" r="3" fill="#111827"/><circle cx="25" cy="16" r="3" fill="#111827"/></svg></div><div class="t"><b>Shared</b><span>Up to 2 seats · save 35%</span></div><div class="p">₹121</div></div>
+    <div class="est"><span>Distance <b>7.4 km</b></span><span>Time <b>22 min</b></span><span>Pay <b>•••• 4242</b></span></div>
+    <div class="btn">Book Mini</div>
+  </div>
+  <div class="home-ind" style="z-index:30"></div>
+</section>
+
+<!-- ═════════════ 6. TAXI — live trip ═════════════ -->
+<section class="screen taxi" id="taxi-trip">
+  <div data-map></div>
+  <svg class="map" style="z-index:2" width="390" height="844" viewBox="0 0 390 844">
+    <path d="M210 282 V240 H320 V170" fill="none" stroke="#111827" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M90 320 H210 V282" fill="none" stroke="#94a3b8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 10"/>
+    <rect x="309" y="158" width="22" height="22" rx="5" fill="#111827" stroke="#fff" stroke-width="4"/>
+    <circle cx="210" cy="282" r="26" fill="#f59e0b" opacity=".18"/>
+    <g transform="translate(196 266)"><rect width="28" height="32" rx="9" fill="#111827"/><rect x="5" y="6" width="18" height="8" rx="3" fill="#fbbf24"/><rect x="5" y="19" width="18" height="7" rx="2" fill="#374151"/></g>
+  </svg>
+  <div class="status" style="position:relative;z-index:3"><span>9:41</span><span class="icons"><span class="bars"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span><span class="batt"><i></i></span></span></div>
+  <div class="float-top card" style="padding:14px 16px;display:flex;align-items:center;gap:12px">
+    <div style="width:40px;height:40px;border-radius:12px;background:#ecfdf5;display:grid;place-items:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.4" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg></div>
+    <div><div style="font-size:16px;font-weight:700">On the way to Tech Park</div><div class="muted" style="font-size:13px">Arriving 9:58 · 3.1 km left</div></div>
+  </div>
+  <div class="sheet">
+    <div class="grab"></div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="avatar" style="width:52px;height:52px;background:#f59e0b;font-size:18px">VK</div>
+      <div style="flex:1"><div style="font-size:17px;font-weight:700">Vikram K.</div><div class="muted" style="font-size:13px">★ 4.9 · 2,340 trips</div></div>
+      <div style="text-align:right"><div style="font-size:15px;font-weight:700;letter-spacing:.04em">KA 05 MX 2217</div><div class="muted" style="font-size:12.5px">White sedan</div></div>
+    </div>
+    <div style="margin:16px 0 6px;height:8px;border-radius:4px;background:#f3f4f6;overflow:hidden"><div style="width:58%;height:100%;border-radius:4px;background:linear-gradient(90deg,#10b981,#f59e0b)"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#6b7280;margin-bottom:16px"><span>Picked up 9:36</span><span><b style="color:#111827">12 min</b> to destination</span></div>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div class="mini-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call</div>
+      <div class="mini-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.2" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/></svg>Message</div>
+      <div class="mini-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:#f9fafb;font-size:14px"><span>Fare (Mini)</span><b>₹186 · Card</b></div>
+  </div>
+  <div class="home-ind" style="z-index:30"></div>
+</section>
+
+<script>
+  var art = document.getElementById('map-art');
+  document.querySelectorAll('[data-map]').forEach(function (slot) { slot.replaceWith(art.content.cloneNode(true)); });
+  var id = new URLSearchParams(location.search).get('s') || 'exam-venue';
+  document.getElementById(id).classList.add('on');
+</script>
+</body>
+</html>

@@ -19,20 +19,20 @@ The six images below are unchanged source files, selected because they do not di
 - Ride booking and estimate: https://api.appilytech.com/uploads/rider_cost_time_estimate_b92d67c660.PNG
 - Live trip tracking: https://api.appilytech.com/uploads/driver_track_trip_4958a9cda4.PNG
 
-## Stock photos (2026-11-16)
+## Illustrative app screens (2026-11-20)
 
-The app screenshots above were replaced on the solutions page with generic stock photos, at the user's request. The six PNG screenshots were removed from `pics/projects/`. Each photo below is free under the Unsplash License (commercial use, no attribution required); licence checked on each photo page. They are cropped to 3:4 portrait, 900x1200 WebP.
+The solutions page shows **generated, illustrative mockups** of each app, not real screenshots and not stock photography (the client screenshots were removed on 2026-11-16, and the interim Unsplash photos on 2026-11-20, both at the user's request). The page labels them "Illustrative screens".
 
-| Project | Local file | Unsplash photo | Photographer |
-| --- | --- | --- | --- |
-| Test Administration Software | `pics/projects/test-admin-exam-hall.webp` | https://unsplash.com/photos/v3P_spLsOH0 | Vishnu Mehra |
-| Test Administration Software | `pics/projects/test-admin-venue.webp` | https://unsplash.com/photos/PDRFeeDniCk | Ivan Aleksic |
-| Social Media App | `pics/projects/social-app-scrolling.webp` | https://unsplash.com/photos/5nmf-0oW2Mg | Swello |
-| Social Media App | `pics/projects/social-app-feed.webp` | https://unsplash.com/photos/CkYIMdehoX4 | Swello |
-| Taxi Hailing App | `pics/projects/taxi-app-hailing.webp` | https://unsplash.com/photos/DyHgVjHrElY | Vitaly Gariev |
-| Taxi Hailing App | `pics/projects/taxi-app-night.webp` | https://unsplash.com/photos/yoTlBlXWy4s | Brayden Goh |
+They are drawn in HTML/CSS in `tools/app-mockups.html` - no third-party images, fonts or brands - and rendered at 390x844 @2x to 780x1688 WebP (quality 90). All names, numbers, places and the "circle" app name are invented placeholders. To change a screen, edit that file, open it with `?s=<screen id>` in a 390px-wide browser window at 2x, screenshot, and convert to WebP.
 
-The night-taxi photo is cropped to leave out the taxi operator's name and logo on the door, so the page does not imply that operator was a client.
+| Project | Local file | Screen id |
+| --- | --- | --- |
+| Test Administration Software | `pics/projects/test-admin-venue-screen.webp` | `exam-venue` |
+| Test Administration Software | `pics/projects/test-admin-checkin-screen.webp` | `exam-checkin` |
+| Social Media App | `pics/projects/social-app-feed-screen.webp` | `social-feed` |
+| Social Media App | `pics/projects/social-app-videos-screen.webp` | `social-videos` |
+| Taxi Hailing App | `pics/projects/taxi-app-booking-screen.webp` | `taxi-book` |
+| Taxi Hailing App | `pics/projects/taxi-app-trip-screen.webp` | `taxi-trip` |
 
 ## Copy boundaries
 

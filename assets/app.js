@@ -1237,10 +1237,10 @@
         var caption = $('figcaption', link.parentElement);
         image.src = link.href;
         image.alt = thumbnail.alt;
-        title.textContent = caption ? caption.textContent : 'Project photo';
+        title.textContent = caption ? caption.textContent : 'App screen';
         original.href = link.href;
         counter.textContent = (currentIndex + 1) + ' / ' + galleryLinks.length;
-        counter.setAttribute('aria-label', 'Photo ' + (currentIndex + 1) + ' of ' + galleryLinks.length);
+        counter.setAttribute('aria-label', 'Screen ' + (currentIndex + 1) + ' of ' + galleryLinks.length);
         previous.disabled = next.disabled = galleryLinks.length < 2;
         dialog.scrollTop = 0;
       }
